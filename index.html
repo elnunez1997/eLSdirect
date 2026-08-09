@@ -724,39 +724,33 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
         <!-- Step 1: Type cards -->
         <div style="margin-bottom:20px">
           <div class="lb-section-label" style="margin-top:0">Step 1 — Choose Letter Type</div>
-          <div id="lb-type-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:6px">
-            <div class="lb-type-card" data-type="repay_standard" onclick="lbSelectCard(this,'repay_standard')">
-              <div class="lb-type-card-title">Standard Repay</div>
-              <div class="lb-type-card-sub">General invalid deduction request</div>
-            </div>
-            <div class="lb-type-card" data-type="repay_duplicate" onclick="lbSelectCard(this,'repay_duplicate')">
-              <div class="lb-type-card-title">Duplicate Deduction</div>
-              <div class="lb-type-card-sub">Already resolved / reimbursed</div>
-            </div>
-            <div class="lb-type-card" data-type="repay_outside_dates" onclick="lbSelectCard(this,'repay_outside_dates')">
-              <div class="lb-type-card-title">Outside Deal Dates</div>
-              <div class="lb-type-card-sub">Deduction outside promo period</div>
-            </div>
-            <div class="lb-type-card" data-type="repay_no_proof" onclick="lbSelectCard(this,'repay_no_proof')">
-              <div class="lb-type-card-title">No Proof of Performance</div>
-              <div class="lb-type-card-sub">No supporting documentation</div>
-            </div>
-            <div class="lb-type-card" data-type="repay_shortages" onclick="lbSelectCard(this,'repay_shortages')">
-              <div class="lb-type-card-title">Shortages</div>
-              <div class="lb-type-card-sub">Full delivery confirmed via BOL</div>
-            </div>
-            <div class="lb-type-card" data-type="repay_freight" onclick="lbSelectCard(this,'repay_freight')">
-              <div class="lb-type-card-title">Freight</div>
-              <div class="lb-type-card-sub">Unauthorized freight deduction</div>
-            </div>
-            <div class="lb-type-card" data-type="repay_wrong_amount" onclick="lbSelectCard(this,'repay_wrong_amount')">
-              <div class="lb-type-card-title">Wrong Allowance Amount</div>
-              <div class="lb-type-card-sub">Deducted more than authorized</div>
-            </div>
-            <div class="lb-type-card" data-type="freeform" onclick="lbSelectCard(this,'freeform')">
-              <div class="lb-type-card-title">✏️ Free-Form</div>
-              <div class="lb-type-card-sub">Write your own letter</div>
-            </div>
+          <div id="lb-type-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px">
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_standard')"><div class="lb-type-card-title">Standard Repay</div><div class="lb-type-card-sub">General invalid deduction</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_allow_shorted')"><div class="lb-type-card-title">Allow. Shorted Product</div><div class="lb-type-card-sub">Allowance on shorted units</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_bracket_pricing')"><div class="lb-type-card-title">Bracket Pricing</div><div class="lb-type-card-sub">Invalid bracket pricing tier</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_cash_discount')"><div class="lb-type-card-title">Cash Discount</div><div class="lb-type-card-sub">Discount not in agreement</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_duplicate')"><div class="lb-type-card-title">Duplicate Deduction</div><div class="lb-type-card-sub">Already resolved / reimbursed</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_floorstock')"><div class="lb-type-card-title">Floorstock / Late Deal</div><div class="lb-type-card-sub">Late deal notification issue</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_freight')"><div class="lb-type-card-title">Freight</div><div class="lb-type-card-sub">Unauthorized freight deduction</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_invalid_audit')"><div class="lb-type-card-title">Invalid Audit</div><div class="lb-type-card-sub">Audit findings not valid</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_invalid_cash')"><div class="lb-type-card-title">Invalid Cash</div><div class="lb-type-card-sub">Unauthorized cash deduction</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_no_backup')"><div class="lb-type-card-title">No Backup Provided</div><div class="lb-type-card-sub">Missing supporting docs</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_no_proof')"><div class="lb-type-card-title">No Proof of Performance</div><div class="lb-type-card-sub">No promo execution evidence</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_not_on_deal')"><div class="lb-type-card-title">Not on Deal</div><div class="lb-type-card-sub">Product not in active deal</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_oinr')"><div class="lb-type-card-title">Off Invoice Received</div><div class="lb-type-card-sub">OI received in error</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_other')"><div class="lb-type-card-title">Other</div><div class="lb-type-card-sub">General repay request</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_outside_dates')"><div class="lb-type-card-title">Outside Deal Dates</div><div class="lb-type-card-sub">Outside promo period</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_policy')"><div class="lb-type-card-title">Policy vs Policy</div><div class="lb-type-card-sub">Against policy conflict</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_price_protection')"><div class="lb-type-card-title">Price Protection</div><div class="lb-type-card-sub">No approved price event</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_pu_allowance')"><div class="lb-type-card-title">PU Allow. on Delivered</div><div class="lb-type-card-sub">Pickup allow. — product delivered</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_retail_merch')"><div class="lb-type-card-title">Retail Merchandising</div><div class="lb-type-card-sub">No approved merch program</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_returns')"><div class="lb-type-card-title">Returns</div><div class="lb-type-card-sub">Return not authorized / matched</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_shortages')"><div class="lb-type-card-title">Shortages</div><div class="lb-type-card-sub">Full delivery confirmed via BOL</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_wrong_amount')"><div class="lb-type-card-title">Wrong Allow. Amount</div><div class="lb-type-card-sub">Deducted more than authorized</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_wrong_type_bb')"><div class="lb-type-card-title">Wrong Allow. Type — BB</div><div class="lb-type-card-sub">Incorrect bill back type</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_wrong_type_scan')"><div class="lb-type-card-title">Wrong Allow. Type — Scan</div><div class="lb-type-card-sub">Incorrect scan type</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'repay_wrong_pricing')"><div class="lb-type-card-title">Wrong Pricing</div><div class="lb-type-card-sub">Incorrect price applied</div></div>
+            <div class="lb-type-card" onclick="lbSelectCard(this,'freeform')"><div class="lb-type-card-title">✏️ Free-Form</div><div class="lb-type-card-sub">Write your own letter</div></div>
           </div>
           <input type="hidden" id="lb-type" value="">
         </div>

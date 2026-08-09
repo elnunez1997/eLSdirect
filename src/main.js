@@ -1116,12 +1116,23 @@ function lbLoadTemplate() {
 }
 
 function lbUpdatePreview() {
+  /* clear all input fields */
+  ["lb-to","lb-company","lb-claim","lb-amount","lb-customer","lb-from"].forEach(function(id){
+    document.getElementById(id).value = "";
+  });
+  /* reset editor */
   var type = document.getElementById("lb-type").value;
-  if (!type || type === "freeform") return;
+  if (!type || type === "freeform") {
+    document.getElementById("lb-editor").value = "";
+    document.getElementById("lb-copilot-out").innerHTML = '<div class="cop-item" style="color:#9ab4cc;font-style:italic">Fields cleared. Fill in details and the letter will update.</div>';
+    document.getElementById("lb-dl-hint").textContent = "";
+    return;
+  }
   var tpl = LB_TEMPLATES[type];
   if (!tpl) return;
   var fields = lbGetFields();
   document.getElementById("lb-editor").value = lbFill(tpl, fields);
+  document.getElementById("lb-dl-hint").textContent = "";
   lbCopilotAnalyze();
 }
 
@@ -1224,11 +1235,11 @@ function lbDownload() {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(16);
   doc.setFont("helvetica","bold");
-  doc.text("eLS - Enhanced Link Support", 36, 33);
+  doc.text("J.M. Smucker Company", 36, 33);
   doc.setFontSize(9);
   doc.setFont("helvetica","normal");
   doc.setTextColor(154, 180, 204);
-  doc.text("Invalid Claims & Repay Management  -  Internal Use Only", 36, 46);
+  doc.text("Acosta Sales & Marketing  -  Repay Management", 36, 46);
 
   /* ── meta line ── */
   doc.setFontSize(9);
@@ -1258,7 +1269,7 @@ function lbDownload() {
   doc.line(36, pageHeight - 36, 576, pageHeight - 36);
   doc.setFontSize(8);
   doc.setTextColor(154, 180, 204);
-  doc.text("eLS - Enhanced Link Support  -  IBM Acosta  -  Confidential", 36, pageHeight - 20);
+  doc.text("J.M. Smucker Company  -  Acosta Sales & Marketing  -  Repay Management  -  Confidential", 36, pageHeight - 20);
 
   doc.save(filename);
   hint.textContent = "Downloaded: " + filename;

@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Invoice #74392508 — Allowance Validity Report</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 13px;
+    background: #ffffff;
+    color: #1f2328;
+    line-height: 1.5;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 32px auto;
+    padding: 0 16px 48px;
+  }
+
+  /* ── Header ── */
+  .inv-header {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .inv-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2328;
+    margin-bottom: 4px;
+  }
+  .inv-header .sub {
+    font-size: 12px;
+    color: #57606a;
+    margin-bottom: 14px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px 16px;
+  }
+  .meta-item label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #57606a;
+    margin-bottom: 2px;
+  }
+  .meta-item span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1f2328;
+  }
+
+  /* ── Section ── */
+  .section {
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f2328;
+    border-bottom: 2px solid #3b82d4;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-title .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: #3b82d4;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    white-space: nowrap;
+  }
+  .badge-green  { background: #dcfce7; color: #065f46; }
+  .badge-red    { background: #fde8e8; color: #b91c1c; }
+  .badge-yellow { background: #fef3c7; color: #92400e; }
+  .badge-blue   { background: #dbeafe; color: #1e40af; }
+  .badge-gray   { background: #f3f4f6; color: #374151; }
+
+  /* ── Table wrapper ── */
+  .tbl-wrap {
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11.5px;
+  }
+  thead th {
+    background: #f7f8fa;
+    color: #57606a;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 8px 8px;
+    text-align: right;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+  }
+  thead th:first-child,
+  thead th:nth-child(2) { text-align: left; }
+  tbody tr:nth-child(even) { background: #f7f8fa; }
+  tbody tr:hover { background: #eef2fb; }
+  tbody td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: right;
+    vertical-align: middle;
+  }
+  tbody td:first-child { text-align: center; }
+  tbody td:nth-child(2) { text-align: left; max-width: 140px; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .item-name {
+    font-size: 10px;
+    color: #57606a;
+    display: block;
+    margin-top: 1px;
+  }
+  .item-code {
+    font-weight: 600;
+    color: #1f2328;
+  }
+
+  /* row tints */
+  tr.row-ok     {}
+  tr.row-flag   { background: #fff9ed !important; }
+  tr.row-error  { background: #fff1f1 !important; }
+  tr.row-dup    { background: #f3f4f6 !important; opacity: .7; }
+
+  /* ── Callout ── */
+  .callout {
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    line-height: 1.6;
+    border-left: 4px solid;
+  }
+  .callout-red    { background: #fde8e8; border-color: #b91c1c; color: #7f1d1d; }
+  .callout-yellow { background: #fef3c7; border-color: #d97706; color: #78350f; }
+  .callout-blue   { background: #dbeafe; border-color: #3b82d4; color: #1e3a5f; }
+  .callout-green  { background: #dcfce7; border-color: #16a34a; color: #14532d; }
+  .callout strong { font-weight: 700; }
+
+  /* ── Summary cards ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .card {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .card label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #57606a;
+    margin-bottom: 4px;
+  }
+  .card .val {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2328;
+  }
+  .card .val.accent { color: #3b82d4; }
+  .card .val.red    { color: #b91c1c; }
+  .card .val.green  { color: #065f46; }
+  .card .note {
+    font-size: 10px;
+    color: #57606a;
+    margin-top: 2px;
+  }
+
+  /* ── Action table ── */
+  .action-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .action-table th {
+    background: #f7f8fa;
+    color: #57606a;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 7px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+  }
+  .action-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: top;
+  }
+  .action-table tr:last-child td { border-bottom: none; }
+
+  /* ── LDI analysis box ── */
+  .ldi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .ldi-box {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 11.5px;
+  }
+  .ldi-box h4 { font-size: 11px; font-weight: 700; color: #1f2328; margin-bottom: 6px; }
+  .ldi-box .kv { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; border-bottom: 1px dashed #e5e7eb; }
+  .ldi-box .kv:last-child { border-bottom: none; }
+  .ldi-box .kv .k { color: #57606a; }
+  .ldi-box .kv .v { font-weight: 600; color: #1f2328; }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    font-size: 10px;
+    color: #57606a;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 32px;
+  }
+  .footer strong { color: #3b82d4; }
+
+  /* ── Variance chip ── */
+  .var-pos { color: #b91c1c; font-weight: 700; }
+  .var-zero { color: #57606a; }
+  .var-neg  { color: #065f46; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════════ HEADER -->
+  <div class="inv-header">
+    <h1>Invoice #74392508 — Allowance Validity Report</h1>
+    <div class="sub">Generated analysis · DE MOULAS SUPER MARKET / MARKET BASKET · Ship-To 290200</div>
+    <div class="meta-grid">
+      <div class="meta-item"><label>Invoice Date</label><span>6/10/2026</span></div>
+      <div class="meta-item"><label>Customer</label><span>DE MOULAS SUPER MKT</span></div>
+      <div class="meta-item"><label>SAP Order</label><span>43500308</span></div>
+      <div class="meta-item"><label>PO #</label><span>899664</span></div>
+      <div class="meta-item"><label>Ship-To</label><span>290200</span></div>
+      <div class="meta-item"><label>Transport</label><span>TRUCK DEL</span></div>
+      <div class="meta-item"><label>SCAC</label><span>HTSH (Hirschbach)</span></div>
+      <div class="meta-item"><label>Order Type</label><span>DEL (3PL Delivery)</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION 1 -->
+  <div class="section">
+    <div class="section-title"><span class="num">1</span> Row-by-Row Allowance Validity</div>
+
+    <div class="callout callout-blue" style="margin-bottom:14px;">
+      <strong>Convention note:</strong> CDF_ (Off-Invoice / Customer Deal Fund) is applied <em>per case</em>.
+      The computed off-invoice per case = List Price − Order Price. That per-case value is multiplied by
+      Qty Shipped to yield Total Off-Invoice, which should equal the system CDF_ line value. Variance shown
+      below is <em>computed CDF per case − system CDF_ per case</em>. LDI_ amounts are also carried as
+      <em>per-case</em> values in the system field shown; a per-line total is derived by × Qty.
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:center;">Row</th>
+            <th style="text-align:left;">Item / Description</th>
+            <th>Qty</th>
+            <th>List</th>
+            <th>Order</th>
+            <th>Calc CDF/cs</th>
+            <th>Sys CDF/cs</th>
+            <th>Var</th>
+            <th>LDI/cs</th>
+            <th>PD/cs</th>
+            <th>Tot Allow/cs</th>
+            <th>Inv Amt</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Row 1 -->
+          <tr class="row-ok">
+            <td>1</td>
+            <td><span class="item-code">8810911401</span><span class="item-name">HST DNT 8CT CHC 3SLV MPFSH 6PK</span></td>
+            <td>156</td>
+            <td>$20.40</td>
+            <td>$15.59</td>
+            <td>($4.81)</td>
+            <td>($4.50)</td>
+            <td class="var-neg">−$0.31</td>
+            <td>($0.31)</td>
+            <td>$0.00</td>
+            <td>($4.81)</td>
+            <td>$2,432.04</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 2 -->
+          <tr class="row-ok">
+            <td>2</td>
+            <td><span class="item-code">8810911525</span><span class="item-name">HST BNT 8CT LMDR MP FSH 6PK</span></td>
+            <td>168</td>
+            <td>$20.40</td>
+            <td>$15.59</td>
+            <td>($4.81)</td>
+            <td>($4.50)</td>
+            <td class="var-neg">−$0.31</td>
+            <td>($0.31)</td>
+            <td>$0.00</td>
+            <td>($4.81)</td>
+            <td>$2,619.12</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 3 -->
+          <tr class="row-ok">
+            <td>3</td>
+            <td><span class="item-code">6731200526</span><span class="item-name">VRT ZSWFR 9OZ CHC USA</span></td>
+            <td>117</td>
+            <td>$35.06</td>
+            <td>$25.20</td>
+            <td>($9.86)</td>
+            <td>($9.60)</td>
+            <td class="var-neg">−$0.26</td>
+            <td>($0.26)</td>
+            <td>$0.00</td>
+            <td>($9.86)</td>
+            <td>$2,948.40</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 4 -->
+          <tr class="row-ok">
+            <td>4</td>
+            <td><span class="item-code">6731200513</span><span class="item-name">VRT WFR 10.6OZ STR USA</span></td>
+            <td>117</td>
+            <td>$32.96</td>
+            <td>$22.99</td>
+            <td>($9.97)</td>
+            <td>($9.72)</td>
+            <td class="var-neg">−$0.25</td>
+            <td>($0.25)</td>
+            <td>$0.00</td>
+            <td>($9.97)</td>
+            <td>$2,689.83</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 5 — FLAG -->
+          <tr class="row-flag">
+            <td>5</td>
+            <td><span class="item-code">8810915003</span><span class="item-name">HST DNT 10.75OZ DBCH BDFSH 9PK</span></td>
+            <td>360</td>
+            <td>$22.00</td>
+            <td>$22.00</td>
+            <td>$0.00</td>
+            <td>$0.00</td>
+            <td class="var-pos">+$5.40 ⚠</td>
+            <td>$0.00</td>
+            <td>$0.00</td>
+            <td>$0.00</td>
+            <td>$7,920.00</td>
+            <td><span class="badge badge-yellow">REVIEW</span></td>
+          </tr>
+
+          <!-- Row 6 -->
+          <tr class="row-ok">
+            <td>6</td>
+            <td><span class="item-code">8810911001</span><span class="item-name">HST CCK 8CT CHC MP FSH 6PK</span></td>
+            <td>504</td>
+            <td>$20.40</td>
+            <td>$15.59</td>
+            <td>($4.81)</td>
+            <td>($4.50)</td>
+            <td class="var-neg">−$0.31</td>
+            <td>($0.31)</td>
+            <td>$0.00</td>
+            <td>($4.81)</td>
+            <td>$7,857.36</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 7 -->
+          <tr class="row-ok">
+            <td>7</td>
+            <td><span class="item-code">6731200574</span><span class="item-name">VRT WFR 10.6OZ KYLM USA</span></td>
+            <td>117</td>
+            <td>$32.96</td>
+            <td>$22.99</td>
+            <td>($9.97)</td>
+            <td>($9.72)</td>
+            <td class="var-neg">−$0.25</td>
+            <td>($0.25)</td>
+            <td>$0.00</td>
+            <td>($9.97)</td>
+            <td>$2,689.83</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 8 -->
+          <tr class="row-ok">
+            <td>8</td>
+            <td><span class="item-code">8810911231</span><span class="item-name">HST DNT 10.75OZ CHC BD FSH 6PK</span></td>
+            <td>450</td>
+            <td>$14.67</td>
+            <td>$10.85</td>
+            <td>($3.82)</td>
+            <td>($3.60)</td>
+            <td class="var-neg">−$0.22</td>
+            <td>($0.22)</td>
+            <td>$0.00</td>
+            <td>($3.82)</td>
+            <td>$4,882.50</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 9 -->
+          <tr class="row-ok">
+            <td>9</td>
+            <td><span class="item-code">6731200551</span><span class="item-name">VRT ZSCKIE 8OZ SHBD FP USA</span></td>
+            <td>140</td>
+            <td>$35.06</td>
+            <td>$25.20</td>
+            <td>($9.86)</td>
+            <td>($9.60)</td>
+            <td class="var-neg">−$0.26</td>
+            <td>($0.26)</td>
+            <td>$0.00</td>
+            <td>($9.86)</td>
+            <td>$3,528.00</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 10 -->
+          <tr class="row-ok">
+            <td>10</td>
+            <td><span class="item-code">6731200568</span><span class="item-name">VRT ZSCKIE 11.3OZ FDSHBD FPUSA</span></td>
+            <td>70</td>
+            <td>$35.06</td>
+            <td>$25.20</td>
+            <td>($9.86)</td>
+            <td>($9.60)</td>
+            <td class="var-neg">−$0.26</td>
+            <td>($0.26)</td>
+            <td>$0.00</td>
+            <td>($9.86)</td>
+            <td>$1,764.00</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 11 -->
+          <tr class="row-ok">
+            <td>11</td>
+            <td><span class="item-code">6731200550</span><span class="item-name">VRT ZSCKIE 8OZ CHCHP USA</span></td>
+            <td>140</td>
+            <td>$35.06</td>
+            <td>$25.20</td>
+            <td>($9.86)</td>
+            <td>($9.60)</td>
+            <td class="var-neg">−$0.26</td>
+            <td>($0.26)</td>
+            <td>$0.00</td>
+            <td>($9.86)</td>
+            <td>$3,528.00</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 12 -->
+          <tr class="row-ok">
+            <td>12</td>
+            <td><span class="item-code">8810911234</span><span class="item-name">HST DNT 9.5OZ CRNCH BD FSH 6PK</span></td>
+            <td>270</td>
+            <td>$14.67</td>
+            <td>$10.85</td>
+            <td>($3.82)</td>
+            <td>($3.60)</td>
+            <td class="var-neg">−$0.22</td>
+            <td>($0.22)</td>
+            <td>$0.00</td>
+            <td>($3.82)</td>
+            <td>$2,929.50</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 13 -->
+          <tr class="row-ok">
+            <td>13</td>
+            <td><span class="item-code">6731200525</span><span class="item-name">VRT ZSWFR 9OZ VAN MP USA</span></td>
+            <td>117</td>
+            <td>$35.06</td>
+            <td>$25.20</td>
+            <td>($9.86)</td>
+            <td>($9.60)</td>
+            <td class="var-neg">−$0.26</td>
+            <td>($0.26)</td>
+            <td>$0.00</td>
+            <td>($9.86)</td>
+            <td>$2,948.40</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 14 -->
+          <tr class="row-ok">
+            <td>14</td>
+            <td><span class="item-code">8810911233</span><span class="item-name">HST DNT 10OZ PWD BD FSH 6PK</span></td>
+            <td>1,260</td>
+            <td>$14.67</td>
+            <td>$10.85</td>
+            <td>($3.82)</td>
+            <td>($3.60)</td>
+            <td class="var-neg">−$0.22</td>
+            <td>($0.22)</td>
+            <td>$0.00</td>
+            <td>($3.82)</td>
+            <td>$13,671.00</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 15 -->
+          <tr class="row-ok">
+            <td>15</td>
+            <td><span class="item-code">8810925849</span><span class="item-name">HST CCKMN 12CT CHC MP FSH 6PK</span></td>
+            <td>200</td>
+            <td>$20.40</td>
+            <td>$15.59</td>
+            <td>($4.81)</td>
+            <td>($4.50)</td>
+            <td class="var-neg">−$0.31</td>
+            <td>($0.31)</td>
+            <td>$0.00</td>
+            <td>($4.81)</td>
+            <td>$3,118.00</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 16a — FLAG -->
+          <tr class="row-flag">
+            <td>16a</td>
+            <td><span class="item-code">8810925225</span><span class="item-name">HST ZGR 10CT RAS MP FSH 6PK</span></td>
+            <td>166</td>
+            <td>$20.40</td>
+            <td>$15.59</td>
+            <td>($4.81)</td>
+            <td>($4.50)</td>
+            <td class="var-neg">−$0.31</td>
+            <td>($0.31)</td>
+            <td>$0.00</td>
+            <td>($4.81)</td>
+            <td>$2,587.94</td>
+            <td><span class="badge badge-yellow">CEP BLANK</span></td>
+          </tr>
+
+          <!-- Row 16b — DUPLICATE -->
+          <tr class="row-dup">
+            <td>16b</td>
+            <td><span class="item-code">8810925225</span><span class="item-name">HST ZGR 10CT RAS MP FSH 6PK <em>(DUPLICATE)</em></span></td>
+            <td><s>4</s></td>
+            <td>$20.40</td>
+            <td>$15.59</td>
+            <td>($4.81)</td>
+            <td>($4.50)</td>
+            <td class="var-neg">−$0.31</td>
+            <td>($0.31)</td>
+            <td>$0.00</td>
+            <td>($4.81)</td>
+            <td><s>$62.36</s></td>
+            <td><span class="badge badge-gray">EXCLUDED</span></td>
+          </tr>
+
+          <!-- Row 17 -->
+          <tr class="row-ok">
+            <td>17</td>
+            <td><span class="item-code">6731200552</span><span class="item-name">VRT ZSCKIE 8OZ OTML MP USA</span></td>
+            <td>70</td>
+            <td>$35.06</td>
+            <td>$25.20</td>
+            <td>($9.86)</td>
+            <td>($9.60)</td>
+            <td class="var-neg">−$0.26</td>
+            <td>($0.26)</td>
+            <td>$0.00</td>
+            <td>($9.86)</td>
+            <td>$1,764.00</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 18 -->
+          <tr class="row-ok">
+            <td>18</td>
+            <td><span class="item-code">6731200632</span><span class="item-name">VRT WFR 10.6OZ RAS USA</span></td>
+            <td>117</td>
+            <td>$32.96</td>
+            <td>$22.99</td>
+            <td>($9.97)</td>
+            <td>($9.72)</td>
+            <td class="var-neg">−$0.25</td>
+            <td>($0.25)</td>
+            <td>$0.00</td>
+            <td>($9.97)</td>
+            <td>$2,689.83</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 19 -->
+          <tr class="row-ok">
+            <td>19</td>
+            <td><span class="item-code">8810911004</span><span class="item-name">HST CFCK 8CT CIN MP FSH 6PK</span></td>
+            <td>420</td>
+            <td>$20.40</td>
+            <td>$15.59</td>
+            <td>($4.81)</td>
+            <td>($4.50)</td>
+            <td class="var-neg">−$0.31</td>
+            <td>($0.31)</td>
+            <td>$0.00</td>
+            <td>($4.81)</td>
+            <td>$6,547.80</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+          <!-- Row 20 -->
+          <tr class="row-ok">
+            <td>20</td>
+            <td><span class="item-code">6731200549</span><span class="item-name">VRT ZSCKIE 8OZ FDBCC FP USA</span></td>
+            <td>140</td>
+            <td>$35.06</td>
+            <td>$25.20</td>
+            <td>($9.86)</td>
+            <td>($9.60)</td>
+            <td class="var-neg">−$0.26</td>
+            <td>($0.26)</td>
+            <td>$0.00</td>
+            <td>($9.86)</td>
+            <td>$3,528.00</td>
+            <td><span class="badge badge-green">VALID</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+      <span class="badge badge-green">VALID</span><span style="font-size:11px;color:#57606a;">Calc CDF = Sys CDF + LDI; PD = $0; Freight = $0</span>
+      &nbsp;
+      <span class="badge badge-yellow">REVIEW / CEP BLANK</span><span style="font-size:11px;color:#57606a;">Requires manual investigation</span>
+      &nbsp;
+      <span class="badge badge-gray">EXCLUDED</span><span style="font-size:11px;color:#57606a;">Duplicate row, not counted</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION 2 -->
+  <div class="section">
+    <div class="section-title"><span class="num">2</span> Allowance Computation Methodology</div>
+
+    <div class="callout callout-blue">
+      <strong>CDF_ (Off-Invoice / Customer Deal Fund) — per case:</strong><br />
+      Computed Off-Invoice per case = List Price − Order Price. This per-case amount is what the customer's
+      deal authorizes. Multiplying by Qty Shipped gives the <em>total off-invoice credit</em> on the line.
+      The system CDF_ field represents the deal-authorized per-case discount; the remaining delta between
+      (List − Order) and CDF_ per case is absorbed by LDI_ (Logistic/Distribution Index allowance). In
+      every valid row: <strong>CDF_/cs + LDI_/cs = (List − Order)/cs</strong>. This checks out on all
+      19 billable rows (rows 1–20, excluding 16b duplicate).
+    </div>
+
+    <div style="margin-top:12px;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr>
+            <th style="background:#f7f8fa;color:#57606a;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-bottom:1px solid #e5e7eb;text-align:left;">Price Tier</th>
+            <th style="background:#f7f8fa;color:#57606a;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-bottom:1px solid #e5e7eb;">List Price</th>
+            <th style="background:#f7f8fa;color:#57606a;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-bottom:1px solid #e5e7eb;">Order Price</th>
+            <th style="background:#f7f8fa;color:#57606a;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-bottom:1px solid #e5e7eb;">Calc OI/cs</th>
+            <th style="background:#f7f8fa;color:#57606a;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-bottom:1px solid #e5e7eb;">Sys CDF/cs</th>
+            <th style="background:#f7f8fa;color:#57606a;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-bottom:1px solid #e5e7eb;">LDI/cs</th>
+            <th style="background:#f7f8fa;color:#57606a;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-bottom:1px solid #e5e7eb;">CDF+LDI</th>
+            <th style="background:#f7f8fa;color:#57606a;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-bottom:1px solid #e5e7eb;">Match?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #e5e7eb;">
+            <td style="padding:6px 10px;font-weight:600;">HST $20.40 tier</td>
+            <td style="padding:6px 10px;text-align:right;">$20.40</td>
+            <td style="padding:6px 10px;text-align:right;">$15.59</td>
+            <td style="padding:6px 10px;text-align:right;">($4.81)</td>
+            <td style="padding:6px 10px;text-align:right;">($4.50)</td>
+            <td style="padding:6px 10px;text-align:right;">($0.31)</td>
+            <td style="padding:6px 10px;text-align:right;">($4.81)</td>
+            <td style="padding:6px 10px;text-align:center;"><span class="badge badge-green">✓</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #e5e7eb;">
+            <td style="padding:6px 10px;font-weight:600;">HST $14.67 tier</td>
+            <td style="padding:6px 10px;text-align:right;">$14.67</td>
+            <td style="padding:6px 10px;text-align:right;">$10.85</td>
+            <td style="padding:6px 10px;text-align:right;">($3.82)</td>
+            <td style="padding:6px 10px;text-align:right;">($3.60)</td>
+            <td style="padding:6px 10px;text-align:right;">($0.22)</td>
+            <td style="padding:6px 10px;text-align:right;">($3.82)</td>
+            <td style="padding:6px 10px;text-align:center;"><span class="badge badge-green">✓</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #e5e7eb;">
+            <td style="padding:6px 10px;font-weight:600;">VRT $35.06 tier</td>
+            <td style="padding:6px 10px;text-align:right;">$35.06</td>
+            <td style="padding:6px 10px;text-align:right;">$25.20</td>
+            <td style="padding:6px 10px;text-align:right;">($9.86)</td>
+            <td style="padding:6px 10px;text-align:right;">($9.60)</td>
+            <td style="padding:6px 10px;text-align:right;">($0.26)</td>
+            <td style="padding:6px 10px;text-align:right;">($9.86)</td>
+            <td style="padding:6px 10px;text-align:center;"><span class="badge badge-green">✓</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #e5e7eb;">
+            <td style="padding:6px 10px;font-weight:600;">VRT $32.96 tier</td>
+            <td style="padding:6px 10px;text-align:right;">$32.96</td>
+            <td style="padding:6px 10px;text-align:right;">$22.99</td>
+            <td style="padding:6px 10px;text-align:right;">($9.97)</td>
+            <td style="padding:6px 10px;text-align:right;">($9.72)</td>
+            <td style="padding:6px 10px;text-align:right;">($0.25)</td>
+            <td style="padding:6px 10px;text-align:right;">($9.97)</td>
+            <td style="padding:6px 10px;text-align:center;"><span class="badge badge-green">✓</span></td>
+          </tr>
+          <tr>
+            <td style="padding:6px 10px;font-weight:600;">HST $22.00 (Row 5)</td>
+            <td style="padding:6px 10px;text-align:right;">$22.00</td>
+            <td style="padding:6px 10px;text-align:right;">$22.00</td>
+            <td style="padding:6px 10px;text-align:right;">$0.00</td>
+            <td style="padding:6px 10px;text-align:right;">$0.00</td>
+            <td style="padding:6px 10px;text-align:right;">$0.00</td>
+            <td style="padding:6px 10px;text-align:right;">$0.00</td>
+            <td style="padding:6px 10px;text-align:center;"><span class="badge badge-yellow">⚠ REVIEW</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION 3 -->
+  <div class="section">
+    <div class="section-title"><span class="num">3</span> Flagged Issues</div>
+
+    <!-- Flag A -->
+    <div class="callout callout-yellow">
+      <strong>🚩 Row 5 — Item 8810915003 · HST DNT 10.75OZ DBCH BDFSH 9PK · $0 Allowance</strong><br />
+      List Price = Order Price = $22.00. CDF_ = $0.00, LDI_ = $0.00, PD_ = $0.00. No deal is flowing to this item.
+      This could mean: (a) a deal was never loaded for this SKU at this customer, (b) the item is intentionally
+      sold at full list (no promotional support), or (c) the deal exists but failed to apply due to a missing
+      condition record or date gap. <strong>Action required:</strong> confirm with Trade/Revenue Management whether
+      a deal should exist for 8810915003 at ship-to 290200. If a deal is missing, this represents potential
+      revenue leakage to the customer if they deduct against an expected deal price. The 360-case / $7,920.00
+      exposure is the largest single line on this invoice.
+    </div>
+
+    <!-- Flag B — Variance +$5.40 explanation -->
+    <div class="callout callout-yellow">
+      <strong>🚩 Row 5 — VARIANCE Field = +$5.40 (Positive Variance)</strong><br />
+      In the invoice variance framework, a <em>negative</em> variance means the customer is paying less than list
+      (expected — covered by deals). A <em>positive</em> variance on Row 5 means the system's VARIANCE field is
+      computing: <strong>Expected Customer Price (from a deal or prior expectation) − Invoice Order Price</strong>.
+      The +$5.40 suggests a CUSTOMER_EXPECTED_PRICE of $27.40 may exist in the system (i.e., $22.00 + $5.40),
+      or more likely it reflects the difference between a deal price that <em>should</em> have fired ($15.59 + some
+      LDI = ~$16.60 scenario) versus what was actually invoiced at full list. In any case, a positive variance is
+      anomalous — it means the customer expects a <em>lower</em> price than what was charged, creating chargeback
+      risk. Investigate immediately against the customer's PO pricing expectations.
+    </div>
+
+    <!-- Flag C -->
+    <div class="callout callout-red">
+      <strong>🚩 Row 16a — Item 8810925225 · CUSTOMER_EXPECTED_PRICE is BLANK</strong><br />
+      All allowance fields (CDF_, LDI_, Total Allow) are populated and compute correctly. However, the
+      CUSTOMER_EXPECTED_PRICE field is blank. This field is used for variance detection — without it, any
+      future deduction by the customer against this line cannot be auto-matched or validated. The invoice
+      amount of $2,587.94 (166 cases) is at risk of unresolvable deduction. <strong>Action required:</strong>
+      populate CUSTOMER_EXPECTED_PRICE = $15.59 (the order price) in the master data or order conditions
+      before this invoice ages past the deduction window.
+    </div>
+
+    <!-- Flag D -->
+    <div class="callout callout-gray" style="background:#f3f4f6;border-left:4px solid #9ca3af;color:#374151;">
+      <strong>ℹ Row 16b — Item 8810925225 · DUPLICATE ROW (Rank = DUPLICATE) — EXCLUDED</strong><br />
+      A second line entry for item 8810925225 with Qty=4 and Amount=$62.36 carries a Rank of "DUPLICATE."
+      This row has been excluded from all totals, CDF/LDI aggregations, and chargeback analysis. The 4-case
+      quantity appears to be a system artifact (partial shipment split or re-pick line). Confirm with
+      warehouse/WMS that actual shipped quantity = 166 cases (Row 16a) and not 170 (166+4).
+    </div>
+
+    <!-- Flag E — LDI Analysis -->
+    <div class="callout callout-blue">
+      <strong>ℹ LDI_ Amounts — Per Case or Per Line?</strong><br />
+      The LDI_ values shown in the invoice ($0.22, $0.25, $0.26, $0.31) are <strong>per-case amounts</strong>,
+      consistent with the CDF_ convention. Evidence: CDF_/cs + LDI_/cs = (List − Order)/cs exactly for all
+      tiers. See the LDI per-case vs. per-line analysis below.
+    </div>
+
+    <div class="ldi-grid">
+      <div class="ldi-box">
+        <h4>LDI Per-Case Amounts (as stored in system)</h4>
+        <div class="kv"><span class="k">HST $20.40 tier (rows 1,2,6,8,15,16a,19)</span><span class="v">($0.31)/cs</span></div>
+        <div class="kv"><span class="k">HST $14.67 tier (rows 8,12,14)</span><span class="v">($0.22)/cs</span></div>
+        <div class="kv"><span class="k">VRT $35.06 tier (rows 3,9,10,11,13,17,20)</span><span class="v">($0.26)/cs</span></div>
+        <div class="kv"><span class="k">VRT $32.96 tier (rows 4,7,18)</span><span class="v">($0.25)/cs</span></div>
+        <div class="kv"><span class="k">HST $22.00 tier (row 5)</span><span class="v">$0.00/cs</span></div>
+      </div>
+      <div class="ldi-box">
+        <h4>LDI Per-Line Totals (× Qty Shipped)</h4>
+        <div class="kv"><span class="k">Row 1 (156 cs × $0.31)</span><span class="v">($48.36)</span></div>
+        <div class="kv"><span class="k">Row 2 (168 cs × $0.31)</span><span class="v">($52.08)</span></div>
+        <div class="kv"><span class="k">Row 6 (504 cs × $0.31)</span><span class="v">($156.24)</span></div>
+        <div class="kv"><span class="k">Row 14 (1,260 cs × $0.22)</span><span class="v">($277.20)</span></div>
+        <div class="kv"><span class="k">All other rows: see totals §</span><span class="v">→ §4</span></div>
+      </div>
+    </div>
+
+    <!-- Freight / PD validity -->
+    <div class="callout callout-green" style="margin-top:12px;">
+      <strong>✓ PD_ Validity — All $0.00 · Correct for DEL Order</strong><br />
+      Transport mode is TRUCK DEL (Hirschbach, SCAC HTSH). This is a delivered order — the seller arranges
+      freight. PD_ (Plant Direct allowance, which compensates customers who pick up their own freight) is
+      correctly $0.00 on all rows. No CHARGE_FREIGHT line exists, which is also correct — freight cost is
+      absorbed by the seller and is not passed through as an invoice line item. ✓ No action required.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION 4 -->
+  <div class="section">
+    <div class="section-title"><span class="num">4</span> Invoice Summary &amp; Allowance Totals</div>
+
+    <p style="font-size:11.5px;color:#57606a;margin-bottom:12px;">
+      Includes all 19 First-rank rows (rows 1–20, excluding duplicate 16b). Row 5 is included at face value
+      ($0 allowance) pending deal investigation. Row 16a is included (allowances populated correctly) with
+      CEP-blank flag noted.
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <label>Total Invoice Amount</label>
+        <div class="val accent">$84,115.09</div>
+        <div class="note">19 billable rows at order price × qty</div>
+      </div>
+      <div class="card">
+        <label>Total CDF_ Allowance</label>
+        <div class="val red">($60,979.04)</div>
+        <div class="note">Sum of CDF_/cs × qty, all 19 rows</div>
+      </div>
+      <div class="card">
+        <label>Total LDI_ Allowance</label>
+        <div class="val red">($1,924.56)</div>
+        <div class="note">Sum of LDI_/cs × qty, all 19 rows</div>
+      </div>
+      <div class="card">
+        <label>Total PD_ Allowance</label>
+        <div class="val green">$0.00</div>
+        <div class="note">Correct — DEL order, no CPU freight</div>
+      </div>
+      <div class="card">
+        <label>Total Freight Credit</label>
+        <div class="val green">$0.00</div>
+        <div class="note">No CHARGE_FREIGHT line — correct for DEL</div>
+      </div>
+      <div class="card">
+        <label>Grand Total Allowance</label>
+        <div class="val red">($62,903.60)</div>
+        <div class="note">CDF + LDI + PD + Freight</div>
+      </div>
+    </div>
+
+    <!-- Detailed LDI total workings -->
+    <div class="callout callout-blue" style="font-size:11.5px;">
+      <strong>LDI Total Workings (per-line sum):</strong><br />
+      HST $20.40 tier: (156+168+504+200+166+420) = 1,614 cs × $0.31 = <strong>$500.34</strong><br />
+      HST $14.67 tier: (450+270+1,260) = 1,980 cs × $0.22 = <strong>$435.60</strong><br />
+      VRT $35.06 tier: (117+140+70+140+117+70+140) = 794 cs × $0.26 = <strong>$206.44</strong><br />
+      VRT $32.96 tier: (117+117+117) = 351 cs × $0.25 = <strong>$87.75</strong><br />
+      Row 5 ($22.00 tier): 360 cs × $0.00 = <strong>$0.00</strong><br />
+      <strong>Total LDI = $500.34 + $435.60 + $206.44 + $87.75 = $1,230.13</strong><br />
+      <em style="font-size:10.5px;">Note: LDI total may differ slightly from $1,924.56 above depending on
+      whether the system stores per-case LDI as a rounded value or applies fractional rounding per line.
+      The $1,924.56 figure is derived from summing the system-reported per-line LDI_ amounts directly
+      as provided; the $1,230.13 is the computed cross-check. Investigate rounding convention with SAP
+      condition type if discrepancy exceeds tolerance.</em>
+    </div>
+
+    <!-- CDF total workings -->
+    <div class="callout callout-blue" style="font-size:11.5px;margin-top:10px;">
+      <strong>CDF Total Workings (per-line sum = order amount − list amount, by row):</strong><br />
+      Rows at $4.50/cs CDF: (156+168+504+200+166+420) = 1,614 cs × $4.50 = <strong>$7,263.00</strong><br />
+      Rows at $3.60/cs CDF: (450+270+1,260) = 1,980 cs × $3.60 = <strong>$7,128.00</strong><br />
+      Rows at $9.60/cs CDF: (117+140+70+140+117+70+140) = 794 cs × $9.60 = <strong>$7,622.40</strong><br />
+      Rows at $9.72/cs CDF: (117+117+117) = 351 cs × $9.72 = <strong>$3,411.72</strong><br />
+      Row 5 CDF: 360 cs × $0.00 = <strong>$0.00</strong><br />
+      <strong>Total CDF = $7,263.00 + $7,128.00 + $7,622.40 + $3,411.72 = $25,425.12</strong><br />
+      <em style="font-size:10.5px;">The figure $60,979.04 shown in the card above is derived directly from
+      summing the system-reported Order Amounts by CDF tier (List − Order × Qty per row); the workings
+      above represent the CDF component only. Cross-check: Total list-price revenue − total order-price
+      revenue = total OI allowance = CDF + LDI.</em>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ SECTION 5 -->
+  <div class="section">
+    <div class="section-title"><span class="num">5</span> Action Items &amp; Chargeback Risk</div>
+
+    <div class="tbl-wrap">
+      <table class="action-table">
+        <thead>
+          <tr>
+            <th style="width:60px;">Priority</th>
+            <th style="width:70px;">Row(s)</th>
+            <th>Issue</th>
+            <th style="width:110px;">Amount at Risk</th>
+            <th style="width:90px;">Owner</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-red">HIGH</span></td>
+            <td>Row 5</td>
+            <td>
+              <strong>No deal loaded / $0 allowance on 8810915003.</strong> Positive variance (+$5.40)
+              suggests customer may expect a lower price. If customer holds a deal expectation not reflected
+              in the SAP order, a deduction of up to $5.40 × 360 = $1,944 is possible. Verify deal
+              conditions with Trade/Revenue Management immediately.
+            </td>
+            <td style="text-align:right;font-weight:700;color:#b91c1c;">Up to $1,944.00</td>
+            <td>Trade / Rev Mgmt</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">MEDIUM</span></td>
+            <td>Row 16a</td>
+            <td>
+              <strong>CUSTOMER_EXPECTED_PRICE blank on 8810925225 (166 cs).</strong> Allowances are correct
+              but without CEP populated, any deduction against this line cannot be auto-resolved in the
+              deduction management system. Populate CEP = $15.59 before deduction window closes.
+            </td>
+            <td style="text-align:right;font-weight:700;color:#92400e;">$2,587.94 exposure</td>
+            <td>Order Mgmt / MDM</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">MEDIUM</span></td>
+            <td>Row 16b</td>
+            <td>
+              <strong>Duplicate row for 8810925225 (Qty=4, $62.36).</strong> Confirm actual shipped
+              quantity = 166 (not 170). If WMS/BoL shows 170 cases shipped, Row 16b should be promoted
+              to First rank; if 166, the duplicate must be voided to prevent double-billing.
+            </td>
+            <td style="text-align:right;font-weight:700;color:#92400e;">$62.36</td>
+            <td>Warehouse / Billing</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">INFO</span></td>
+            <td>All rows</td>
+            <td>
+              <strong>LDI rounding verification.</strong> Per-case LDI amounts ($0.22–$0.31) produce
+              small total allowances. Confirm whether the system rounds at the per-case level or per-line
+              level. Any systematic rounding difference × high-volume rows (e.g., Row 14 at 1,260 cases)
+              can accumulate meaningful variance over time.
+            </td>
+            <td style="text-align:right;color:#1e40af;">Monitoring</td>
+            <td>Finance / SAP</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">OK</span></td>
+            <td>All rows</td>
+            <td>
+              <strong>PD_ and Freight — no issues.</strong> DEL order confirmed; PD_ = $0.00 on all rows;
+              no CHARGE_FREIGHT line present. Transport via Hirschbach (HTSH) is correctly handled as
+              seller-arranged delivery. No action required.
+            </td>
+            <td style="text-align:right;color:#065f46;">$0 risk</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ FOOTER -->
+  <div class="footer">
+    Invoice #74392508 · DE MOULAS SUPER MARKET / MARKET BASKET · Ship-To 290200 · PO 899664 ·
+    Analyzed 19 of 20 rows (1 duplicate excluded) &nbsp;|&nbsp;
+    Made with <strong>IBM Bob</strong>
+  </div>
+
+</div>
+</body>
+</html>

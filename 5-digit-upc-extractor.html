@@ -1,0 +1,181 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>5-Digit UPC Extractor</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1f2328;
+    background: #ffffff;
+    padding: 24px 16px 40px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: #57606a; font-size: 13px; margin-bottom: 20px; }
+  label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px; }
+  textarea {
+    width: 100%;
+    height: 180px;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    background: #f7f8fa;
+    color: #1f2328;
+  }
+  textarea:focus { outline: 2px solid #3b82d4; outline-offset: -1px; background: #fff; }
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin: 12px 0 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  button {
+    padding: 8px 18px;
+    border-radius: 5px;
+    border: 1px solid #e5e7eb;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #3b82d4;
+    color: #fff;
+    border-color: #3b82d4;
+  }
+  button:hover { background: #2563ba; border-color: #2563ba; }
+  button.secondary { background: #f7f8fa; color: #1f2328; border-color: #e5e7eb; font-weight: 500; }
+  button.secondary:hover { background: #e5e7eb; }
+  .hint { font-size: 12px; color: #57606a; }
+  .stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  .stats span { color: #57606a; }
+  .stats strong { color: #1f2328; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: #57606a;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    position: sticky;
+    top: 0;
+  }
+  tbody tr:nth-child(even) { background: #f7f8fa; }
+  tbody tr:hover { background: #eef3fb; }
+  td {
+    border: 1px solid #e5e7eb;
+    padding: 7px 12px;
+    vertical-align: top;
+  }
+  td.row-num { color: #57606a; font-size: 12px; width: 42px; text-align: center; }
+  td.upcs { font-family: "Courier New", monospace; font-size: 12px; color: #1f2328; white-space: nowrap; }
+  td.upcs .tag {
+    display: inline-block;
+    background: #e8f0fb;
+    color: #2563ba;
+    border-radius: 3px;
+    padding: 1px 6px;
+    margin: 1px 2px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  td.upcs .none { color: #57606a; font-style: italic; font-family: inherit; }
+  td.source { color: #57606a; font-size: 12px; word-break: break-word; }
+  .table-wrap { overflow-x: auto; border-radius: 6px; border: 1px solid #e5e7eb; }
+  .hidden { display: none; }
+  .copy-btn {
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    background: #f7f8fa;
+    color: #1f2328;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .copy-btn:hover { background: #e5e7eb; }
+  .section-title {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  footer {
+    margin-top: 40px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 12px;
+    color: #57606a;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>5-Digit UPC Extractor</h1>
+  <p class="subtitle">Paste your response/notes text below — one row per line. Extracts only 5-digit UPC codes, ignoring invoice numbers and amounts.</p>
+
+  <label>Input Text (one note per line)</label>
+  <textarea id="inputText"></textarea>
+
+  <div class="controls">
+    <button id="extractBtn">Extract UPCs</button>
+    <button class="secondary" id="clearBtn">Clear</button>
+    <button class="secondary" id="loadSampleBtn">Load Sample Data</button>
+    <span class="hint">Invoice numbers (7–8 digits) are automatically excluded.</span>
+  </div>
+
+  <div id="results" class="hidden">
+    <div class="stats" id="statsBar"></div>
+    <div class="section-title">
+      Results
+      <button class="copy-btn" id="copyTsvBtn">Copy as TSV</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Extracted UPCs</th>
+            <th>Source Text</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>Made with IBM Bob</footer>
+</div>
+
+
+</body>
+</html>

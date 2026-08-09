@@ -1,0 +1,13 @@
+# Excel workbooks — keep off version control (may contain PII / sensitive data)
+*.xlsx
+*.xlsm
+*.xls
+
+# OS noise
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Local build output
+dist/
+node_modules/

@@ -3,6 +3,9 @@
 *.xlsm
 *.xls
 
+# Exception: repay letter templates are intentionally tracked
+!repayletters/*.xlsx
+
 # OS noise
 Thumbs.db
 .DS_Store

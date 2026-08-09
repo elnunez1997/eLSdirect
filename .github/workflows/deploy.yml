@@ -16,70 +16,63 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build — inline src/main.js and public/compass.html into index.html
+      - name: Build — inline src/main.js and compass.html into index.html
         run: |
-          set -e
+          python3 << 'PYEOF'
+import re
 
-          INDEX="index.html"
-          MAIN="src/main.js"
-          COMPASS="public/compass.html"
+with open("index.html", encoding="utf-8") as f:
+    html = f.read()
 
-          # Read files
-          main_js=$(cat "$MAIN")
-          compass_html=$(cat "$COMPASS")
+with open("src/main.js", encoding="utf-8") as f:
+    main_js = f.read()
 
-          # Strip any previously inlined script back to src= reference (idempotent)
-          python3 - <<'PYEOF'
-          import re, sys
+with open("public/compass.html", encoding="utf-8") as f:
+    compass_html = f.read()
 
-          with open("index.html", encoding="utf-8") as f:
-              html = f.read()
+# Strip any previously inlined script (idempotent)
+html = re.sub(
+    r'<script>\s*\n.*?</script>(\s*</body>)',
+    r'<script src="src/main.js"></script>\1',
+    html, flags=re.DOTALL
+)
 
-          with open("src/main.js", encoding="utf-8") as f:
-              main_js = f.read()
+# Strip any previously inlined srcdoc (idempotent)
+html = re.sub(
+    r'<iframe srcdoc=".*?"(.*?)></iframe>',
+    r'<iframe src="public/compass.html"\1></iframe>',
+    html, flags=re.DOTALL
+)
 
-          with open("public/compass.html", encoding="utf-8") as f:
-              compass_html = f.read()
+# Inline main.js
+html = html.replace(
+    '<script src="src/main.js"></script>',
+    "<script>\n" + main_js + "\n</script>"
+)
 
-          # 1. Strip previously inlined script → restore src= placeholder
-          html = re.sub(
-              r'<script>\s*\n.*?</script>(\s*</body>)',
-              r'<script src="src/main.js"></script>\1',
-              html, flags=re.DOTALL
-          )
+# Inline compass.html as srcdoc
+compass_escaped = compass_html.replace("&", "&amp;").replace('"', "&quot;")
+srcdoc = '<iframe srcdoc="' + compass_escaped + '" style="width:100%;height:100%;border:none;" title="eLS Compass"></iframe>'
+html = re.sub(
+    r'<iframe src="public/compass\.html" style="width:100%;height:100%;border:none;" title="eLS Compass"></iframe>',
+    srcdoc,
+    html
+)
 
-          # 2. Strip previously inlined srcdoc → restore src= placeholder
-          html = re.sub(
-              r'<iframe srcdoc=".*?"(.*?)></iframe>',
-              r'<iframe src="public/compass.html"\1></iframe>',
-              html, flags=re.DOTALL
-          )
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html)
 
-          # 3. Inline main.js
-          inline_script = "<script>\n" + main_js + "\n</script>"
-          html = html.replace('<script src="src/main.js"></script>', inline_script)
-
-          # 4. Inline compass.html as srcdoc
-          compass_escaped = compass_html.replace("&", "&amp;").replace('"', "&quot;")
-          srcdoc_iframe = '<iframe srcdoc="' + compass_escaped + '" style="width:100%;height:100%;border:none;" title="eLS Compass"></iframe>'
-          html = re.sub(
-              r'<iframe src="public/compass\.html" style="width:100%;height:100%;border:none;" title="eLS Compass"></iframe>',
-              srcdoc_iframe,
-              html
-          )
-
-          with open("index.html", "w", encoding="utf-8") as f:
-              f.write(html)
-
-          size = len(html.encode("utf-8"))
-          print(f"index.html written ({size:,} bytes)")
-          PYEOF
+print(f"index.html written ({len(html.encode()):,} bytes)")
+PYEOF
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -89,13 +82,6 @@ jobs:
         with:
           path: '.'
 
-  deploy:
-    needs: build
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

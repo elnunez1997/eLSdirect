@@ -1,4 +1,4 @@
-﻿
+
 
 // â”€â”€ DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 var DIRECT=[
@@ -1044,6 +1044,27 @@ function lbFill(tpl, fields) {
     .replace(/{FROM}/g, fields.FROM);
 }
 
+function lbSelectCard(el, type) {
+  // Highlight selected card
+  document.querySelectorAll(".lb-type-card").forEach(function(c){ c.classList.remove("selected"); });
+  el.classList.add("selected");
+  document.getElementById("lb-type").value = type;
+  // Show editor area, hide empty state
+  document.getElementById("lb-empty-state").style.display = "none";
+  document.getElementById("lb-editor-area").style.display = "block";
+  if (type === "freeform") {
+    document.getElementById("lb-editor").value = "";
+    document.getElementById("lb-editor").placeholder = "Write your letter here…";
+    document.getElementById("lb-copilot-out").innerHTML = '<div class="cop-item" style="color:#9ab4cc;font-style:italic">Start typing — Copilot will review your letter as you write.</div>';
+    return;
+  }
+  var tpl = LB_TEMPLATES[type];
+  if (!tpl) return;
+  var fields = lbGetFields();
+  document.getElementById("lb-editor").value = lbFill(tpl, fields);
+  lbCopilotAnalyze();
+}
+
 function lbLoadTemplate() {
   var type = document.getElementById("lb-type").value;
   if (!type) return;
@@ -1051,8 +1072,6 @@ function lbLoadTemplate() {
   if (tpl === undefined) return;
   if (type === "freeform") {
     document.getElementById("lb-editor").value = "";
-    document.getElementById("lb-editor").placeholder = "Write your letter hereâ€¦";
-    document.getElementById("lb-copilot-out").innerHTML = '<div class="cop-item" style="color:#9ab4cc;font-style:italic">Start typing â€” Copilot will review your letter as you write.</div>';
     return;
   }
   var fields = lbGetFields();
@@ -1141,20 +1160,48 @@ function lbCopilotAnalyze() {
 
 function lbDownload() {
   var text = document.getElementById("lb-editor").value.trim();
+  var hint = document.getElementById("lb-dl-hint");
   if (!text) {
-    document.getElementById("lb-dl-hint").textContent = "Nothing to download â€” write or select a template first.";
-    document.getElementById("lb-dl-hint").style.color = "#92400e";
+    hint.textContent = "Nothing to download — select a template first.";
+    hint.style.color = "#92400e";
     return;
   }
   var customer = document.getElementById("lb-customer").value.trim().replace(/[^a-z0-9]/gi,"_") || "letter";
-  var filename = "repay_letter_" + customer + ".txt";
+  var type = document.getElementById("lb-type").value.replace(/^repay_/,"") || "custom";
+  var filename = "repay_" + type + "_" + customer + ".txt";
   var blob = new Blob([text], {type: "text/plain"});
   var a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = filename;
   a.click();
-  document.getElementById("lb-dl-hint").textContent = "Downloaded: " + filename;
-  document.getElementById("lb-dl-hint").style.color = "#065f46";
+  hint.textContent = "Downloaded: " + filename;
+  hint.style.color = "#065f46";
+}
+
+function lbCopyClipboard() {
+  var text = document.getElementById("lb-editor").value.trim();
+  var hint = document.getElementById("lb-dl-hint");
+  if (!text) {
+    hint.textContent = "Nothing to copy — select a template first.";
+    hint.style.color = "#92400e";
+    return;
+  }
+  try {
+    navigator.clipboard.writeText(text).then(function(){
+      hint.textContent = "Copied to clipboard!";
+      hint.style.color = "#065f46";
+    });
+  } catch(e) {
+    // fallback
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    hint.textContent = "Copied to clipboard!";
+    hint.style.color = "#065f46";
+  }
 }
 
 // â”€â”€ DATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -1388,7 +1435,9 @@ window.filterRepayLetters = filterRepayLetters;
 window.openRepayLetter = openRepayLetter;
 window.bpsFilter = bpsFilter;
 window.lbLoadTemplate = lbLoadTemplate;
+window.lbSelectCard = lbSelectCard;
 window.lbUpdatePreview = lbUpdatePreview;
 window.lbCopilotAnalyze = lbCopilotAnalyze;
 window.lbDownload = lbDownload;
+window.lbCopyClipboard = lbCopyClipboard;
 window.showJobAidSteps = showJobAidSteps;

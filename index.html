@@ -243,6 +243,15 @@ a.em:hover{text-decoration:underline}
 .btn-outline{background:#fff;color:#4a9eff;border:1px solid #4a9eff}
 .btn-outline:hover{background:#f0f7ff}
 
+/* ── LETTER TYPE CARDS ────────────────────────────────────────────────── */
+.lb-type-card{background:#f7f9fc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .15s}
+.lb-type-card:hover{border-color:#4a9eff;background:#eff6ff}
+.lb-type-card.selected{border-color:#4a9eff;background:#dbeafe;box-shadow:0 0 0 3px rgba(74,158,255,.15)}
+.lb-type-card-title{font-size:13px;font-weight:700;color:#1c2b3a;margin-bottom:3px}
+.lb-type-card-sub{font-size:11px;color:#57606a;line-height:1.4}
+.lb-type-card.selected .lb-type-card-title{color:#1d4ed8}
+.lb-type-card.selected .lb-type-card-sub{color:#3b82f6}
+
 /* ── LETTER BUILDER ───────────────────────────────────────────────────── */
 .lb-wrap{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:24px;margin-top:28px}
 .lb-wrap h3{font-size:15px;font-weight:700;color:#1c2b3a;margin-bottom:4px}
@@ -702,71 +711,111 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     <div class="breadcrumb">Home / <span>Templates</span></div>
     <div class="page-header">
       <h1>Templates &amp; Forms</h1>
-      <p>Repay letter templates for all active deduction reason types. Search or use the dropdown to download the correct letter.</p>
+      <p>Pick a letter type, fill in the details, and download — or grab the pre-built xlsx file directly.</p>
     </div>
-    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:24px;max-width:620px">
-      <div style="font-size:13px;font-weight:600;color:#1c2b3a;margin-bottom:12px">Select a Repay Letter to Open</div>
-      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-        <input type="text" id="rl-search" placeholder="Type to search letter…" oninput="filterRepayLetters(this.value)" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;outline:none">
-      </div>
-      <select id="rl-select" size="8" style="width:100%;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;padding:4px;background:#f7f8fa;color:#1c2b3a;outline:none;margin-bottom:14px"></select>
-      <div style="display:flex;gap:10px;align-items:center">
-        <a id="rl-open-btn" href="#" target="_blank" onclick="return openRepayLetter()" style="padding:8px 22px;background:#1c2b3a;color:#fff;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none">⬇ Download Letter</a>
-        <span id="rl-hint" style="font-size:12px;color:#9ab4cc">Select a letter above, then click Open PDF</span>
-      </div>
-    </div>
-    <!-- CREATE YOUR OWN LETTER -->
-    <div class="lb-wrap">
-      <h3>✍️ Create Your Own Letter</h3>
-      <p class="lb-sub">Select a template type to auto-fill the letter, or write free-form. Copilot will review your draft for grammar and tone.</p>
-      <div class="lb-section-label">Step 1 — Select Template Type</div>
-      <div class="lb-row">
-        <div class="lb-field" style="max-width:340px">
-          <label>Template Type</label>
-          <select id="lb-type" onchange="lbLoadTemplate()">
-            <option value="">— Choose a template or write free-form —</option>
-            <option value="repay_standard">Repay Request — Standard</option>
-            <option value="repay_duplicate">Repay Request — Duplicate Deduction</option>
-            <option value="repay_outside_dates">Repay Request — Outside Deal Dates</option>
-            <option value="repay_no_proof">Repay Request — No Proof of Performance</option>
-            <option value="repay_shortages">Repay Request — Shortages</option>
-            <option value="repay_freight">Repay Request — Freight</option>
-            <option value="repay_wrong_amount">Repay Request — Wrong Allowance Amount</option>
-            <option value="freeform">Free-Form (write your own)</option>
-          </select>
+
+    <!-- ── TWO-COLUMN LAYOUT ── -->
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start">
+
+      <!-- LEFT: Letter Builder -->
+      <div class="lb-wrap" style="margin-top:0">
+
+        <!-- Step 1: Type cards -->
+        <div style="margin-bottom:20px">
+          <div class="lb-section-label" style="margin-top:0">Step 1 — Choose Letter Type</div>
+          <div id="lb-type-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:6px">
+            <div class="lb-type-card" data-type="repay_standard" onclick="lbSelectCard(this,'repay_standard')">
+              <div class="lb-type-card-title">Standard Repay</div>
+              <div class="lb-type-card-sub">General invalid deduction request</div>
+            </div>
+            <div class="lb-type-card" data-type="repay_duplicate" onclick="lbSelectCard(this,'repay_duplicate')">
+              <div class="lb-type-card-title">Duplicate Deduction</div>
+              <div class="lb-type-card-sub">Already resolved / reimbursed</div>
+            </div>
+            <div class="lb-type-card" data-type="repay_outside_dates" onclick="lbSelectCard(this,'repay_outside_dates')">
+              <div class="lb-type-card-title">Outside Deal Dates</div>
+              <div class="lb-type-card-sub">Deduction outside promo period</div>
+            </div>
+            <div class="lb-type-card" data-type="repay_no_proof" onclick="lbSelectCard(this,'repay_no_proof')">
+              <div class="lb-type-card-title">No Proof of Performance</div>
+              <div class="lb-type-card-sub">No supporting documentation</div>
+            </div>
+            <div class="lb-type-card" data-type="repay_shortages" onclick="lbSelectCard(this,'repay_shortages')">
+              <div class="lb-type-card-title">Shortages</div>
+              <div class="lb-type-card-sub">Full delivery confirmed via BOL</div>
+            </div>
+            <div class="lb-type-card" data-type="repay_freight" onclick="lbSelectCard(this,'repay_freight')">
+              <div class="lb-type-card-title">Freight</div>
+              <div class="lb-type-card-sub">Unauthorized freight deduction</div>
+            </div>
+            <div class="lb-type-card" data-type="repay_wrong_amount" onclick="lbSelectCard(this,'repay_wrong_amount')">
+              <div class="lb-type-card-title">Wrong Allowance Amount</div>
+              <div class="lb-type-card-sub">Deducted more than authorized</div>
+            </div>
+            <div class="lb-type-card" data-type="freeform" onclick="lbSelectCard(this,'freeform')">
+              <div class="lb-type-card-title">✏️ Free-Form</div>
+              <div class="lb-type-card-sub">Write your own letter</div>
+            </div>
+          </div>
+          <input type="hidden" id="lb-type" value="">
         </div>
-      </div>
-      <div class="lb-section-label">Step 2 — Fill in Details</div>
-      <div class="lb-row">
-        <div class="lb-field"><label>Recipient Name</label><input type="text" id="lb-to" placeholder="e.g. John Smith" oninput="lbUpdatePreview()"></div>
-        <div class="lb-field"><label>Recipient Title / Company</label><input type="text" id="lb-company" placeholder="e.g. Acosta — Kroger Team" oninput="lbUpdatePreview()"></div>
-        <div class="lb-field"><label>Deduction / Claim #</label><input type="text" id="lb-claim" placeholder="e.g. DED-2024-0091" oninput="lbUpdatePreview()"></div>
-      </div>
-      <div class="lb-row">
-        <div class="lb-field"><label>Amount</label><input type="text" id="lb-amount" placeholder="e.g. $1,250.00" oninput="lbUpdatePreview()"></div>
-        <div class="lb-field"><label>Customer</label><input type="text" id="lb-customer" placeholder="e.g. Kroger" oninput="lbUpdatePreview()"></div>
-        <div class="lb-field"><label>Your Name / Sender</label><input type="text" id="lb-from" placeholder="e.g. eLS Team" oninput="lbUpdatePreview()"></div>
-      </div>
-      <div class="lb-section-label">Step 3 — Edit / View Letter</div>
-      <div class="lb-editor-wrap">
-        <textarea class="lb-editor" id="lb-editor" placeholder="Your letter will appear here. You can also type free-form directly." oninput="lbCopilotAnalyze()"></textarea>
-      </div>
-      <div class="copilot-panel">
-        <div class="copilot-header">
-          <div class="copilot-logo">Co</div>
-          <span class="copilot-title">Copilot Advisor</span>
-          <span class="copilot-badge">Grammar &amp; Tone</span>
+
+        <!-- Step 2: Fields -->
+        <div class="lb-section-label">Step 2 — Fill in Details</div>
+        <div class="lb-row">
+          <div class="lb-field"><label>Recipient Name</label><input type="text" id="lb-to" placeholder="e.g. John Smith" oninput="lbUpdatePreview()"></div>
+          <div class="lb-field"><label>Recipient Company</label><input type="text" id="lb-company" placeholder="e.g. Kroger AP Team" oninput="lbUpdatePreview()"></div>
         </div>
-        <div class="copilot-output" id="lb-copilot-out">
-          <div class="cop-item" style="color:#9ab4cc;font-style:italic">Start typing or select a template — Copilot will review your letter here.</div>
+        <div class="lb-row">
+          <div class="lb-field"><label>Deduction / Claim #</label><input type="text" id="lb-claim" placeholder="e.g. DED-2024-0091" oninput="lbUpdatePreview()"></div>
+          <div class="lb-field"><label>Amount</label><input type="text" id="lb-amount" placeholder="e.g. $1,250.00" oninput="lbUpdatePreview()"></div>
+          <div class="lb-field"><label>Customer</label><input type="text" id="lb-customer" placeholder="e.g. Kroger" oninput="lbUpdatePreview()"></div>
         </div>
-      </div>
-      <div class="lb-actions">
-        <button class="btn btn-dark" onclick="lbUpdatePreview()">🔄 Refresh Preview</button>
-        <button class="btn btn-outline" onclick="lbCopilotAnalyze()">✨ Run Copilot Check</button>
-        <button class="btn btn-green" onclick="lbDownload()">⬇ Download Letter (.txt)</button>
-        <span id="lb-dl-hint" style="font-size:12px;color:#9ab4cc">Fill in fields and edit the letter before downloading.</span>
-      </div>
+        <div class="lb-row">
+          <div class="lb-field"><label>Your Name / Sender</label><input type="text" id="lb-from" placeholder="e.g. eLS Team" oninput="lbUpdatePreview()"></div>
+        </div>
+
+        <!-- Step 3: Editor -->
+        <div class="lb-section-label">Step 3 — Review &amp; Edit Letter</div>
+        <div id="lb-empty-state" style="background:#f7f9fc;border:1.5px dashed #e2e8f0;border-radius:10px;padding:32px;text-align:center;color:#a0aec0;font-size:13px;margin-bottom:12px">
+          ← Select a letter type above to get started
+        </div>
+        <div id="lb-editor-area" style="display:none">
+          <div class="lb-editor-wrap">
+            <textarea class="lb-editor" id="lb-editor" placeholder="Your letter will appear here…" oninput="lbCopilotAnalyze()"></textarea>
+          </div>
+          <div class="copilot-panel" style="margin-top:10px">
+            <div class="copilot-header">
+              <div class="copilot-logo">Co</div>
+              <span class="copilot-title">Copilot Advisor</span>
+              <span class="copilot-badge">Grammar &amp; Tone</span>
+            </div>
+            <div class="copilot-output" id="lb-copilot-out">
+              <div class="cop-item" style="color:#9ab4cc;font-style:italic">Fill in details — Copilot will review your letter here.</div>
+            </div>
+          </div>
+          <div class="lb-actions" style="margin-top:14px">
+            <button class="btn btn-green" onclick="lbDownload()">⬇ Download (.txt)</button>
+            <button class="btn btn-outline" onclick="lbCopyClipboard()">📋 Copy to Clipboard</button>
+            <button class="btn btn-dark" onclick="lbUpdatePreview()">🔄 Refresh</button>
+            <span id="lb-dl-hint" style="font-size:12px;color:#9ab4cc"></span>
+          </div>
+        </div>
+
+      </div><!-- /left -->
+
+      <!-- RIGHT: Download pre-built xlsx -->
+      <div>
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;position:sticky;top:72px">
+          <div style="font-size:13px;font-weight:700;color:#1c2b3a;margin-bottom:4px">📁 Pre-Built Letter Files</div>
+          <div style="font-size:12px;color:#57606a;margin-bottom:14px">Download a ready-made xlsx repay letter template</div>
+          <input type="text" id="rl-search" placeholder="🔍 Search letter…" oninput="filterRepayLetters(this.value)" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;outline:none;margin-bottom:8px;box-sizing:border-box">
+          <select id="rl-select" size="10" style="width:100%;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;padding:4px;background:#f7f8fa;color:#1c2b3a;outline:none;margin-bottom:10px"></select>
+          <button onclick="openRepayLetter()" style="width:100%;padding:10px;background:#1c2b3a;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px">⬇ Download Selected File</button>
+          <div id="rl-hint" style="font-size:11px;color:#9ab4cc;margin-top:8px;text-align:center"></div>
+        </div>
+      </div><!-- /right -->
+
     </div>
   </div><!-- /template -->
 

@@ -1060,7 +1060,18 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
   /* ── session check ── */
   function show(){document.getElementById('login-gate').classList.remove('hidden');}
   function hide(){document.getElementById('login-gate').classList.add('hidden');}
-  try{if(sessionStorage.getItem(SESSION_KEY)==='1'){hide();return;}}catch(e){}
+  function showAdminBtn(){
+    var btn=document.getElementById('admin-panel-btn');
+    if(btn) btn.style.display='flex';
+  }
+  try{
+    if(sessionStorage.getItem(SESSION_KEY)==='1'){
+      hide();
+      /* restore admin button if master session is flagged */
+      if(sessionStorage.getItem(SESSION_KEY+'_master')==='1') showAdminBtn();
+      return;
+    }
+  }catch(e){}
   show();
 
   /* ── sign in ── */
@@ -1071,8 +1082,8 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       try{sessionStorage.setItem(SESSION_KEY,'1');}catch(e){}
       /* show admin panel only for master account */
       if(isMaster(u,p)){
-        var btn=document.getElementById('admin-panel-btn');
-        if(btn) btn.style.display='flex';
+        try{sessionStorage.setItem(SESSION_KEY+'_master','1');}catch(e){}
+        showAdminBtn();
       }
       hide();
       document.getElementById('login-error').textContent='';

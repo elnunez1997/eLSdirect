@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Footprint Directory</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;background:#fff;color:#1f2328}
+header{background:#f7f8fa;border-bottom:1px solid #e5e7eb;padding:16px 24px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:12px;color:#57606a;margin-top:2px}
+.container{max-width:1200px;margin:0 auto;padding:24px 16px}
+.tabs{display:flex;border-bottom:2px solid #e5e7eb;margin-bottom:20px}
+.tab-btn{padding:8px 18px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:#57606a;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab-btn.active{color:#3b82d4;border-bottom-color:#3b82d4}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.controls{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+input[type=text]{padding:7px 12px;border:1px solid #e5e7eb;border-radius:4px;font-size:13px;width:300px}
+select{padding:7px 10px;border:1px solid #e5e7eb;border-radius:4px;font-size:13px;background:#fff}
+.count{font-size:12px;color:#57606a;margin-left:auto}
+.table-wrap{overflow-x:auto;border:1px solid #e5e7eb;border-radius:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:9px 12px;text-align:left;font-weight:600;font-size:12px;color:#57606a;border-bottom:1px solid #e5e7eb;white-space:nowrap;background:#f7f8fa;position:sticky;top:0;z-index:1}
+td{padding:8px 12px;border-bottom:1px solid #f3f4f6;vertical-align:top;max-width:200px;word-break:break-word}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f7f8fa}
+tr.hidden{display:none}
+.sba{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap}
+.fb{background:#dbeafe;color:#1d4ed8}
+.sbs{background:#d1fae5;color:#065f46}
+.pet{background:#ede9fe;color:#4c1d95}
+.coffee{background:#fef3c7;color:#92400e}
+.fhs{background:#ffe4e6;color:#9f1239}
+.other{background:#f3f4f6;color:#374151}
+a.em{color:#3b82d4;text-decoration:none;font-size:12px}
+a.em:hover{text-decoration:underline}
+.muted{color:#57606a;font-size:12px;font-style:italic}
+.empty-row td{text-align:center;padding:32px;color:#57606a}
+footer{text-align:center;font-size:12px;color:#57606a;border-top:1px solid #e5e7eb;padding:16px;margin-top:32px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Footprint Directory</h1>
+  <p>Source: Footprint.xlsx &nbsp;·&nbsp; Updated 6.16.26 &nbsp;·&nbsp; 3 sheets loaded</p>
+</header>
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('direct',this)">US Retail – Direct</button>
+    <button class="tab-btn" onclick="showTab('acosta',this)">US Retail – Acosta Supported</button>
+    <button class="tab-btn" onclick="showTab('natdist',this)">Natural Dist. BMs</button>
+  </div>
+
+  <!-- TAB 1 -->
+  <div id="tab-direct" class="tab-panel active">
+    <div class="controls">
+      <input type="text" id="d-search" placeholder="Search customer…" oninput="filter('direct')">
+      <select id="d-sba" onchange="filter('direct')">
+        <option value="">All SBAs</option>
+        <option>SBS</option><option>Pet</option><option>Coffee</option><option>FHS</option>
+      </select>
+      <span class="count" id="d-count"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Customer</th><th>SBA</th></tr></thead>
+        <tbody id="d-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div id="tab-acosta" class="tab-panel">
+    <div class="controls">
+      <input type="text" id="a-search" placeholder="Search customer, name, email…" oninput="filter('acosta')">
+      <select id="a-sba" onchange="filter('acosta')">
+        <option value="">All SBAs</option>
+        <option>F&amp;B</option><option>SBS</option><option>Pet</option><option>Coffee</option><option>FHS</option>
+      </select>
+      <span class="count" id="a-count"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Customer</th><th>SBA</th>
+          <th>JMS Sales VP</th><th>JMS Sales Director</th><th>JMS Sales Manager</th>
+          <th>Acosta Leadership</th><th>Acosta BM</th>
+          <th>Trade Spec (Central)</th><th>Local Trade Spec</th><th>Local Trade Mgr</th>
+          <th>Order Routing</th><th>Acosta CSC</th><th>Deduction Analyst</th><th>Invalid Processor</th>
+        </tr></thead>
+        <tbody id="a-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 3 -->
+  <div id="tab-natdist" class="tab-panel">
+    <div class="controls">
+      <input type="text" id="n-search" placeholder="Search…" oninput="filter('natdist')">
+      <span class="count" id="n-count"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Customer</th><th>Natural Distributor</th>
+          <th>JMS Natural Dist. POC</th><th>SBA</th>
+          <th>Acosta BM</th><th>Phone</th>
+        </tr></thead>
+        <tbody id="n-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<footer>Made with IBM Bob</footer>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+// Direct: [customer, sba]
+var DIRECT = [
+  ["Ahold","SBS"],["Ahold","Pet"],["Ahold","Coffee"],["Ahold","FHS"],
+  ["Aldi / No claims or BMA support",""],
+  ["Bartell Drug",""],
+  ["BJ's","SBS"],["BJ's","Pet"],["BJ's","Coffee"],["BJ's","FHS"],
+  ["Chain Drug Marketing",""],
+  ["Costco / No claims or direct BMA support",""],
+  ["CVS",""],
+  ["DelHaize","SBS"],["DelHaize","Pet"],["DelHaize","Coffee"],["DelHaize","FHS"],
+  ["Discount Drug Mart",""],
+  ["Dollar General","SBS"],["Dollar General","Pet"],["Dollar General","Coffee"],["Dollar General","FHS"],
+  ["Drug Customers (CVS, Walgreens, Discount Drug, Kinney)","Pet"],
+  ["Drug Customers (CVS, Walgreens, Discount Drug, Kinney)","Coffee"],
+  ["Drug Customers (CVS, Walgreens, Discount Drug, Kinney)","SBS"],
+  ["Drug Customers (CVS, Walgreens, Discount Drug, Kinney)","FHS"],
+  ["Family Dollar","SBS"],["Family Dollar","Pet"],["Family Dollar","Coffee"],["Family Dollar","FHS"],
+  ["Frank W Kerr Company",""],
+  ["Giant Eagle","SBS"],["Giant Eagle","Pet"],["Giant Eagle","Coffee"],["Giant Eagle","FHS"],
+  ["Halfon Candy Co / claims only, no direct BMA support",""],
+  ["HEB","SBS"],["HEB","Pet"],["HEB","FHS"],["HEB","Coffee"],
+  ["HyVee","SBS"],["HyVee","Pet"],["HyVee","FHS"],["HyVee","Coffee"],
+  ["Ingles","Coffee"],["Ingles","SBS"],["Ingles","Pet"],["Ingles","FHS"],
+  ["KPH Healthcare (Kinney)",""],
+  ["Kroger","SBS"],["Kroger","Pet"],["Kroger","Coffee"],["Kroger","FHS"],
+  ["Market Basket (Demoulas - Sales broker assist)","SBS"],
+  ["Market Basket (Demoulas - Sales broker assist)","Coffee"],
+  ["Market Basket (Demoulas - Sales broker assist)","Pet"],
+  ["Market Basket (Demoulas - Sales broker assist)","FHS"],
+  ["Meijer","SBS"],["Meijer","Pet"],["Meijer","Coffee"],["Meijer","FHS"],
+  ["Northeast Grocers/Tops & Price Chopper","SBS"],
+  ["Northeast Grocers/Tops & Price Chopper","Pet"],
+  ["Northeast Grocers/Tops & Price Chopper","Coffee"],
+  ["Northeast Grocers/Tops & Price Chopper","FHS"],
+  ["Publix","SBS"],["Publix","Pet"],["Publix","Coffee"],["Publix","FHS"],
+  ["Rite Aid",""],
+  ["SEG","Coffee"],["SEG","SBS"],["SEG","Pet"],["SEG","FHS"],
+  ["Target","SBS"],["Target","Pet"],["Target","Coffee"],["Target","FHS"],
+  ["Wakefern","SBS"],["Wakefern","Pet"],["Wakefern","Coffee"],["Wakefern","FHS"],
+  ["Walgreens",""],
+  ["Wegmans","Pet"],["Wegmans","SBS"],["Wegmans","Coffee"],["Wegmans","FHS"],
+  ["Weis","SBS"],["Weis","Pet"],["Weis","Coffee"],["Weis","FHS"],
+  ["Winco","Coffee"],["Winco","Pet"],["Winco","SBS"],["Winco","FHS"]
+];
+
+// Acosta: [customer, sba, vpName, vpEmail, dirName, dirEmail, mgrName, mgrEmail,
+//          acostaLeadership, bmName, bmEmail, centralTS, localTS, localTM,
+//          orderRouting, cscName, cscEmail, deductionAnalyst, invalidProcessor]
+var ACOSTA = [
+  ["Affiliated - West Texas","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Paula Palmejar","paula.palmejar@jmsmucker.com","Christine Hill","Stephanie Black","sxblack@acosta.com","Michael Nievarez","Amor Vasquez","Bridget Torbick","Acosta","Carrie Basinger","CBasinger@acosta.com","Joshua Vargas","Jameson Balbin"],
+  ["Affiliated - West Texas","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Christine Hill","Stephanie Black","sxblack@acosta.com","Michael Nievarez","Amor Vasquez","Bridget Torbick","Acosta","Carrie Basinger","CBasinger@acosta.com","Joshua Vargas","Jameson Balbin"],
+  ["Affiliated - West Texas","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","JJ Brown","jason.brown@jmsmucker.com","Matt Field/Christine Hill","Stephanie Black","sxblack@acosta.com","Michael Nievarez","Amor Vasquez","Bridget Torbick","Acosta","Carrie Basinger","CBasinger@acosta.com","Joshua Vargas","Jameson Balbin"],
+  ["Alberstons - No Cal","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Matt Field/Richard Coccimiglio","Diana Burton","dburton@acosta.com","Ian Hector Eninares","Linda De La O","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Alberstons - No Cal","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field/Richard Coccimiglio","Diana Burton","dburton@acosta.com","Ian Hector Eninares","Linda De La O","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Alberstons - No Cal","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field/Richard Coccimiglio","Diana Burton","dburton@acosta.com","Ian Hector Eninares","Linda De La O","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Matt Field","Matt Field","mfield@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field","Matt Field","mfield@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field","Matt Field","mfield@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Denver","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Matt Field","Matt Field","mfield@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Denver","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field","Robert Casabonne","rcasabonne@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Denver","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field","Robert Casabonne","rcasabonne@acosta.com","Ian Hector Eninares","Darean Harvey","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Inter Mountain","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Matt Field","Matt Field","mfield@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Inter Mountain","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field","Robert Casabonne","rcasabonne@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Inter Mountain","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field","Robert Casabonne","rcasabonne@acosta.com","Ian Hector Eninares","Darean Harvey","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Jewel","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Matt Field/Kim Haigh","Gail Schonta","gschonta@acosta.com","Ian Hector Eninares","Bridget Torbick","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Jewel","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field/Kim Haigh","Gail Schonta","gschonta@acosta.com","Ian Hector Eninares","Bridget Torbick","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Jewel","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field/Kim Haigh","Gail Schonta","gschonta@acosta.com","Ian Hector Eninares","Bridget Torbick","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Mid Atlantic","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Matt Field/Jeff Mullinix","Peggy Kiehl","pkiehl@acosta.com","Ian Hector Eninares","Robyn Yalian","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Mid Atlantic","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field/Jeff Mullinix","Peggy Kiehl","pkiehl@acosta.com","Ian Hector Eninares","Robyn Yalian","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Mid Atlantic","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field/Jeff Mullinix","Peggy Kiehl","pkiehl@acosta.com","Ian Hector Eninares","Robyn Yalian","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Portland","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Joey Zornado","Dave Choate","DChoate@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Portland","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field/Joseph Zornado","Dave Choate","DChoate@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Portland","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Joey Zornado","Dave Choate","DChoate@acosta.com","Ian Hector Eninares","Darean Harvey","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Seattle","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Joey Zornado","Dave Choate","DChoate@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Seattle","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field/Joseph Zornado","Dave Choate","DChoate@acosta.com","Ian Hector Eninares","Jessica Huggins","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Seattle","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Joey Zornado","Dave Choate","DChoate@acosta.com","Ian Hector Eninares","Darean Harvey","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Shaws","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Matt Field/Jeff Mullinix","Peggy Kiehl","pkiehl@acosta.com","Ian Hector Eninares","Robyn Yalian","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Shaws","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field/Jeff Mullinix","Peggy Kiehl","pkiehl@acosta.com","Ian Hector Eninares","Robyn Yalian","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - Shaws","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field/Jeff Mullinix","Peggy Kiehl","pkiehl@acosta.com","Ian Hector Eninares","Robyn Yalian","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - So Cal","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Matt Field/Michael Welter","Jasper Shin","jshin@acosta.com","Ian Hector Eninares","Linda De La O","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - So Cal","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field/Michael Welter","Jasper Shin","jshin@acosta.com","Ian Hector Eninares","Linda De La O","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - So Cal","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field/Michael Welter","Myles Byington","mbyington@acosta.com","Ian Hector Eninares","Linda De La O","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - SW","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Matt Field/Michael Welter","Marian Rockwell","mrockwell@acosta.com","Ian Hector Eninares","Linda De La O","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - SW","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field/Michael Welter","Marian Rockwell","mrockwell@acosta.com","Ian Hector Eninares","Linda De La O","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - SW","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field/Michael Welter","Marian Rockwell","mrockwell@acosta.com","Ian Hector Eninares","Linda De La O","Bridget Torbick","JMS","No Acosta CS Support","","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - United Supermarkets","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Roger Pao","roger.pao@jmsmucker.com","Christine Hill","Stephanie Black","sxblack@acosta.com","Ian Hector Eninares","Amor Vasquez","Bridget Torbick","JMS","Vicki Lagaly","vlagaly@acosta.com","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - United Supermarkets","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Matt Field/Christine Hill","Stephanie Black","sxblack@acosta.com","Ian Hector Eninares","Amor Vasquez","Bridget Torbick","JMS","Vicki Lagaly","vlagaly@acosta.com","Larry Oliquino","Justine Maglapid"],
+  ["Albertsons - United Supermarkets","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Matt Field/Christine Hill","Stephanie Black","sxblack@acosta.com","Ian Hector Eninares","Amor Vasquez","Bridget Torbick","JMS","Vicki Lagaly","vlagaly@acosta.com","Larry Oliquino","Justine Maglapid"],
+  ["Aloha Foods","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Marie Catuar","marie.catuar@jmsmucker.com","David Nelson","Kelvin Truong","ktruong@acosta.com","Sofia Del Valle","Melissa Hostetler","Cameron Fithian","n/a","Vicki Lagaly","vlagaly@acosta.com","Ace Ecalner","Jameson Balbin"],
+  ["Aloha Foods","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","David Nelson","Ricky Sinconis","rsinconis@acosta.com","Sofia Del Valle","Stephanie Leimer Simmons","Kimberly Thomas","n/a","Vicki Lagaly","vlagaly@acosta.com","Ace Ecalner","Jameson Balbin"],
+  ["Aloha Foods","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","David Nelson","Ricky Sinconis","rsinconis@acosta.com","Sofia Del Valle","Stephanie Leimer Simmons","Kimberly Thomas","n/a","Vicki Lagaly","vlagaly@acosta.com","Ace Ecalner","Jameson Balbin"],
+  ["ASG - Associated Supermarket Group","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Fred Drantch - Director, Wholesale","fred.drantch@jmsmucker.com","Jeff Keller","jeffrey.keller@jmsmucker.com","Bridget Faughnan","Rich Guarnieri","rguarnieri@acosta.com","Sharlotte Ables","Tom Gianni","Lorraine Dinkel","n/a","Carrie Basinger","CBasinger@acosta.com","Joshua Vargas","Jameson Balbin"],
+  ["ASG - Associated Supermarket Group","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","Bridget Faughnan","Rich Guarnieri","rguarnieri@acosta.com","Sharlotte Ables","Tom Gianni","Lorraine Dinkel","n/a","Carrie Basinger","CBasinger@acosta.com","Joshua Vargas","Jameson Balbin"],
+  ["ASG - Associated Supermarket Group","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Kevin Lazarski","kevin.lazarski1@jmsmucker.com","Bridget Faughnan","Rich Guarnieri","rguarnieri@acosta.com","Sharlotte Ables","Tom Gianni","Lorraine Dinkel","n/a","Carrie Basinger","CBasinger@acosta.com","Joshua Vargas","Jameson Balbin"],
+  ["Associated Food","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Marie Catuar","marie.catuar@jmsmucker.com","David Nelson","Kelvin Truong","ktruong@acosta.com","Sharlotte Ables","Melissa Hostetler","Cameron Fithian","JMS","Lizamarie Barreto","lbarreto@acosta.com","Joshua Vargas","Jim Jocel Balbuena"],
+  ["Associated Food","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","David Nelson","Kristen Albrecht","kcalbrecht@acosta.com","Sharlotte Ables","Marla Card","Raquel Sustaita","JMS","Lizamarie Barreto","lbarreto@acosta.com","Joshua Vargas","Jim Jocel Balbuena"],
+  ["Associated Food","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","David Nelson","Kristen Albrecht","kcalbrecht@acosta.com","Sharlotte Ables","Marla Card","Raquel Sustaita","JMS","Lizamarie Barreto","lbarreto@acosta.com","Joshua Vargas","Jim Jocel Balbuena"],
+  ["Associated Grocers - Baton Rouge","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Adrienne Brown","adrienne.brown@jmsmucker.com","Tom Mcguire","Alex Ordonez","aordonezmacias@acosta.com","Sharlotte Ables","Mary Peterson","Sarah Lofland","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Joshua Vargas","Jim Jocel Balbuena"],
+  ["Associated Grocers - Baton Rouge","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","Tom Mcguire","Alex Ordonez","aordonezmacias@acosta.com","Sharlotte Ables","Mary Peterson","Sarah Lofland","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Joshua Vargas","Jim Jocel Balbuena"],
+  ["Associated Grocers - Baton Rouge","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Katie Pittman - Director, Sales East","katie.pittman@jmsmucker.com","Jeff White","jeff.white@jmsmucker.com","Tom Mcguire","Alex Ordonez","aordonezmacias@acosta.com","Sharlotte Ables","Mary Peterson","Sarah Lofland","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Joshua Vargas","Jim Jocel Balbuena"],
+  ["Associated Grocers - Birmingham","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Adrienne Brown","adrienne.brown@jmsmucker.com","Chris Fields","Carol Land","cland@acosta.com","Sharlotte Ables","Kristy Dial","Raquel Sustaita","JMS","Lizamarie Barreto","lbarreto@acosta.com","Joshua Vargas","Justine Maglapid"],
+  ["Associated Grocers - Birmingham","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Katie Pittman - Director, Sales East","katie.pittman@jmsmucker.com","Jeff White","jeff.white@jmsmucker.com","Chris Fields","Josh Hines","jhines@acosta.com","Sharlotte Ables","Kristy Dial","Raquel Sustaita","JMS","Lizamarie Barreto","lbarreto@acosta.com","Joshua Vargas","Justine Maglapid"],
+  ["Associated Grocers - Birmingham","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","Chris Fields","Josh Hines","jhines@acosta.com","Sharlotte Ables","Kristy Dial","Raquel Sustaita","JMS","Lizamarie Barreto","lbarreto@acosta.com","Joshua Vargas","Justine Maglapid"],
+  ["AWG","FHS","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Fred Drantch - Director, Wholesale","fred.drantch@jmsmucker.com","Al Curran","alexander.curran@jmsmucker.com","Christy Heitman","Doug Kasson","dkasson@acosta.com","Ma. Klabelle Arellano","Taylor Pannell","Sarah Lofland","VMI = JMS, All Other = Acosta","Alexia Young","ayoung2@acosta.com","Angel Ken Azur","Justine Maglapid"],
+  ["AWG","Coffee","Heidi Bangos","heidi.bangos@jmsmucker.com","Fred Drantch - Director, Wholesale","fred.drantch@jmsmucker.com","Tom Renslow","thomas.renslow@jmsmucker.com","Christy Heitman","Doug Kasson","dkasson@acosta.com","Ma. Klabelle Arellano","Taylor Pannell","Sarah Lofland","VMI = JMS, All Other = Acosta","Alexia Young","ayoung2@acosta.com","Angel Ken Azur","Justine Maglapid"],
+  ["AWG","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","Christy Heitman","Megan Post","mpost@acosta.com","Ma. Klabelle Arellano","Taylor Pannell","Sarah Lofland","VMI = JMS, All Other = Acosta","Alexia Young","ayoung2@acosta.com","Angel Ken Azur","Justine Maglapid"],
+  ["AWG","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Adrienne Brown","adrienne.brown@jmsmucker.com","Christy Heitman","Megan Post","mpost@acosta.com","Ma. Klabelle Arellano","Taylor Pannell","Sarah Lofland","VMI = JMS, All Other = Acosta","Alexia Young","ayoung2@acosta.com","Angel Ken Azur","Justine Maglapid"],
+  ["Basha's","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","David Nelson","Jennifer Harp","jharp@acosta.com","Roy Villeno Chavez","Tiffany Ronquillo","Cameron Fithian","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Janna Segui","Erjay Molina"],
+  ["Basha's","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Marie Catuar","marie.catuar@jmsmucker.com","David Nelson","Kelvin Truong","ktruong@acosta.com","Roy Villeno Chavez","Melissa Hostetler","Cameron Fithian","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Janna Segui","Erjay Molina"],
+  ["Basha's","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","David Nelson","Jennifer Harp","jharp@acosta.com","Roy Villeno Chavez","Dana Conllin","Cameron Fithian","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Janna Segui","Erjay Molina"],
+  ["Bi Mart","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Katie Pittman - Director, Sales East","katie.pittman@jmsmucker.com","Fernando Acosta","fernando.acosta@jmsmucker.com","Brett McGowan","Jack Harris","jharris@acosta.com","Sharlotte Ables","Stephanie Leimer Simmons","Kimberly Thomas","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Ace Ecalner","Jim Jocel Balbuena"],
+  ["Bi Mart","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Doug Vanderhorst","Jaqueline Combs","jcombs@acosta.com","Sharlotte Ables","Stephanie Leimer Simmons","Kimberly Thomas","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Ace Ecalner","Jim Jocel Balbuena"],
+  ["Bi Mart","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Mike Aquilina","michael.aquilina@jmsmucker.com","Brett McGowan","Jack Harris","jharris@acosta.com","Sharlotte Ables","Stephanie Leimer Simmons","Kimberly Thomas","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Ace Ecalner","Jim Jocel Balbuena"],
+  ["Big Lots","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Kevin Lazarski","kevin.lazarski1@jmsmucker.com","Calvin Johnson","Calvin Johnson","cjohnson@acosta.com","","Melissa Walker","Denise Arriaga","JMS","Vicki Lagaly","vlagaly@acosta.com","Ace Ecalner","Jim Jocel Balbuena"],
+  ["Big Lots","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Calvin Johnson","Calvin Johnson","cjohnson@acosta.com","","Melissa Walker","Denise Arriaga","JMS","Vicki Lagaly","vlagaly@acosta.com","Ace Ecalner","Jim Jocel Balbuena"],
+  ["Big Lots","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Katie Pittman - Director, Sales East","katie.pittman@jmsmucker.com","Fernando Acosta","fernando.acosta@jmsmucker.com","Calvin Johnson","Calvin Johnson","cjohnson@acosta.com","","Melissa Walker","Denise Arriaga","JMS","Vicki Lagaly","vlagaly@acosta.com","Ace Ecalner","Jim Jocel Balbuena"],
+  ["Bozzuto's","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Kevin Lazarski","kevin.lazarski1@jmsmucker.com","John Hollaran","Erin Lajoie","elajoie@acosta.com","Ma. Klabelle Arellano","Christine Mustac","Stephanie Stiles","Acosta","Carrie Basinger","CBasinger@acosta.com","Janna Segui","Jim Jocel Balbuena"],
+  ["Bozzuto's","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","John Hollaran","Erin Lajoie","elajoie@acosta.com","Ma. Klabelle Arellano","Christine Mustac","Stephanie Stiles","Acosta","Carrie Basinger","CBasinger@acosta.com","Janna Segui","Jim Jocel Balbuena"],
+  ["Bozzuto's","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Katie Pittman - Director, Sales East","katie.pittman@jmsmucker.com","Fernando Acosta","fernando.acosta@jmsmucker.com","Kevin Mcbride","Erin Lajoie","elajoie@acosta.com","Ma. Klabelle Arellano","Christine Mustac","Stephanie Stiles","Acosta","Carrie Basinger","CBasinger@acosta.com","Janna Segui","Jim Jocel Balbuena"],
+  ["Brookshire Bros","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","JJ Brown","jason.brown@jmsmucker.com","Tom Mcguire","Alex Ordonez","aordonezmacias@acosta.com","Sharlotte Ables","Mary Peterson","Sarah Lofland","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Janna Segui","Justine Maglapid"],
+  ["Brookshire Bros","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Tom Mcguire","Alex Ordonez","aordonezmacias@acosta.com","Sharlotte Ables","Mary Peterson","Sarah Lofland","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Janna Segui","Justine Maglapid"],
+  ["Brookshire Bros","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Paula Palmejar","paula.palmejar@jmsmucker.com","Tom Mcguire","Alex Ordonez","aordonezmacias@acosta.com","Sharlotte Ables","Mary Peterson","Sarah Lofland","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Janna Segui","Justine Maglapid"],
+  ["Brookshire Grocery","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","JJ Brown","jason.brown@jmsmucker.com","Tom Mcguire","Alex Ordonez","aordonezmacias@acosta.com","Sharlotte Ables","Mary Peterson","Sarah Lofland","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Janna Segui","Justine Maglapid"],
+  ["Brookshire Grocery","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Tom Mcguire","Alex Ordonez","aordonezmacias@acosta.com","Sharlotte Ables","Mary Peterson","Sarah Lofland","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Janna Segui","Justine Maglapid"],
+  ["Brookshire Grocery","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Paula Palmejar","paula.palmejar@jmsmucker.com","Tom Mcguire","Alex Ordonez","aordonezmacias@acosta.com","Sharlotte Ables","Mary Peterson","Sarah Lofland","Acosta","Lizamarie Barreto","lbarreto@acosta.com","Janna Segui","Justine Maglapid"],
+  ["C&S","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Kevin Lazarski","kevin.lazarski1@jmsmucker.com","John Hollaran","Erin Lajoie","elajoie@acosta.com","Jastine Matias","Christine Mustac","Stephanie Stiles","JMS","No Acosta CS Support","","Lovely Joy Janoras","Jim Jocel Balbuena"],
+  ["C&S","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","Kevin Mcbride","Erin Lajoie","elajoie@acosta.com","Jastine Matias","Christine Mustac","Stephanie Stiles","JMS","No Acosta CS Support","","Lovely Joy Janoras","Jim Jocel Balbuena"],
+  ["C&S","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Fred Drantch - Director, Wholesale","fred.drantch@jmsmucker.com","Jeff Keller","jeffrey.keller@jmsmucker.com","Kevin Mcbride","Erin Lajoie","elajoie@acosta.com","Jastine Matias","Christine Mustac","Stephanie Stiles","JMS","No Acosta CS Support","","Lovely Joy Janoras","Jim Jocel Balbuena"],
+  ["C&S No Cal","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Fred Drantch - Director, Wholesale","fred.drantch@jmsmucker.com","Jeff Keller","jeffrey.keller@jmsmucker.com","Brett McGowan","Jack Harris","jharris@acosta.com","Jastine Matias","Stephanie Leimer Simmons","Kimberly Thomas","JMS","No Acosta CS Support","","Lovely Joy Janoras","Jim Jocel Balbuena"],
+  ["C&S No Cal","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","Doug Vanderhorst","Jaqueline Combs","jcombs@acosta.com","Jastine Matias","Stephanie Leimer Simmons","Kimberly Thomas","JMS","No Acosta CS Support","","Lovely Joy Janoras","Jim Jocel Balbuena"],
+  ["C&S No Cal","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Kevin Lazarski","kevin.lazarski1@jmsmucker.com","Kevin Mcbride","Jennifer Kovalik","jkovalik@acosta.com","Jastine Matias","Stephanie Leimer Simmons","Kimberly Thomas","JMS","No Acosta CS Support","","Lovely Joy Janoras","Jim Jocel Balbuena"],
+  ["C&S Hawaii","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","Doug Vanderhorst","Jaqueline Combs","jcombs@acosta.com","Jastine Matias","Rachelle Hyams","Rachelle Hyams","JMS","No Acosta CS Support","","Lovely Joy Janoras","Jim Jocel Balbuena"],
+  ["C&S Hawaii","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Fred Drantch - Director, Wholesale","fred.drantch@jmsmucker.com","Jeff Keller","jeffrey.keller@jmsmucker.com","n/a","LH Gamble","","Jastine Matias","Rachelle Hyams","Rachelle Hyams","JMS","No Acosta CS Support","","Lovely Joy Janoras","Jim Jocel Balbuena"],
+  ["C&S Hawaii","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Kevin Lazarski","kevin.lazarski1@jmsmucker.com","n/a","LH Gamble","","Jastine Matias","Rachelle Hyams","Rachelle Hyams","JMS","No Acosta CS Support","","Lovely Joy Janoras","Jim Jocel Balbuena"],
+  ["Cavallaro Foods","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","(JMS Wegmans direct)","","n/a","(JMS Wegmans direct)","","Michael Nievarez","Mari Dunn Quitoriano","Elizabeth Brooks","Acosta","Carrie Basinger","CBasinger@acosta.com","Ace Ecalner","Justine Maglapid"],
+  ["Cavallaro Foods","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","(JMS Wegmans direct)","","n/a","(JMS Wegmans direct)","","Michael Nievarez","Mari Dunn Quitoriano","Elizabeth Brooks","Acosta","Carrie Basinger","CBasinger@acosta.com","Ace Ecalner","Justine Maglapid"],
+  ["Cavallaro Foods","Coffee","Heidi Bangos","heidi.bangos@jmsmucker.com","Katie Pittman - Director, Sales East","katie.pittman@jmsmucker.com","Mateo Colon","mateo.colon@jmsmucker.com","John Cleary","Jennifer Gorom (Cafe Bustelo only)","Jgorom@acosta.com","Michael Nievarez","Christine Mustac","Stephanie Stiles","Acosta","Carrie Basinger","CBasinger@acosta.com","Ace Ecalner","Justine Maglapid"],
+  ["Certco/Woodmans","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","JJ Brown","jason.brown@jmsmucker.com","Bob Weber","Barbara Bronkhorst","bbronkhorst@acosta.com","Ma. Klabelle Arellano","Jackie Lynn","Kim Thomas","Acosta","Vicki Lagaly","vlagaly@acosta.com","Ace Ecalner","Jim Jocel Balbuena"],
+  ["Certco/Woodmans","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Shiketa Gresham - Director, Regional","shiketa.gresham@jmsmucker.com","Brandon Brady","brandon.brady@jmsmucker.com","Bob Weber","Barbara Bronkhorst","bbronkhorst@acosta.com","Ma. Klabelle Arellano","Jackie Lynn","Kim Thomas","Acosta","Vicki Lagaly","vlagaly@acosta.com","Ace Ecalner","Jim Jocel Balbuena"],
+  ["Certco/Woodmans","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Matt Kleinhenz - Director, West & eCom","matt.kleinhenz@jmsmucker.com","Marie Catuar","marie.catuar@jmsmucker.com","Bob Weber","Ryan Weber","rxweber@acosta.com","Ma. Klabelle Arellano","Jackie Lynn","Kim Thomas","Acosta","Vicki Lagaly","vlagaly@acosta.com","Ace Ecalner","Jim Jocel Balbuena"],
+  ["Cottage Distributors","F&B","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Katie Pittman - Director, Sales East","katie.pittman@jmsmucker.com","Jeff White","jeff.white@jmsmucker.com","Bridget Faughnan","Rich Guarnieri","rguarnieri@acosta.com","Jane Faurillo","Tom Gianni","Lorraine Dinkel","JMS","No Acosta CS Support","","Larry Oliquino","Jim Jocel Balbuena"],
+  ["Cottage Distributors","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","Bridget Faughnan","Rich Guarnieri","rguarnieri@acosta.com","Jane Faurillo","Tom Gianni","Lorraine Dinkel","JMS","No Acosta CS Support","","Larry Oliquino","Jim Jocel Balbuena"],
+  ["Cottage Distributors","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Donna Shaffer - Director, Regional","donna.shaffer@jmsmucker.com","Kevin Lazarski","kevin.lazarski1@jmsmucker.com","Bridget Faughnan","Rich Guarnieri","rguarnieri@acosta.com","Jane Faurillo","Tom Gianni","Lorraine Dinkel","JMS","No Acosta CS Support","","Larry Oliquino","Jim Jocel Balbuena"],
+  ["Crest Foods","FHS","Ariana Lopez Irlanda","ariana.lopezirlanda@jmsmucker.com","Fred Drantch - Director, Wholesale","fred.drantch@jmsmucker.com","Al Curran","alexander.curran@jmsmucker.com","Christy Heitman","Doug Kasson","dkasson@acosta.com","Ma. Klabelle Arellano","Taylor Pannell","Sarah Lofland","Acosta","Alexia Young","ayoung2@acosta.com","Angel Ken Azur","Justine Maglapid"],
+  ["Crest Foods","Coffee","Heidi Bangos","heidi.bangos@jmsmucker.com","Fred Drantch - Director, Wholesale","fred.drantch@jmsmucker.com","Tom Renslow","thomas.renslow@jmsmucker.com","Christy Heitman","Doug Kasson","dkasson@acosta.com","Ma. Klabelle Arellano","Taylor Pannell","Sarah Lofland","Acosta","Alexia Young","ayoung2@acosta.com","Angel Ken Azur","Justine Maglapid"],
+  ["Crest Foods","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, Regional","jason.oliver@jsmucker.com","Michael Nemeth","michael.nemeth@jmsmucker.com","Christy Heitman","Megan Post","mpost@acosta.com","Ma. Klabelle Arellano","Taylor Pannell","Sarah Lofland","Acosta","Alexia Young","ayoung2@acosta.com","Angel Ken Azur","Justine Maglapid"]
+];
+
+var NATDIST = [
+  ["Wakefern","UNFI Natural","Tyler Becker","tyler.becker@jmsmucker.com","F&B","Chris Curty","ccurty@acosta.com","302-236-9532"],
+  ["Giant Eagle","KeHE","Tyler Becker","tyler.becker@jmsmucker.com","F&B","Martha Cheatwood","mcheatwood@acosta.com","412-522-3126"],
+  ["SEG","UNFI Natural","Tyler Becker","tyler.becker@jmsmucker.com","F&B","Howard Wayne Daughtery","hdaughtery@acosta.com","904-315-5777"],
+  ["Publix","KeHE","Tyler Becker","tyler.becker@jmsmucker.com","F&B","Cade Alfieri","calfieri@acosta.com","813-769-3017"],
+  ["The Giant Company","UNFI Natural","Tyler Becker","tyler.becker@jmsmucker.com","F&B","Tracey Readinger","treadinger@acosta.com","717-571-6536"],
+  ["Hy-Vee","UNFI Natural","Tyler Becker","tyler.becker@jmsmucker.com","F&B","Brendan Mortimer","bmortimer@acosta.com","708-200-6405"],
+  ["Thrive Markets","UNFI Natural","Tyler Becker","tyler.becker@jmsmucker.com","F&B","Nicholas Altieri","naltieri@acosta.com","973-668-2888"]
+];
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function sba(s) {
+  var map = {"F&B":"fb","SBS":"sbs","Pet":"pet","Coffee":"coffee","FHS":"fhs"};
+  var c = map[s] || "other";
+  return s ? '<span class="sba '+c+'">'+s+'</span>' : "";
+}
+function person(name, email) {
+  if (!name) return "";
+  var n = name.trim();
+  if (!n || n === " ") return "";
+  if (email && email.trim() && email.trim() !== "No Acosta CS Support")
+    return n + '<br><a class="em" href="mailto:'+email.trim()+'">'+email.trim()+'</a>';
+  if (email && email.trim() === "No Acosta CS Support")
+    return n + '<br><span class="muted">No Acosta CS Support</span>';
+  return n;
+}
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderDirect(rows) {
+  var b = document.getElementById("d-body"), h = "";
+  if (!rows.length) { b.innerHTML='<tr class="empty-row"><td colspan="3">No results found</td></tr>'; return; }
+  for (var i=0; i<rows.length; i++) {
+    h += '<tr><td style="color:#57606a;font-size:12px;">'+(i+1)+'</td><td>'+esc(rows[i][0])+'</td><td>'+sba(rows[i][1])+'</td></tr>';
+  }
+  b.innerHTML = h;
+  document.getElementById("d-count").textContent = rows.length + " rows";
+}
+
+function renderAcosta(rows) {
+  var b = document.getElementById("a-body"), h = "";
+  if (!rows.length) { b.innerHTML='<tr class="empty-row"><td colspan="15">No results found</td></tr>'; return; }
+  for (var i=0; i<rows.length; i++) {
+    var r = rows[i];
+    h += '<tr>'
+      + '<td style="color:#57606a;font-size:12px;">'+(i+1)+'</td>'
+      + '<td><strong>'+esc(r[0])+'</strong></td>'
+      + '<td>'+sba(r[1])+'</td>'
+      + '<td>'+person(r[2],r[3])+'</td>'
+      + '<td>'+person(r[4],r[5])+'</td>'
+      + '<td>'+person(r[6],r[7])+'</td>'
+      + '<td>'+esc(r[8])+'</td>'
+      + '<td>'+person(r[9],r[10])+'</td>'
+      + '<td>'+esc(r[11])+'</td>'
+      + '<td>'+esc(r[12])+'</td>'
+      + '<td>'+esc(r[13])+'</td>'
+      + '<td><span style="font-size:12px;">'+esc(r[14])+'</span></td>'
+      + '<td>'+person(r[15],r[16])+'</td>'
+      + '<td>'+esc(r[17])+'</td>'
+      + '<td>'+esc(r[18])+'</td>'
+      + '</tr>';
+  }
+  b.innerHTML = h;
+  document.getElementById("a-count").textContent = rows.length + " rows";
+}
+
+function renderNatDist(rows) {
+  var b = document.getElementById("n-body"), h = "";
+  if (!rows.length) { b.innerHTML='<tr class="empty-row"><td colspan="7">No results found</td></tr>'; return; }
+  for (var i=0; i<rows.length; i++) {
+    var r = rows[i];
+    h += '<tr>'
+      + '<td style="color:#57606a;font-size:12px;">'+(i+1)+'</td>'
+      + '<td><strong>'+esc(r[0])+'</strong></td>'
+      + '<td>'+esc(r[1])+'</td>'
+      + '<td>'+person(r[2],r[3])+'</td>'
+      + '<td>'+sba(r[4])+'</td>'
+      + '<td>'+person(r[5],r[6])+'</td>'
+      + '<td>'+esc(r[7])+'</td>'
+      + '</tr>';
+  }
+  b.innerHTML = h;
+  document.getElementById("n-count").textContent = rows.length + " rows";
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function filter(tab) {
+  if (tab === 'direct') {
+    var q = document.getElementById("d-search").value.toLowerCase();
+    var s = document.getElementById("d-sba").value;
+    renderDirect(DIRECT.filter(function(r){
+      return (!q || r[0].toLowerCase().indexOf(q) >= 0) && (!s || r[1] === s);
+    }));
+  } else if (tab === 'acosta') {
+    var q = document.getElementById("a-search").value.toLowerCase();
+    var s = document.getElementById("a-sba").value;
+    renderAcosta(ACOSTA.filter(function(r){
+      return (!q || r.join(" ").toLowerCase().indexOf(q) >= 0) && (!s || r[1] === s);
+    }));
+  } else {
+    var q = document.getElementById("n-search").value.toLowerCase();
+    renderNatDist(NATDIST.filter(function(r){
+      return !q || r.join(" ").toLowerCase().indexOf(q) >= 0;
+    }));
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll(".tab-panel").forEach(function(p){ p.classList.remove("active"); });
+  document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
+  document.getElementById("tab-"+id).classList.add("active");
+  btn.classList.add("active");
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderDirect(DIRECT);
+renderAcosta(ACOSTA);
+renderNatDist(NATDIST);
+</script>
+</body>
+</html>

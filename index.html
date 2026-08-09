@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eLS — Enhanced Link Support</title>
+<style>
+/* ── LOGIN GATE ───────────────────────────────────────────────────────── */
+#login-gate{position:fixed;inset:0;z-index:99999;background:#0f1c2a;display:flex;align-items:center;justify-content:center;flex-direction:column}
+#login-gate.hidden{display:none}
+.login-card{background:#1c2b3a;border:1px solid #243548;border-radius:16px;padding:48px 44px 40px;width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:0}
+.login-ibm-bar{width:100%;display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.login-ibm-logo{display:flex;gap:2px}
+.login-ibm-logo span{display:block;width:7px;height:22px;background:#4a9eff;border-radius:1px}
+.login-ibm-logo span:nth-child(2){height:16px;margin-top:3px}
+.login-ibm-logo span:nth-child(3){height:22px}
+.login-ibm-logo span:nth-child(4){height:16px;margin-top:3px}
+.login-ibm-logo span:nth-child(5){height:22px}
+.login-ibm-text{font-size:13px;font-weight:700;color:#4a9eff;letter-spacing:2px}
+.login-divider{width:100%;height:1px;background:#243548;margin-bottom:28px}
+.login-app-name{font-size:26px;font-weight:800;color:#fff;letter-spacing:1px;margin-bottom:4px}
+.login-app-name span{color:#4a9eff}
+.login-app-sub{font-size:13px;color:#7a92a8;margin-bottom:32px;letter-spacing:.3px}
+.login-label{width:100%;font-size:11px;font-weight:700;letter-spacing:.8px;color:#4a6580;text-transform:uppercase;margin-bottom:6px}
+.login-input-wrap{width:100%;position:relative;margin-bottom:8px}
+.login-input{width:100%;padding:12px 44px 12px 14px;background:#0f1c2a;border:1px solid #2d3f52;border-radius:8px;color:#fff;font-size:14px;outline:none;letter-spacing:.5px}
+.login-input:focus{border-color:#4a9eff}
+.login-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#4a6580;background:none;border:none;padding:0;line-height:1}
+.login-eye:hover{color:#9ab4cc}
+.login-error{width:100%;font-size:12px;color:#f87171;min-height:18px;margin-bottom:12px;text-align:center}
+.login-btn{width:100%;padding:13px;background:#4a9eff;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:background .15s;margin-top:4px}
+.login-btn:hover{background:#2d7dd2}
+.login-btn:active{background:#1a6bc0}
+.login-footer{margin-top:28px;font-size:11px;color:#2d3f52;text-align:center;line-height:1.8}
+
+/* ── RESET & BASE ─────────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;background:#f0f2f5;color:#1f2328;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOP NAV BAR ──────────────────────────────────────────────────────── */
+.topbar{background:#1c2b3a;color:#fff;height:52px;display:flex;align-items:center;padding:0 24px;gap:16px;position:fixed;top:0;left:0;right:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.topbar-logo{font-size:15px;font-weight:700;letter-spacing:1px;color:#fff;white-space:nowrap}
+.topbar-logo span{color:#4a9eff}
+.topbar-search{flex:1;max-width:380px;margin-left:24px;position:relative}
+.topbar-search input{width:100%;padding:7px 12px 7px 36px;border:none;border-radius:6px;background:#2d3f52;color:#fff;font-size:13px;outline:none}
+.topbar-search input::placeholder{color:#7a92a8}
+.topbar-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.topbar-user{display:flex;align-items:center;gap:8px;cursor:pointer}
+.topbar-avatar{width:32px;height:32px;border-radius:50%;background:#4a9eff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff}
+.topbar-username{font-size:13px;color:#c8d8e8}
+.topbar-date{font-size:12px;color:#7a92a8}
+
+/* ── SIDEBAR ──────────────────────────────────────────────────────────── */
+.sidebar{position:fixed;top:52px;left:0;width:220px;bottom:0;background:#1c2b3a;padding:20px 0;overflow-y:auto;z-index:90;transition:transform .2s}
+.sidebar-section{padding:4px 0 8px}
+.sidebar-label{font-size:10px;font-weight:700;letter-spacing:.8px;color:#4a6580;padding:0 20px 6px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;color:#9ab4cc;font-size:13px;font-weight:500;border-left:3px solid transparent;transition:all .15s}
+.nav-item:hover{background:#243548;color:#fff}
+.nav-item.active{background:#243548;color:#4a9eff;border-left-color:#4a9eff}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.sidebar-divider{height:1px;background:#243548;margin:8px 20px}
+
+/* ── MAIN CONTENT ─────────────────────────────────────────────────────── */
+.main{margin-left:220px;margin-top:52px;padding:28px 28px 40px;flex:1;min-height:calc(100vh - 52px)}
+.page{display:none}
+.page.active{display:block}
+
+/* ── PAGE HEADER ──────────────────────────────────────────────────────── */
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;color:#1c2b3a}
+.page-header p{font-size:13px;color:#57606a;margin-top:3px}
+.breadcrumb{font-size:12px;color:#7a92a8;margin-bottom:8px}
+.breadcrumb span{color:#4a9eff}
+
+/* ── KPI CARDS ────────────────────────────────────────────────────────── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:#fff;border-radius:10px;padding:18px 20px;border:1px solid #e5e7eb;display:flex;flex-direction:column;gap:4px}
+.kpi-label{font-size:11px;font-weight:600;color:#57606a;text-transform:uppercase;letter-spacing:.5px}
+.kpi-value{font-size:28px;font-weight:700;color:#1c2b3a;line-height:1.2}
+.kpi-sub{font-size:12px;color:#57606a}
+.kpi-accent{width:36px;height:4px;border-radius:2px;margin-bottom:8px}
+
+/* ── DASHBOARD TILES ──────────────────────────────────────────────────── */
+.tiles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:28px}
+.tile{background:#fff;border-radius:12px;padding:24px;border:1px solid #e5e7eb;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.tile:hover{border-color:#4a9eff;box-shadow:0 4px 16px rgba(74,158,255,.15);transform:translateY(-2px)}
+.tile-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.tile-title{font-size:15px;font-weight:700;color:#1c2b3a}
+.tile-desc{font-size:12px;color:#57606a;line-height:1.5}
+.tile-arrow{position:absolute;top:20px;right:20px;color:#c8d8e8;font-size:18px}
+.tile:hover .tile-arrow{color:#4a9eff}
+.tile-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#dbeafe;color:#1d4ed8;margin-top:2px}
+
+/* ── TWO COLUMN LAYOUT ────────────────────────────────────────────────── */
+.two-col{display:grid;grid-template-columns:1fr 340px;gap:20px}
+.widget{background:#fff;border-radius:10px;border:1px solid #e5e7eb;padding:20px}
+.widget h3{font-size:13px;font-weight:700;color:#1c2b3a;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:8px}
+.widget h3 .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* ── ANNOUNCEMENTS ────────────────────────────────────────────────────── */
+.announce-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f3f4f6}
+.announce-item:last-child{border-bottom:none;padding-bottom:0}
+.announce-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.announce-title{font-size:13px;font-weight:600;color:#1c2b3a}
+.announce-body{font-size:12px;color:#57606a;margin-top:2px}
+.announce-date{font-size:11px;color:#9ab4cc;margin-top:3px}
+
+/* ── RECENT ACTIVITY ──────────────────────────────────────────────────── */
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid #f3f4f6}
+.activity-item:last-child{border-bottom:none}
+.activity-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.activity-text{font-size:12px;color:#1f2328}
+.activity-time{font-size:11px;color:#9ab4cc;margin-top:2px}
+
+/* ── QUICK LINKS ──────────────────────────────────────────────────────── */
+.quick-link{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:#1f2328;transition:background .15s}
+.quick-link:hover{background:#f0f2f5}
+.quick-link svg{color:#4a9eff;flex-shrink:0}
+
+/* ── SEARCH BAR (inline page) ────────────────────────────────────────── */
+.page-search{display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap}
+.page-search input{padding:8px 14px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;width:320px;outline:none}
+.page-search input:focus{border-color:#4a9eff}
+.page-search select{padding:8px 12px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;background:#fff;outline:none}
+.page-search select:focus{border-color:#4a9eff}
+.row-count{font-size:12px;color:#57606a;margin-left:auto}
+
+/* ── TABLE ────────────────────────────────────────────────────────────── */
+.table-card{background:#fff;border-radius:10px;border:1px solid #e5e7eb;overflow:hidden}
+.table-wrap{overflow-x:auto;max-height:520px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:10px 14px;text-align:left;font-weight:600;font-size:11px;color:#57606a;border-bottom:2px solid #e5e7eb;white-space:nowrap;background:#f7f8fa;position:sticky;top:0;z-index:2}
+td{padding:9px 14px;border-bottom:1px solid #f3f4f6;vertical-align:top;max-width:200px;word-break:break-word}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f7f8fa}
+a.em{color:#3b82d4;text-decoration:none;font-size:12px}
+a.em:hover{text-decoration:underline}
+
+/* ── BADGES ───────────────────────────────────────────────────────────── */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap}
+.fb{background:#dbeafe;color:#1d4ed8}
+.sbs{background:#d1fae5;color:#065f46}
+.pet{background:#ede9fe;color:#4c1d95}
+.coffee{background:#fef3c7;color:#92400e}
+.fhs{background:#ffe4e6;color:#9f1239}
+.other{background:#f3f4f6;color:#374151}
+
+/* ── REASON CODE ──────────────────────────────────────────────────────── */
+.rc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.rc-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px}
+.rc-code{font-size:13px;font-weight:700;color:#1c2b3a;margin-bottom:4px}
+.rc-desc{font-size:12px;color:#57606a;margin-bottom:6px}
+.rc-question{font-size:12px;color:#4a6580;font-style:italic;padding:8px;background:#f7f8fa;border-radius:6px;border-left:3px solid #4a9eff}
+.rc-table-card{background:#fff;border-radius:10px;border:1px solid #e5e7eb;overflow:hidden}
+.rc-table-wrap{overflow-x:auto;max-height:600px;overflow-y:auto}
+.rc-table-wrap table{width:100%;border-collapse:collapse;font-size:13px}
+.rc-table-wrap thead th{padding:10px 14px;text-align:left;font-weight:600;font-size:11px;color:#57606a;border-bottom:2px solid #e5e7eb;white-space:nowrap;background:#f7f8fa;position:sticky;top:0;z-index:2}
+.rc-table-wrap td{padding:10px 14px;border-bottom:1px solid #f3f4f6;vertical-align:top}
+.rc-table-wrap tr:last-child td{border-bottom:none}
+.rc-table-wrap tr:hover td{background:#f7f8fa}
+.rc-name-cell{font-weight:700;color:#1c2b3a;font-size:13px}
+.rc-q-cell{font-size:12px;color:#4a6580;font-style:italic;border-left:3px solid #4a9eff;padding-left:8px}
+
+/* ── JOB AID ──────────────────────────────────────────────────────────── */
+.jobaid-section{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:24px;margin-bottom:16px}
+.jobaid-section h3{font-size:15px;font-weight:700;color:#1c2b3a;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.step-row{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid #f3f4f6}
+.step-row:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:50%;background:#4a9eff;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{font-size:13px;color:#1f2328}
+.step-content strong{color:#1c2b3a}
+.jobaid-cat-label{font-size:11px;font-weight:700;letter-spacing:.8px;color:#4a6580;text-transform:uppercase;padding:16px 0 8px;border-bottom:1px solid #e5e7eb;margin-bottom:12px}
+.jobaid-topic-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin-bottom:14px}
+.jobaid-topic-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.jobaid-topic-title{font-size:14px;font-weight:700;color:#1c2b3a}
+.jobaid-topic-cat{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#dbeafe;color:#1d4ed8;white-space:nowrap;flex-shrink:0}
+.jobaid-topic-summary{font-size:13px;color:#57606a;line-height:1.6;margin-bottom:12px}
+.jobaid-topic-footer{display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid #f3f4f6}
+.jobaid-topic-updated{font-size:11px;color:#9ab4cc}
+
+/* ── BPS TABLE ─────────────────────────────────────────────────────────── */
+.bps-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.bps-filters input{padding:7px 12px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;outline:none;width:220px}
+.bps-filters input:focus{border-color:#4a9eff}
+.bps-filters select{padding:7px 12px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;background:#fff;outline:none;cursor:pointer}
+.bps-filters select:focus{border-color:#4a9eff}
+.bps-row-count{font-size:12px;color:#57606a;margin-left:auto;white-space:nowrap}
+.bps-table-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden}
+.bps-table-wrap{overflow-x:auto;max-height:560px;overflow-y:auto}
+.bps-table-wrap table{width:100%;border-collapse:collapse;font-size:12px}
+.bps-table-wrap thead th{padding:9px 12px;text-align:left;font-weight:600;font-size:11px;color:#57606a;border-bottom:2px solid #e5e7eb;white-space:nowrap;background:#f7f8fa;position:sticky;top:0;z-index:2}
+.bps-table-wrap td{padding:8px 12px;border-bottom:1px solid #f3f4f6;vertical-align:top;font-size:12px;max-width:200px;word-break:break-word}
+.bps-table-wrap tr:last-child td{border-bottom:none}
+.bps-table-wrap tr:hover td{background:#f7f8fa}
+.bps-pill-yes{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;white-space:nowrap}
+.bps-pill-no{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;background:#f3f4f6;color:#374151;white-space:nowrap}
+.bps-pill-direct{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;background:#dbeafe;color:#1d4ed8;white-space:nowrap}
+.bps-pill-indirect{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;white-space:nowrap}
+.bps-pill-wholesale{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;background:#ede9fe;color:#4c1d95;white-space:nowrap}
+.bps-signon{font-family:"Consolas",monospace;font-size:11px;background:#f7f8fa;padding:1px 4px;border-radius:3px;border:1px solid #e5e7eb;display:inline-block;margin-bottom:2px}
+
+/* ── TEMPLATE ─────────────────────────────────────────────────────────── */
+.template-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;display:flex;gap:16px;align-items:flex-start;margin-bottom:14px}
+.template-icon{width:48px;height:48px;border-radius:10px;background:#f0f2f5;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.template-info h4{font-size:14px;font-weight:700;color:#1c2b3a;margin-bottom:4px}
+.template-info p{font-size:12px;color:#57606a}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:#4a9eff;color:#fff}
+.btn-primary:hover{background:#2d7dd2}
+.btn-outline{background:#fff;color:#4a9eff;border:1px solid #4a9eff}
+.btn-outline:hover{background:#f0f7ff}
+
+/* ── LETTER BUILDER ───────────────────────────────────────────────────── */
+.lb-wrap{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:24px;margin-top:28px}
+.lb-wrap h3{font-size:15px;font-weight:700;color:#1c2b3a;margin-bottom:4px}
+.lb-wrap .lb-sub{font-size:12px;color:#57606a;margin-bottom:18px}
+.lb-section-label{font-size:11px;font-weight:700;letter-spacing:.6px;color:#4a6580;text-transform:uppercase;margin-bottom:8px;margin-top:18px}
+.lb-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.lb-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px}
+.lb-field label{font-size:11px;font-weight:600;color:#57606a}
+.lb-field input,.lb-field select,.lb-field textarea{padding:7px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;color:#1f2328;background:#fff;outline:none;font-family:inherit}
+.lb-field input:focus,.lb-field select:focus,.lb-field textarea:focus{border-color:#4a9eff}
+.lb-editor-wrap{position:relative;margin-top:8px}
+.lb-editor{width:100%;min-height:280px;resize:vertical;padding:14px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;line-height:1.7;color:#1f2328;font-family:-apple-system,"Segoe UI",system-ui,sans-serif;background:#fff;outline:none}
+.lb-editor:focus{border-color:#4a9eff}
+.copilot-panel{background:#f7f8fa;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-top:14px}
+.copilot-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.copilot-logo{width:22px;height:22px;border-radius:4px;background:#1c2b3a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#4a9eff;letter-spacing:.5px;flex-shrink:0}
+.copilot-title{font-size:12px;font-weight:700;color:#1c2b3a}
+.copilot-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;background:#dbeafe;color:#1d4ed8;margin-left:4px}
+.copilot-output{font-size:12px;color:#57606a;line-height:1.7;min-height:48px}
+.copilot-output .cop-item{padding:5px 0;border-bottom:1px solid #f0f2f5}
+.copilot-output .cop-item:last-child{border-bottom:none}
+.copilot-output .cop-good{color:#065f46;font-weight:600}
+.copilot-output .cop-warn{color:#92400e;font-weight:600}
+.copilot-output .cop-fix{color:#1d4ed8}
+.lb-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;align-items:center}
+.btn-dark{background:#1c2b3a;color:#fff;border:none}
+.btn-dark:hover{background:#243548}
+.btn-green{background:#065f46;color:#fff;border:none}
+.btn-green:hover{background:#047857}
+
+/* ── DIRECTORY ────────────────────────────────────────────────────────── */
+.dir-tabs{display:flex;gap:0;border-bottom:2px solid #e5e7eb;margin-bottom:20px}
+.dir-tab{padding:8px 18px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:#57606a;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
+.dir-tab.active{color:#4a9eff;border-bottom-color:#4a9eff}
+.dir-panel{display:none}
+.dir-panel.active{display:block}
+
+/* ── PORTAL ───────────────────────────────────────────────────────────── */
+.portal-search{display:flex;gap:10px;margin-bottom:20px;align-items:center;flex-wrap:wrap}
+.portal-search input{padding:8px 14px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;width:360px;outline:none}
+.portal-search input:focus{border-color:#4a9eff}
+.portal-count{font-size:12px;color:#57606a;margin-left:auto}
+.portal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.portal-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit}
+.portal-card:hover{border-color:#4a9eff;box-shadow:0 4px 16px rgba(74,158,255,.15);transform:translateY(-2px)}
+.portal-card h4{font-size:14px;font-weight:700;color:#1c2b3a;display:flex;align-items:center;gap:8px}
+.portal-card p{font-size:12px;color:#57606a;line-height:1.5;flex:1}
+.portal-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px;padding-top:8px;border-top:1px solid #f3f4f6}
+.status-pill{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.status-active{background:#d1fae5;color:#065f46}
+.status-info{background:#dbeafe;color:#1d4ed8}
+.status-warn{background:#fef3c7;color:#92400e}
+.portal-arrow{font-size:16px;color:#4a9eff}
+.portal-hidden{display:none}
+
+/* ── MUTED ────────────────────────────────────────────────────────────── */
+.muted{color:#57606a;font-size:12px;font-style:italic}
+.empty{text-align:center;padding:40px;color:#9ab4cc;font-size:13px}
+footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7eb;padding:14px;background:#fff;margin-left:220px}
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR ─────────────────────────────────────────────────────────── -->
+<div class="topbar">
+  <div class="topbar-logo">e<span>LS</span> &nbsp;<span style="font-weight:400;font-size:12px;opacity:.7;letter-spacing:.5px">Enhanced Link Support</span></div>
+  <div class="topbar-search">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="global-search" placeholder="Search customers, contacts, portals…" oninput="globalSearch(this.value)">
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-date" id="topbar-date"></div>
+    <div class="topbar-user">
+      <div class="topbar-avatar" style="background:#1c2b3a;font-size:11px;letter-spacing:.5px;border:1px solid #4a9eff">eLS</div>
+      <div class="topbar-username">Invalid Claims &amp; Repay</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SIDEBAR ──────────────────────────────────────────────────────────── -->
+<div class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main</div>
+    <div class="nav-item active" onclick="navigate('dashboard',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="navigate('directory',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Directory
+    </div>
+    <div class="nav-item" onclick="navigate('portal',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Customer Portal
+    </div>
+    <div class="nav-item" onclick="openCompass()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+      eLS Compass
+    </div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Resources</div>
+    <div class="nav-item" onclick="navigate('jobaid',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Job Aids
+    </div>
+    <div class="nav-item" onclick="navigate('reasoncode',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Reason Codes
+    </div>
+    <div class="nav-item" onclick="navigate('template',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Templates
+    </div>
+    <div class="nav-item" onclick="navigate('customersop',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Customer SOP
+    </div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Help</div>
+    <div class="nav-item" onclick="navigate('help',this)">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Help &amp; Links
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ──────────────────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- DASHBOARD PAGE -->
+  <div id="page-dashboard" class="page active">
+    <div class="breadcrumb">Home</div>
+
+    <!-- Team Identity Banner -->
+    <div style="background:#1c2b3a;border-radius:12px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:1px">e<span style="color:#4a9eff">LS</span></div>
+        <div style="font-size:15px;font-weight:600;color:#fff;margin-top:2px">Enhanced Link Support</div>
+        <div style="font-size:13px;color:#4a9eff;font-weight:500;margin-top:4px;letter-spacing:.5px">Invalid Claims &amp; Repay Management Portal</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:#4a6580;text-transform:uppercase;letter-spacing:.8px;font-weight:700">Resources</div>
+        <div style="font-size:12px;color:#9ab4cc;margin-top:4px;line-height:1.8">
+          Customer Directory &nbsp;·&nbsp; Job Aids &amp; Process Guides<br>
+          Customer Portals &nbsp;·&nbsp; Reason Code Reference<br>
+          Templates &amp; Forms &nbsp;·&nbsp; AP &amp; AR Contacts
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tiles -->
+    <div class="page-header" style="margin-bottom:14px">
+      <h1 style="font-size:16px">Quick Navigation</h1>
+    </div>
+    <div class="tiles-grid">
+      <div class="tile" onclick="navigate('jobaid', null)">
+        <div class="tile-icon" style="background:#fff3cd">📋</div>
+        <div class="tile-title">Job Aids</div>
+        <div class="tile-desc">BPS Team SOP Reference (19 customers), BMA procedures, Reason Code guidelines, and Order Routing guide.</div>
+        <div class="tile-badge">Updated 7.28.26</div>
+        <div class="tile-arrow">→</div>
+      </div>
+      <div class="tile" onclick="navigate('template', null)">
+        <div class="tile-icon" style="background:#d1fae5">📄</div>
+        <div class="tile-title">Templates</div>
+        <div class="tile-desc">Downloadable forms for claim submissions, BMA (Business Manager Associate) repay forms, and invoice support.</div>
+        <div class="tile-badge">Forms &amp; Docs</div>
+        <div class="tile-arrow">→</div>
+      </div>
+      <div class="tile" onclick="navigate('portal', null)">
+        <div class="tile-icon" style="background:#ede9fe">🌐</div>
+        <div class="tile-title">Customer Portal</div>
+        <div class="tile-desc">Click-to-open portal cards for all major retail customers — opens directly in a new tab.</div>
+        <div class="tile-badge">9 Portals</div>
+        <div class="tile-arrow">→</div>
+      </div>
+      <div class="tile" onclick="navigate('directory', null)">
+        <div class="tile-icon" style="background:#fce7f3">👥</div>
+        <div class="tile-title">Directory</div>
+        <div class="tile-desc">Full contact hierarchy across US Retail Direct, Acosta Supported accounts, and Natural Distributor BMs — VP, Director, Sales Rep, BMA, Deduction Analyst, and more.</div>
+        <div class="tile-badge">285+ Records · 4 Tabs</div>
+        <div class="tile-arrow">→</div>
+      </div>
+      <div class="tile" onclick="navigate('help', null)">
+        <div class="tile-icon" style="background:#f0fdf4">❓</div>
+        <div class="tile-title">Help &amp; Links</div>
+        <div class="tile-desc">Escalation contacts, FAQs, and helpful resources for the eLS portal operations.</div>
+        <div class="tile-arrow">→</div>
+      </div>
+    </div>
+
+    <!-- Bottom two-col -->
+    <div class="two-col">
+      <div>
+        <!-- Announcements -->
+        <div class="widget" style="margin-bottom:18px">
+          <h3><span class="dot" style="background:#f59e0b"></span> Announcements &amp; Updates</h3>
+          <div class="announce-item">
+            <div class="announce-dot" style="background:#4a9eff"></div>
+            <div>
+              <div class="announce-title">Job Aid Updated — 7.28.26</div>
+              <div class="announce-body">Invalid Claims process guide has been refreshed. Please review the updated escalation steps and BMA (Business Manager Associate) repay procedures.</div>
+              <div class="announce-date">July 28, 2026</div>
+            </div>
+          </div>
+          <div class="announce-item">
+            <div class="announce-dot" style="background:#22c55e"></div>
+            <div>
+              <div class="announce-title">eLS Directory — Version 6.16.26</div>
+              <div class="announce-body">US Retail Direct directory updated with complete contact hierarchy — VP, Director, Sales Rep, Coordinator, and AP/AR contacts now available.</div>
+              <div class="announce-date">June 16, 2026</div>
+            </div>
+          </div>
+          <div class="announce-item">
+            <div class="announce-dot" style="background:#f59e0b"></div>
+            <div>
+              <div class="announce-title">Reminder: Deduction Aging Review</div>
+              <div class="announce-body">Monthly deduction aging review is scheduled. Ensure all pending invalid claims are validated and routed before month-end.</div>
+              <div class="announce-date">Ongoing</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="widget">
+          <h3><span class="dot" style="background:#7c5cd8"></span> Recent Activity</h3>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#dbeafe">📋</div>
+            <div>
+              <div class="activity-text"><strong>Job Aid</strong> — viewed invalid claims process guide</div>
+              <div class="activity-time">Today, 9:14 AM</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#d1fae5">👥</div>
+            <div>
+              <div class="activity-text"><strong>Directory</strong> — searched "Albertsons" in US Retail Direct</div>
+              <div class="activity-time">Today, 8:52 AM</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#fce7f3">🌐</div>
+            <div>
+              <div class="activity-text"><strong>Customer Portal</strong> — opened Kroger vendor portal</div>
+              <div class="activity-time">Yesterday, 3:30 PM</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:#ede9fe">📄</div>
+            <div>
+              <div class="activity-text"><strong>Template</strong> — downloaded BMA (Business Manager Associate) Claim Form</div>
+              <div class="activity-time">Yesterday, 11:05 AM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <!-- Quick Links -->
+        <div class="widget">
+          <h3><span class="dot" style="background:#4a9eff"></span> Quick Links</h3>
+          <div class="quick-link" onclick="navigate('directory',null)">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            US Retail Direct — Directory
+          </div>
+          <div class="quick-link" onclick="navigate('jobaid',null)">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Invalid Claims Process Guide
+          </div>
+          <div class="quick-link" onclick="navigate('jobaid',null)">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            BMA (Business Manager Associate) Repay Guide
+          </div>
+          <div class="quick-link" onclick="navigate('portal',null)">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg>
+            Customer Portals
+          </div>
+          <div class="quick-link" onclick="navigate('template',null)">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            Templates &amp; Forms
+          </div>
+        </div>
+
+        <!-- Tool Status -->
+        <div class="widget">
+          <h3><span class="dot" style="background:#22c55e"></span> Portal Status</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+              <span>Directory</span><span class="status-pill status-active">Current</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+              <span>Job Aids</span><span class="status-pill status-active">Updated 7.28.26</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+              <span>Templates</span><span class="status-pill status-info">Review Pending</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+              <span>Customer Portals</span><span class="status-pill status-warn">External Dep.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Identity Widget -->
+        <div class="widget">
+          <h3><span class="dot" style="background:#2d6a4f"></span> eLS — Enhanced Link Support</h3>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <div style="width:44px;height:44px;border-radius:8px;background:#1c2b3a;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#4a9eff;letter-spacing:.5px">IT</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#1c2b3a">eLS — Enhanced Link Support</div>
+              <div style="font-size:12px;color:#57606a">Invalid Claims &amp; Repay Management Portal</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#57606a;line-height:1.8">
+            <div>📋 Invalid Claims &bull; Repays</div>
+            <div>🌐 Customer Invoice Support</div>
+            <div>📂 Client Invoice Support</div>
+            <div>👥 AP &amp; AR Contact Resources</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /dashboard -->
+
+  <!-- JOB AID PAGE -->
+  <div id="page-jobaid" class="page">
+    <div class="breadcrumb">Home / <span>Job Aids</span></div>
+    <div class="page-header">
+      <h1>Job Aids</h1>
+      <p>Process guides, BPS Team Information, and reference material — updated 7.28.26 &nbsp;·&nbsp; <strong>BMA</strong> = Business Manager Associate</p>
+    </div>
+
+    <div class="jobaid-cat-label" style="margin-top:8px">🔍 Reason Code Validation</div>
+    <div class="jobaid-topic-card">
+      <div class="jobaid-topic-header">
+        <div class="jobaid-topic-title">Reason Code Selection Guidelines</div>
+        <span class="jobaid-topic-cat" style="background:#ede9fe;color:#4c1d95">Reason Code</span>
+      </div>
+      <div class="jobaid-topic-summary">Guidelines for selecting the correct reason code before processing a deduction. For each code, a key validation question must be answered affirmatively before the code can be applied. Covers all 26 active reason codes including Allowance on Shorted Product, Duplicate Deduction, Freight, No Proof of Performance, Outside Deal Dates, and more. Always cross-reference the Reason Code Reference page.</div>
+      <div class="jobaid-topic-footer">
+        <span class="jobaid-topic-updated">Updated: 7.28.26</span>
+        <button class="btn btn-outline" onclick="navigate('reasoncode',null)">🔍 Open Reason Codes</button>
+        <button class="btn btn-outline">⬇ Download</button>
+      </div>
+    </div>
+
+    <div class="jobaid-cat-label" style="margin-top:8px">📚 SOP Library</div>
+    <div class="jobaid-topic-card">
+      <div class="jobaid-topic-header">
+        <div class="jobaid-topic-title">SOP Library</div>
+        <span class="jobaid-topic-cat" style="background:#dbeafe;color:#1d4ed8">SOP Library</span>
+      </div>
+      <div class="jobaid-topic-summary">Full library of Acosta Standard Operating Procedures (SOPs) for all assigned customers. Use this resource to look up claim validation rules, backup retrieval instructions, indirect handling, and client-specific processing guidelines. Hosted in IBM Box.</div>
+      <div class="jobaid-topic-footer">
+        <span class="jobaid-topic-updated">Updated: 7.13.26</span>
+        <a class="btn btn-primary" href="https://ibm.box.com/v/elsopprivatecontentacosta" target="_blank" style="text-decoration:none">📖 Open SOP Library</a>
+      </div>
+    </div>
+
+    <div class="jobaid-section" style="margin-top:20px">
+      <h3>📎 Related Resources</h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-outline" onclick="navigate('template',null)">📄 Templates &amp; Forms</button>
+        <button class="btn btn-outline" onclick="navigate('directory',null)">👥 Open Directory</button>
+        <button class="btn btn-outline" onclick="navigate('portal',null)">🌐 Customer Portals</button>
+        <a class="btn btn-outline" href="public/footprint-directory.html" target="_blank" style="text-decoration:none">🏠 Footprint</a>
+        <a class="btn btn-primary" href="https://ibm.box.com/v/elsopprivatecontentacosta" target="_blank" style="text-decoration:none">📖 SOP Library</a>
+      </div>
+    </div>
+  </div><!-- /jobaid -->
+
+  <!-- CUSTOMER SOP PAGE -->
+  <div id="page-customersop" class="page">
+    <div class="breadcrumb">Home / <span>Customer SOP</span></div>
+    <div class="page-header">
+      <h1>Customer SOP — BPS Consolidated Reference</h1>
+      <p>Extracted from Acosta SOP documents. Search or filter by customer type and portal availability.</p>
+    </div>
+    <div class="bps-filters">
+      <input type="text" id="bps-search" placeholder="Search customer, contact, notes…" oninput="bpsFilter()">
+      <select id="bps-type" onchange="bpsFilter()">
+        <option value="">All Customer Types</option>
+        <option value="Direct">Direct</option>
+        <option value="Indirect">Indirect</option>
+        <option value="Wholesale">Wholesale / Distributor</option>
+      </select>
+      <select id="bps-portal" onchange="bpsFilter()">
+        <option value="">All Portal Status</option>
+        <option value="yes">Has Portal</option>
+        <option value="no">No Portal</option>
+      </select>
+      <span class="bps-row-count" id="bps-count"></span>
+    </div>
+    <div class="bps-table-card">
+      <div class="bps-table-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th>
+            <th style="min-width:160px">Customer</th>
+            <th style="min-width:90px">Type</th>
+            <th style="min-width:180px">Repay Info</th>
+            <th style="min-width:130px">Portal</th>
+            <th style="min-width:220px">Backup Contact / Email</th>
+            <th style="min-width:220px">BPS Notes</th>
+          </tr></thead>
+          <tbody id="bps-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="jobaid-section" style="margin-top:20px">
+      <h3>📎 Related Resources</h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-outline" onclick="navigate('jobaid',null)">📋 Job Aids</button>
+        <button class="btn btn-outline" onclick="navigate('directory',null)">👥 Open Directory</button>
+        <button class="btn btn-outline" onclick="navigate('portal',null)">🌐 Customer Portals</button>
+      </div>
+    </div>
+  </div><!-- /customersop -->
+
+  <!-- REASON CODE PAGE -->
+  <div id="page-reasoncode" class="page">
+    <div class="breadcrumb">Home / <span>Reason Code</span></div>
+    <div class="page-header">
+      <h1>Reason Code Reference</h1>
+      <p>All active deduction reason codes with simplified descriptions and key validation questions.</p>
+    </div>
+    <div class="page-search">
+      <input type="text" id="rc-search" placeholder="Search reason codes…" oninput="filterRC(this.value)">
+      <span class="row-count" id="rc-count"></span>
+    </div>
+    <div class="rc-table-card">
+      <div class="rc-table-wrap">
+        <table id="rc-table">
+          <thead><tr>
+            <th style="width:200px">Reason Code</th>
+            <th style="width:260px">Simplified Description</th>
+            <th>Key Validation Question</th>
+            <th style="width:130px">Repay Letter</th>
+          </tr></thead>
+          <tbody id="rc-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /reasoncode -->
+
+  <!-- TEMPLATE PAGE -->
+  <div id="page-template" class="page">
+    <div class="breadcrumb">Home / <span>Templates</span></div>
+    <div class="page-header">
+      <h1>Templates &amp; Forms</h1>
+      <p>Repay letter templates for all active deduction reason types. Search or use the dropdown to open the correct letter in Box.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:24px;max-width:620px">
+      <div style="font-size:13px;font-weight:600;color:#1c2b3a;margin-bottom:12px">Select a Repay Letter to Open</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <input type="text" id="rl-search" placeholder="Type to search letter…" oninput="filterRepayLetters(this.value)" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;outline:none">
+      </div>
+      <select id="rl-select" size="8" style="width:100%;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;padding:4px;background:#f7f8fa;color:#1c2b3a;outline:none;margin-bottom:14px"></select>
+      <div style="display:flex;gap:10px;align-items:center">
+        <a id="rl-open-btn" href="#" target="_blank" onclick="return openRepayLetter()" style="padding:8px 22px;background:#1c2b3a;color:#fff;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none">📂 Open PDF in Box</a>
+        <span id="rl-hint" style="font-size:12px;color:#9ab4cc">Select a letter above, then click Open PDF</span>
+      </div>
+    </div>
+    <!-- CREATE YOUR OWN LETTER -->
+    <div class="lb-wrap">
+      <h3>✍️ Create Your Own Letter</h3>
+      <p class="lb-sub">Select a template type to auto-fill the letter, or write free-form. Copilot will review your draft for grammar and tone.</p>
+      <div class="lb-section-label">Step 1 — Select Template Type</div>
+      <div class="lb-row">
+        <div class="lb-field" style="max-width:340px">
+          <label>Template Type</label>
+          <select id="lb-type" onchange="lbLoadTemplate()">
+            <option value="">— Choose a template or write free-form —</option>
+            <option value="repay_standard">Repay Request — Standard</option>
+            <option value="repay_duplicate">Repay Request — Duplicate Deduction</option>
+            <option value="repay_outside_dates">Repay Request — Outside Deal Dates</option>
+            <option value="repay_no_proof">Repay Request — No Proof of Performance</option>
+            <option value="repay_shortages">Repay Request — Shortages</option>
+            <option value="repay_freight">Repay Request — Freight</option>
+            <option value="repay_wrong_amount">Repay Request — Wrong Allowance Amount</option>
+            <option value="freeform">Free-Form (write your own)</option>
+          </select>
+        </div>
+      </div>
+      <div class="lb-section-label">Step 2 — Fill in Details</div>
+      <div class="lb-row">
+        <div class="lb-field"><label>Recipient Name</label><input type="text" id="lb-to" placeholder="e.g. John Smith" oninput="lbUpdatePreview()"></div>
+        <div class="lb-field"><label>Recipient Title / Company</label><input type="text" id="lb-company" placeholder="e.g. Acosta — Kroger Team" oninput="lbUpdatePreview()"></div>
+        <div class="lb-field"><label>Deduction / Claim #</label><input type="text" id="lb-claim" placeholder="e.g. DED-2024-0091" oninput="lbUpdatePreview()"></div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-field"><label>Amount</label><input type="text" id="lb-amount" placeholder="e.g. $1,250.00" oninput="lbUpdatePreview()"></div>
+        <div class="lb-field"><label>Customer</label><input type="text" id="lb-customer" placeholder="e.g. Kroger" oninput="lbUpdatePreview()"></div>
+        <div class="lb-field"><label>Your Name / Sender</label><input type="text" id="lb-from" placeholder="e.g. eLS Team" oninput="lbUpdatePreview()"></div>
+      </div>
+      <div class="lb-section-label">Step 3 — Edit / View Letter</div>
+      <div class="lb-editor-wrap">
+        <textarea class="lb-editor" id="lb-editor" placeholder="Your letter will appear here. You can also type free-form directly." oninput="lbCopilotAnalyze()"></textarea>
+      </div>
+      <div class="copilot-panel">
+        <div class="copilot-header">
+          <div class="copilot-logo">Co</div>
+          <span class="copilot-title">Copilot Advisor</span>
+          <span class="copilot-badge">Grammar &amp; Tone</span>
+        </div>
+        <div class="copilot-output" id="lb-copilot-out">
+          <div class="cop-item" style="color:#9ab4cc;font-style:italic">Start typing or select a template — Copilot will review your letter here.</div>
+        </div>
+      </div>
+      <div class="lb-actions">
+        <button class="btn btn-dark" onclick="lbUpdatePreview()">🔄 Refresh Preview</button>
+        <button class="btn btn-outline" onclick="lbCopilotAnalyze()">✨ Run Copilot Check</button>
+        <button class="btn btn-green" onclick="lbDownload()">⬇ Download Letter (.txt)</button>
+        <span id="lb-dl-hint" style="font-size:12px;color:#9ab4cc">Fill in fields and edit the letter before downloading.</span>
+      </div>
+    </div>
+  </div><!-- /template -->
+
+  <!-- CUSTOMER PORTAL PAGE -->
+  <div id="page-portal" class="page">
+    <div class="breadcrumb">Home / <span>Customer Portal</span></div>
+    <div class="page-header">
+      <h1>Customer Portals</h1>
+      <p>Click any portal card to open the customer's deduction or vendor portal in a new tab.</p>
+    </div>
+    <div class="portal-search">
+      <input type="text" id="portal-search" placeholder="Search customer portals…" oninput="filterPortals(this.value)">
+      <span class="portal-count" id="portal-count"></span>
+    </div>
+    <div class="portal-grid" id="portal-grid"></div>
+  </div><!-- /portal -->
+
+  <!-- DIRECTORY PAGE -->
+  <div id="page-directory" class="page">
+    <div class="breadcrumb">Home / <span>Directory</span></div>
+    <div class="page-header">
+      <h1>Directory</h1>
+      <p>Complete customer contact hierarchy — US Retail Direct, Acosta Supported accounts, and Natural Distributor BMs.</p>
+    </div>
+    <div class="dir-tabs">
+      <button class="dir-tab active" id="dtab-direct" onclick="switchDirTab('direct')">US Retail Direct</button>
+      <button class="dir-tab" id="dtab-acosta" onclick="switchDirTab('acosta')">Acosta Supported</button>
+      <button class="dir-tab" id="dtab-natdist" onclick="switchDirTab('natdist')">Natural Dist. BMs</button>
+      <button class="dir-tab" id="dtab-contacts" onclick="switchDirTab('contacts')">JMS Contact Chain</button>
+    </div>
+
+    <div id="dpanel-direct" class="dir-panel active">
+      <div class="page-search">
+        <input type="text" id="d-search" placeholder="Search customer or SBA…" oninput="filterDirect()">
+        <select id="d-sba" onchange="filterDirect()">
+          <option value="">All SBAs</option>
+          <option>SBS</option><option>Pet</option><option>Coffee</option><option>FHS</option>
+        </select>
+        <span class="row-count" id="d-count"></span>
+      </div>
+      <div class="table-card"><div class="table-wrap">
+        <table><thead><tr>
+          <th>#</th><th>Customer</th><th>SBA</th>
+          <th>JMS Sales VP</th><th>JMS Sales Director</th><th>JMS Sales Rep</th>
+          <th>JMS Sales Coordinator</th><th>Acosta HQ BMA</th>
+          <th>Acosta Deduction Analyst</th><th>Invalid Processor</th>
+          <th>Escalations</th><th>Escalation Contact</th>
+        </tr></thead>
+        <tbody id="d-body"></tbody></table>
+      </div></div>
+    </div>
+
+    <div id="dpanel-acosta" class="dir-panel">
+      <div class="page-search">
+        <input type="text" id="a-search" placeholder="Search customer, name, email, director…" oninput="filterAcosta()">
+        <select id="a-sba" onchange="filterAcosta()">
+          <option value="">All SBAs</option>
+          <option>F&amp;B</option><option>SBS</option><option>Pet</option><option>Coffee</option><option>FHS</option>
+        </select>
+        <span class="row-count" id="a-count"></span>
+      </div>
+      <div class="table-card"><div class="table-wrap" style="max-height:580px">
+        <table><thead><tr>
+          <th>#</th><th>Customer</th><th>SBA</th>
+          <th>JMS Sales VP</th><th>JMS Sales Director</th><th>JMS Sales Manager</th>
+          <th>Acosta Leadership</th><th>Acosta BM</th>
+          <th>Centralized Trade Specialist</th><th>Local Trade Specialist</th>
+          <th>Local Trade Manager</th><th>Order Routing</th>
+          <th>Acosta CSC</th><th>Acosta Deduction Analyst</th>
+          <th>Invalid Processor</th><th>Escalations</th>
+        </tr></thead>
+        <tbody id="a-body"></tbody></table>
+      </div></div>
+    </div>
+
+    <div id="dpanel-natdist" class="dir-panel">
+      <div class="page-search">
+        <input type="text" id="n-search" placeholder="Search customer, distributor, or contact…" oninput="filterNatDist()">
+        <span class="row-count" id="n-count"></span>
+      </div>
+      <div class="table-card"><div class="table-wrap">
+        <table><thead><tr>
+          <th>#</th><th>Customer</th><th>Natural Distributor</th>
+          <th>JMS Natural Dist. POC</th><th>SBA</th><th>Acosta BM</th><th>Phone</th>
+        </tr></thead>
+        <tbody id="n-body"></tbody></table>
+      </div></div>
+    </div>
+
+    <div id="dpanel-contacts" class="dir-panel">
+      <div class="page-search">
+        <input type="text" id="c-search" placeholder="Search customer, branch, client manager, coordinator…" oninput="filterContacts()">
+        <select id="c-client" onchange="filterContacts()">
+          <option value="">All Clients</option>
+          <option value="JMSFRZ">JMSFRZ — Frozen</option>
+          <option value="JMSMUC">JMSMUC — Mucker</option>
+        </select>
+        <span class="row-count" id="c-count"></span>
+      </div>
+      <div class="table-card"><div class="table-wrap" style="max-height:580px">
+        <table><thead><tr>
+          <th>#</th><th>Client</th><th>Branch</th><th>Signon</th>
+          <th>Customer Name</th><th>Client Manager</th><th>BMA</th>
+          <th>BMA Supervisor</th><th>CS Coordinator</th>
+          <th>CS Supervisor</th><th>COE Supervisor</th>
+        </tr></thead>
+        <tbody id="c-body"></tbody></table>
+      </div></div>
+    </div>
+  </div><!-- /directory -->
+
+  <!-- HELP PAGE -->
+  <div id="page-help" class="page">
+    <div class="breadcrumb">Home / <span>Help &amp; Links</span></div>
+    <div class="page-header">
+      <h1>Help &amp; Links</h1>
+      <p>Escalation contacts, FAQs, and resources for eLS — Enhanced Link Support.</p>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="jobaid-section">
+          <h3>📞 Escalation Contacts</h3>
+          <div class="step-row"><div class="step-num">1</div><div class="step-content"><strong>First Contact:</strong> JMS Sales Rep or Deduction Analyst — see US Retail Direct Directory</div></div>
+          <div class="step-row"><div class="step-num">2</div><div class="step-content"><strong>Second Level:</strong> JMS Sales Coordinator → JMS Sales Director</div></div>
+          <div class="step-row"><div class="step-num">3</div><div class="step-content"><strong>Third Level:</strong> JMS Sales VP</div></div>
+        </div>
+        <div class="jobaid-section">
+          <h3>❓ FAQ</h3>
+          <div class="step-row"><div class="step-num">Q</div><div class="step-content"><strong>What does BMA mean?</strong> — BMA = Business Manager Associate. Used in repay processes and claim submissions.</div></div>
+          <div class="step-row"><div class="step-num">Q</div><div class="step-content"><strong>How do I find the contact for a specific customer?</strong> — Use the Directory, search by customer name, and filter by SBA.</div></div>
+          <div class="step-row"><div class="step-num">Q</div><div class="step-content"><strong>Where do I find claim templates?</strong> — Navigate to the Templates page from the dashboard or sidebar.</div></div>
+          <div class="step-row"><div class="step-num">Q</div><div class="step-content"><strong>How do I open a customer portal?</strong> — Navigate to Customer Portal, find the card, and click it — it opens directly in a new tab.</div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="widget">
+          <h3><span class="dot" style="background:#4a9eff"></span> Quick Navigate</h3>
+          <div class="quick-link" onclick="navigate('jobaid',null)">📋 Job Aids</div>
+          <div class="quick-link" onclick="navigate('template',null)">📄 Templates</div>
+          <div class="quick-link" onclick="navigate('portal',null)">🌐 Customer Portal</div>
+          <div class="quick-link" onclick="navigate('directory',null)">👥 Directory</div>
+        </div>
+        <div class="widget">
+          <h3><span class="dot" style="background:#22c55e"></span> Portal Version</h3>
+          <div style="font-size:13px;color:#57606a;line-height:2">
+            <div>Tool: <strong style="color:#1c2b3a">eLS — Enhanced Link Support</strong></div>
+            <div>Version: <strong style="color:#1c2b3a">6.16.26</strong></div>
+            <div>Job Aids: <strong style="color:#1c2b3a">7.28.26</strong></div>
+            <div>Environment: <strong style="color:#1c2b3a">Internal — eLS Portal</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /help -->
+
+  <!-- GLOBAL SEARCH RESULTS -->
+  <div id="page-search" class="page">
+    <div class="breadcrumb">Home / <span>Search Results</span></div>
+    <div class="page-header">
+      <h1>Search Results</h1>
+      <p id="search-summary"></p>
+    </div>
+    <div class="table-card"><div class="table-wrap">
+      <table><thead><tr><th>#</th><th>Customer</th><th>SBA</th><th>Section</th><th>Match</th></tr></thead>
+      <tbody id="search-body"></tbody></table>
+    </div></div>
+  </div>
+
+</div><!-- /main -->
+
+<footer>eLS — Enhanced Link Support &nbsp;·&nbsp; Invalid Claims &amp; Repay Management Portal &nbsp;·&nbsp; Internal Use Only &nbsp;·&nbsp; Made with IBM Bob</footer>
+
+<!-- COMPASS MODAL -->
+<div id="compass-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);align-items:flex-start;justify-content:center;padding:20px;">
+  <div style="position:relative;width:100%;max-width:820px;height:calc(100vh - 40px);border-radius:14px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4);">
+    <button onclick="document.getElementById('compass-modal').style.display='none'" style="position:absolute;top:10px;right:12px;z-index:10;background:#fff1f2;border:1px solid #fecaca;color:#dc2626;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;">&#x2715; Close</button>
+    <iframe src="public/compass.html" style="width:100%;height:100%;border:none;" title="eLS Compass"></iframe>
+  </div>
+</div>
+
+<!-- ── LOGIN GATE ──────────────────────────────────────────────────────── -->
+<div id="login-gate">
+  <div class="login-card">
+    <div class="login-ibm-bar">
+      <div class="login-ibm-logo">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="login-ibm-text">IBM</div>
+    </div>
+    <div class="login-divider"></div>
+    <div class="login-app-name">e<span>LS</span></div>
+    <div class="login-app-sub">Enhanced Link Support &nbsp;·&nbsp; Internal Portal</div>
+    <div class="login-label">Access Code</div>
+    <div class="login-input-wrap">
+      <input class="login-input" id="login-input" type="password" placeholder="Enter access code" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="login-eye" id="login-eye" onclick="toggleLoginEye()" title="Show/hide">
+        <svg id="eye-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-footer">
+      IBM Acosta · Invalid Claims &amp; Repay Management<br>
+      For access, contact your team lead
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY='els_auth_26',CODE='eLS2026';
+  function show(){document.getElementById('login-gate').classList.remove('hidden');}
+  function hide(){document.getElementById('login-gate').classList.add('hidden');}
+  try{if(sessionStorage.getItem(KEY)==='1'){hide();return;}}catch(e){}
+  show();
+  window.doLogin=function(){
+    var v=document.getElementById('login-input').value;
+    if(v===CODE){
+      try{sessionStorage.setItem(KEY,'1');}catch(e){}
+      hide();
+      document.getElementById('login-error').textContent='';
+    } else {
+      var el=document.getElementById('login-error');
+      el.textContent='Incorrect access code. Try again.';
+      document.getElementById('login-input').value='';
+      document.getElementById('login-input').focus();
+      el.style.animation='none';
+      el.offsetHeight;
+      el.style.animation='shake .3s ease';
+    }
+  };
+  window.toggleLoginEye=function(){
+    var inp=document.getElementById('login-input');
+    var ico=document.getElementById('eye-icon');
+    if(inp.type==='password'){
+      inp.type='text';
+      ico.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      inp.type='password';
+      ico.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  };
+})();
+</script>
+<style>
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+</style>
+
+<script src="src/main.js"></script>
+</body>
+</html>

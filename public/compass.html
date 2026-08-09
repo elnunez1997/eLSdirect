@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>eLS Compass &mdash; INVALIDS DIA PATH</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f0f2f5;color:#1a1d2e;font-family:-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;}
+
+/* HEADER */
+#app-header{width:100%;background:#ffffff;border-bottom:1px solid #dde1ea;padding:10px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.logo{font-size:17px;font-weight:800;color:#1d4ed8;letter-spacing:-.2px;}
+.tag{font-size:10px;color:#6b7280;margin-top:1px;}
+.hright{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.hbtn{background:#f3f4f6;border:1px solid #dde1ea;color:#374151;border-radius:7px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.hbtn:hover{background:#e5e7eb;border-color:#9ca3af;color:#111827;}
+.hbtn.restart{color:#b45309;border-color:#fde68a;background:#fffbeb;}
+.hbtn.restart:hover{background:#fef3c7;}
+
+/* TAB BAR */
+#tab-bar{width:100%;background:#ffffff;border-bottom:1px solid #dde1ea;display:flex;padding:0 24px;gap:2px;}
+.tab{padding:10px 16px;font-size:12px;font-weight:700;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.3px;}
+.tab:hover{color:#1a1d2e;}
+.tab.active{color:#1d4ed8;border-bottom-color:#1d4ed8;}
+
+/* LAYOUT */
+#layout{display:flex;flex:1;overflow:hidden;}
+#main-col{flex:1;overflow-y:auto;padding:24px 16px 60px;display:flex;flex-direction:column;align-items:center;}
+
+/* SIDE PANEL */
+#side-panel{width:280px;background:#ffffff;border-left:1px solid #dde1ea;overflow-y:auto;padding:18px;flex-shrink:0;display:none;box-shadow:-2px 0 8px rgba(0,0,0,.04);}
+#side-panel.open{display:block;}
+.sp-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#1d4ed8;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #dde1ea;}
+.sp-section{margin-bottom:20px;}
+.sp-sec-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#b45309;margin-bottom:8px;}
+.sp-link{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all .15s;font-size:12px;color:#374151;text-decoration:none;}
+.sp-link:hover{border-color:#1d4ed8;color:#1d4ed8;background:#eff6ff;}
+.sp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sp-note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:9px 11px;font-size:11px;color:#92400e;line-height:1.5;margin-bottom:6px;}
+
+/* SEARCH BAR */
+#search-wrap{width:100%;max-width:500px;margin-bottom:16px;position:relative;}
+#search-input{width:100%;background:#ffffff;border:1px solid #dde1ea;border-radius:10px;padding:10px 14px 10px 38px;font-size:13px;color:#1a1d2e;outline:none;transition:border .15s;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+#search-input:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1);}
+#search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:14px;}
+#search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#ffffff;border:1px solid #dde1ea;border-radius:10px;z-index:200;overflow:hidden;display:none;box-shadow:0 4px 16px rgba(0,0,0,.1);}
+.sr-item{padding:10px 14px;cursor:pointer;font-size:13px;color:#1a1d2e;border-bottom:1px solid #f3f4f6;transition:background .12s;}
+.sr-item:last-child{border-bottom:none;}
+.sr-item:hover{background:#eff6ff;}
+.sr-cat{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+
+/* PROGRESS */
+#prog-wrap{width:100%;max-width:500px;margin-bottom:10px;display:none;}
+#prog-track{height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden;}
+#prog-fill{height:100%;background:#1d4ed8;border-radius:2px;transition:width .4s;width:0%;}
+#prog-labels{display:flex;justify-content:space-between;font-size:10px;color:#6b7280;margin-top:4px;}
+
+/* BREADCRUMB */
+#bc{width:100%;max-width:500px;display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:11px;color:#6b7280;margin-bottom:10px;min-height:16px;}
+.bc-sep{color:#d1d5db;}
+.bc-lnk{color:#1d4ed8;cursor:pointer;}
+.bc-lnk:hover{text-decoration:underline;}
+.bc-cur{color:#1a1d2e;font-weight:600;}
+
+/* CARD */
+#card{width:100%;max-width:500px;}
+.phone-card{width:100%;background:#ffffff;border:1px solid #dde1ea;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);animation:cardUp .2s ease;}
+@keyframes cardUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* CARD HEADER */
+.ch{padding:13px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:8px;}
+.ch-dot{width:8px;height:8px;border-radius:50%;}
+.ch-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
+.ch-step{margin-left:auto;font-size:10px;color:#6b7280;background:#f3f4f6;padding:2px 9px;border-radius:10px;font-weight:600;}
+.ch-blue{background:#eff6ff;}.ch-blue .ch-dot{background:#1d4ed8;}.ch-blue .ch-lbl{color:#1d4ed8;}
+.ch-yellow{background:#fffbeb;}.ch-yellow .ch-dot{background:#d97706;}.ch-yellow .ch-lbl{color:#d97706;}
+.ch-red{background:#fff1f2;}.ch-red .ch-dot{background:#dc2626;}.ch-red .ch-lbl{color:#dc2626;}
+.ch-green{background:#f0fdf4;}.ch-green .ch-dot{background:#16a34a;}.ch-green .ch-lbl{color:#16a34a;}
+.ch-orange{background:#fff7ed;}.ch-orange .ch-dot{background:#ea580c;}.ch-orange .ch-lbl{color:#ea580c;}
+
+/* CARD BODY */
+.cb{padding:22px 22px 18px;}
+.qbox{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+.qbox-t{font-size:16px;font-weight:700;color:#111827;line-height:1.35;}
+.qbox-s{font-size:12px;color:#6b7280;margin-top:5px;}
+.notebox{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;font-size:12px;color:#92400e;margin-bottom:14px;line-height:1.5;}
+.notebox strong{color:#b45309;}
+.notebox a{color:#1d4ed8;font-weight:600;text-decoration:underline;word-break:break-all;}
+.notebox a:hover{color:#1e40af;}
+.cklist{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+.cklist-t{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#d97706;font-weight:700;margin-bottom:8px;}
+.cklist ul{padding-left:16px;}
+.cklist li{font-size:12px;color:#374151;margin-bottom:4px;line-height:1.4;}
+.cklist li strong{color:#b45309;}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+.opt{display:flex;align-items:center;gap:12px;padding:13px 16px;background:#f9fafb;border-radius:12px;cursor:pointer;transition:all .15s;border:1.5px solid #e5e7eb;}
+.opt:hover{transform:translateX(2px);}
+.opt.yes{border-color:#16a34a;}.opt.yes:hover{background:#f0fdf4;}
+.opt.no{border-color:#dc2626;}.opt.no:hover{background:#fff1f2;}
+.opt.oa{border-color:#1d4ed8;}.opt.oa:hover{background:#eff6ff;}
+.opt.ob{border-color:#d97706;}.opt.ob:hover{background:#fffbeb;}
+.opt.oc{border-color:#ea580c;}.opt.oc:hover{background:#fff7ed;}
+.radio{width:20px;height:20px;border-radius:50%;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.opt.yes .radio{border-color:#16a34a;}.opt.no .radio{border-color:#dc2626;}
+.opt.oa .radio{border-color:#1d4ed8;}.opt.ob .radio{border-color:#d97706;}.opt.oc .radio{border-color:#ea580c;}
+.rdot{width:9px;height:9px;border-radius:50%;display:none;}
+.opt.yes .rdot{background:#16a34a;}.opt.no .rdot{background:#dc2626;}
+.opt.oa .rdot{background:#1d4ed8;}.opt.ob .rdot{background:#d97706;}.opt.oc .rdot{background:#ea580c;}
+.opt:hover .rdot{display:block;}
+.opt-body{flex:1;}
+.opt-l{font-size:14px;font-weight:700;color:#111827;}
+.opt-d{font-size:11px;color:#6b7280;margin-top:1px;}
+
+/* NAV BUTTONS */
+.nav{display:flex;gap:8px;flex-wrap:wrap;padding-top:4px;}
+.nbtn{border:1px solid #e5e7eb;background:#f9fafb;color:#374151;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.nbtn:hover{color:#111827;border-color:#9ca3af;background:#f3f4f6;}
+.nbtn.nr{color:#b45309;border-color:#fde68a;background:#fffbeb;}.nbtn.nr:hover{background:#fef3c7;}
+.nbtn.nh{color:#1d4ed8;border-color:#bfdbfe;background:#eff6ff;}.nbtn.nh:hover{background:#dbeafe;}
+
+/* DONE BUTTON */
+.done-btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:16px;letter-spacing:.3px;transition:all .2s;}
+.done-btn:hover:not(:disabled){filter:brightness(1.07);}
+.done-btn:disabled{opacity:.45;cursor:not-allowed;filter:none;}
+.done-green{background:#16a34a;color:#ffffff;}
+.done-blue{background:#1d4ed8;color:#ffffff;}
+.done-yellow{background:#d97706;color:#ffffff;}
+.done-orange{background:#ea580c;color:#ffffff;}
+.done-red{background:#dc2626;color:#ffffff;}
+
+/* REQUIRED ACTIONS CHECKLIST */
+.ra{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+.ra-t{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:#1d4ed8;font-weight:700;margin-bottom:10px;}
+.ra-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;cursor:pointer;user-select:none;}
+.ra-item:last-child{border-bottom:none;}
+.ra-item.checked .ra-text{color:#9ca3af;text-decoration:line-through;}
+.ra-cb{width:18px;height:18px;border-radius:4px;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:all .15s;background:#ffffff;}
+.ra-item.checked .ra-cb{background:#16a34a;border-color:#16a34a;}
+.ra-check{display:none;color:#ffffff;font-size:11px;font-weight:900;}
+.ra-item.checked .ra-check{display:block;}
+.ra-text{font-size:13px;color:#374151;line-height:1.45;}
+.ra-hint{font-size:11px;color:#6b7280;margin-bottom:12px;padding:6px 10px;background:#eff6ff;border-radius:6px;border-left:3px solid #1d4ed8;}
+
+/* RESOLUTION NOTE */
+.rn{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 13px;margin-bottom:12px;font-size:12px;color:#92400e;}
+.rn strong{color:#b45309;display:block;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+
+/* PATH TRAIL */
+.path-blk{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 13px;margin-bottom:12px;}
+.path-blk-t{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#6b7280;font-weight:700;margin-bottom:7px;}
+.trail{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:11px;}
+.tn{background:#e5e7eb;border-radius:3px;padding:2px 7px;color:#374151;}
+.tn.e{border:1px solid #16a34a;color:#16a34a;background:#f0fdf4;}
+.tn.e.blue{border-color:#1d4ed8;color:#1d4ed8;background:#eff6ff;}
+.tn.e.yellow{border-color:#d97706;color:#d97706;background:#fffbeb;}
+.tn.e.orange{border-color:#ea580c;color:#ea580c;background:#fff7ed;}
+.tn.e.red{border-color:#dc2626;color:#dc2626;background:#fff1f2;}
+.ta{color:#9ca3af;font-size:11px;}
+
+/* HOME */
+.home-card{width:100%;max-width:500px;background:#ffffff;border:1px solid #dde1ea;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);animation:cardUp .2s ease;}
+.home-top{padding:26px 24px 18px;border-bottom:1px solid #f3f4f6;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);}
+.home-logo{font-size:22px;font-weight:800;color:#ffffff;margin-bottom:3px;}
+.home-tag{font-size:12px;color:#bfdbfe;}
+.home-grid{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.htile{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px 14px;cursor:pointer;transition:all .15s;}
+.htile:hover{border-color:#1d4ed8;background:#eff6ff;transform:translateY(-2px);box-shadow:0 4px 12px rgba(29,78,216,.1);}
+.htile-dot{width:9px;height:9px;border-radius:50%;margin-bottom:9px;}
+.htile-t{font-size:13px;font-weight:700;color:#111827;margin-bottom:2px;}
+.htile-d{font-size:11px;color:#6b7280;}
+.home-leg{padding:10px 16px 18px;display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:#6b7280;border-top:1px solid #f3f4f6;}
+.leg{display:flex;align-items:center;gap:5px;}
+.ldot{width:7px;height:7px;border-radius:50%;}
+
+/* DASHBOARD */
+.dash-grid{width:100%;max-width:500px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.dstat{background:#ffffff;border:1px solid #dde1ea;border-radius:14px;padding:18px 14px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.dstat-n{font-size:28px;font-weight:800;margin-bottom:2px;}
+.dstat-l{font-size:11px;color:#6b7280;line-height:1.3;}
+.dash-section{width:100%;max-width:500px;background:#ffffff;border:1px solid #dde1ea;border-radius:14px;padding:18px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.dash-sec-t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#1d4ed8;margin-bottom:14px;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.bar-lbl{font-size:12px;color:#374151;width:140px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-track{flex:1;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.bar-val{font-size:11px;color:#6b7280;width:24px;text-align:right;flex-shrink:0;}
+.empty-dash{text-align:center;padding:36px;color:#6b7280;font-size:13px;}
+.dash-reset{background:#fff1f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;width:100%;margin-top:8px;transition:all .15s;}
+.dash-reset:hover{background:#fee2e2;}
+
+/* FOOTER */
+footer{border-top:1px solid #dde1ea;text-align:center;padding:12px;font-size:11px;color:#9ca3af;background:#ffffff;}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  #side-panel{display:none !important;}
+  .home-grid{grid-template-columns:1fr;}
+  .dash-grid{grid-template-columns:1fr 1fr;}
+  #main-col{padding:14px 10px 40px;}
+}
+@media(max-width:360px){
+  .dash-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="app-header">
+  <div>
+    <div class="logo">&#x1F9ED; eLS Compass</div>
+    <div class="tag">Navigate Every Case with Confidence.</div>
+  </div>
+  <div class="hright">
+    <button class="hbtn" onclick="toggleResources()">&#x1F4DA; Resources</button>
+    <button class="hbtn" onclick="goHome()">&#x229E; Home</button>
+    <button class="hbtn restart" onclick="restart()">&#x21BA; Restart</button>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div id="tab-bar">
+  <div class="tab active" id="tab-wizard" onclick="switchTab('wizard')">&#x1F9ED; Wizard</div>
+  <div class="tab" id="tab-dash" onclick="switchTab('dash')">&#x1F4CA; Dashboard</div>
+</div>
+
+<!-- LAYOUT -->
+<div id="layout">
+
+  <!-- MAIN COLUMN -->
+  <div id="main-col">
+
+    <!-- WIZARD VIEW -->
+    <div id="view-wizard">
+      <div id="search-wrap">
+        <span id="search-icon">&#x1F50D;</span>
+        <input id="search-input" type="text" placeholder="Search workflow (e.g., Follow Up, Portal, Jira...)" oninput="onSearch(this.value)" onblur="hideSearch()" onkeydown="searchKey(event)"/>
+        <div id="search-results"></div>
+      </div>
+      <div id="prog-wrap">
+        <div id="prog-track"><div id="prog-fill"></div></div>
+        <div id="prog-labels"><span id="step-lbl">Step 1</span><span id="pct-lbl">0%</span></div>
+      </div>
+      <div id="bc"></div>
+      <div id="card"></div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="view-dash" style="display:none;width:100%;max-width:500px;">
+      <div id="dash-content"></div>
+    </div>
+
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div id="side-panel">
+    <div class="sp-title">&#x1F4DA; Resource Center</div>
+
+    <div class="sp-section">
+      <div class="sp-sec-t">&#x1F517; SOP References</div>
+      <a class="sp-link" href="#" onclick="return false;"><span class="sp-dot" style="background:#1d4ed8;"></span>INVALIDS DIA PATH SOP</a>
+      <a class="sp-link" href="#" onclick="return false;"><span class="sp-dot" style="background:#1d4ed8;"></span>Repayment Process SOP</a>
+      <a class="sp-link" href="#" onclick="return false;"><span class="sp-dot" style="background:#1d4ed8;"></span>Invalidation Process SOP</a>
+      <a class="sp-link" href="#" onclick="return false;"><span class="sp-dot" style="background:#1d4ed8;"></span>BM/LTS Approval SOP</a>
+    </div>
+
+    <div class="sp-section">
+      <div class="sp-sec-t">&#x1F3AB; Jira Links</div>
+      <a class="sp-link" href="https://jiraservice.ihost.com/" target="_blank" rel="noopener"><span class="sp-dot" style="background:#d97706;"></span>Jira Service Portal</a>
+      <a class="sp-link" href="#" onclick="return false;"><span class="sp-dot" style="background:#d97706;"></span>GCIT Backup Request Queue</a>
+      <a class="sp-link" href="#" onclick="return false;"><span class="sp-dot" style="background:#d97706;"></span>Open Tickets Dashboard</a>
+    </div>
+
+    <div class="sp-section">
+      <div class="sp-sec-t">&#x1F310; Customer Portals</div>
+      <a class="sp-link" href="#" onclick="return false;"><span class="sp-dot" style="background:#16a34a;"></span>Portal Directory (eLS Tool)</a>
+      <a class="sp-link" href="#" onclick="return false;"><span class="sp-dot" style="background:#16a34a;"></span>High Radius (HR)</a>
+      <a class="sp-link" href="#" onclick="return false;"><span class="sp-dot" style="background:#16a34a;"></span>Customer Master Lookup</a>
+    </div>
+
+    <div class="sp-section">
+      <div class="sp-sec-t">&#x1F4E7; Email Templates</div>
+      <div class="sp-note">&#x1F4CC; <strong>Repay Request Template</strong> &mdash; Use when sending a repayment request to the customer via email (no portal).</div>
+      <div class="sp-note">&#x1F4CC; <strong>BM/LTS Approval Request</strong> &mdash; Use when requesting written approval before processing.</div>
+      <div class="sp-note">&#x1F4CC; <strong>GCC/Deduction Routing Note</strong> &mdash; Use when sending a case back for processing.</div>
+    </div>
+
+    <div class="sp-section">
+      <div class="sp-sec-t">&#x1F4CB; Reference Notes</div>
+      <div class="sp-note">Action Codes: <strong style="color:#374151;">IRS</strong> = Repay Request Sent &nbsp;|&nbsp; <strong style="color:#374151;">IRR</strong> = 2nd Repay Request</div>
+      <div class="sp-note">GCIT backup requests must be verified in Jira before creating a new ticket to avoid duplicates.</div>
+      <div class="sp-note">BM/LTS approval must always be in writing (email). Verbal approvals are <strong>not</strong> accepted.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>Made with IBM Bob &nbsp;|&nbsp; eLS Compass &mdash; INVALIDS DIA PATH Wizard</footer>
+
+<script>
+// DECISION TREE
+var T = {
+  START: {type:'home'},
+
+  MAIN: {type:'multi', hdr:{c:'ch-blue', l:'&#x1F9ED; Main Option'}, stepN:'Hub',
+    q:'What type of case are you processing?',
+    s:'Select the workflow that matches your current case.',
+    opts:[
+      {c:'oa', l:'No BU (Back Up)',  d:'No Business Unit backup is available',         n:'NB_PORTAL'},
+      {c:'ob', l:'Follow Up',        d:'Customer sent a follow-up or repay request',    n:'FU_REQ'},
+      {c:'oc', l:'Invalid Process',  d:'Case falls under the Invalid Process path',     n:'INV_TP'}
+    ]},
+
+  // FOLLOW UP branch
+  FU_REQ: {type:'yn', hdr:{c:'ch-blue', l:'&#x1F504; Follow Up'}, stepN:'1 of 2',
+    q:'Is there a Follow-Up or Repay Request present?',
+    s:'Check High Radius (HR) for a repay request or follow-up from the customer.',
+    cklist:{t:'&#x2714; Complete this checklist before proceeding', items:[
+      '<strong>ACTION CODE: IRS</strong> (Repay Request Sent) / <strong>IRR</strong> (2nd Repay Request)',
+      '<strong>CHECK ATTACHMENT IN HIGH RADIUS (HR)</strong>: Repay Packet / Repay Request (Email Contents)',
+      '<strong>IMPORTANT:</strong> Check the Notes/Comments section in HR for any special instructions from the customer'
+    ]},
+    yL:'Yes &mdash; Follow-up / Repay Request found in HR',
+    nL:'No &mdash; No follow-up available',
+    y:'FU_POCKET', n:'R_FU_NO_FOLLOWUP'},
+
+  R_FU_NO_FOLLOWUP: {type:'res', hdr:{c:'ch-yellow', l:'&#x1F504; Follow Up'}, col:'yellow', icon:'&#x1F50D;',
+    t:'No Follow-Up Available &mdash; Verify in HR', sub:'Follow Up &#x2192; No Follow-Up Found',
+    dc:'done-yellow', dt:'&#x2705; Done &mdash; Return to Home',
+    a:['No follow-up or repay request was found',
+       'Verify the HR (High Radius) attachment for any repay request or email contents',
+       'Check the Comments/Notes section in HR for any additional information from the customer'],
+    note:null},
+
+  FU_POCKET: {type:'multi', hdr:{c:'ch-blue', l:'&#x1F504; Follow Up'}, stepN:'2 of 2',
+    q:'Does the follow-up include a Repay Packet?',
+    s:'Check the attachment in High Radius for the Repay Packet.',
+    opts:[
+      {c:'oa', l:'With Repay Packet',    d:'Repay Packet attachment is present in HR',   n:'R_FU_WITH'},
+      {c:'ob', l:'Without Repay Packet', d:'No Repay Packet attachment found in HR',      n:'R_FU_WITHOUT'}
+    ]},
+
+  R_FU_WITH: {type:'res', hdr:{c:'ch-blue', l:'&#x1F504; Follow Up'}, col:'blue', icon:'&#x1F4EC;',
+    t:'Open Repay Packet &amp; Reply', sub:'Follow Up &#x2192; With Repay Packet',
+    dc:'done-blue', dt:'&#x1F4EC; Mark All Actions Complete to Proceed',
+    a:['Open the Repay Packet in High Radius',
+       'Verify the sender of the email and reply appropriately',
+       'Use the eLS tool as a guide while composing your reply',
+       'Click DONE once the reply is sent and logged in HR'],
+    note:'The eLS tool includes email assistance. Use it as your guide when replying to the customer.'},
+
+  R_FU_WITHOUT: {type:'res', hdr:{c:'ch-orange', l:'&#x1F504; Follow Up'}, col:'orange', icon:'&#x1F500;',
+    t:'Proceed to the Invalidation Process', sub:'Follow Up &#x2192; Without Repay Packet',
+    dc:'done-orange', dt:'&#x27A1; Mark All Actions Complete to Proceed',
+    a:['No Repay Packet is attached &mdash; proceed to the Invalidation Process',
+       'Select &ldquo;Invalid Process&rdquo; from the Main Option to continue',
+       'Follow the Invalidation Process steps per SOP'],
+    note:null},
+
+  // NO BU branch
+  NB_PORTAL: {type:'yn', hdr:{c:'ch-yellow', l:'&#x1F4C2; No BU (Back Up)'}, stepN:'1 of 4',
+    q:'Does the customer have a portal?',
+    s:'Check the customer master to determine whether a vendor or customer portal is available.',
+    note:'You may check the eLS tool as a reference for portal information.',
+    yL:'Yes &mdash; Customer has a portal',
+    nL:'No &mdash; Customer does not have a portal',
+    y:'NB_P_BACKUP', n:'NB_NP_JIRA'},
+
+  NB_P_BACKUP: {type:'yn', hdr:{c:'ch-yellow', l:'&#x1F4C2; No BU &mdash; Portal'}, stepN:'2 of 4',
+    q:'Is the backup documentation present in the portal?',
+    s:'Log in to the customer portal and check whether backup documentation is available for this deduction.',
+    yL:'Yes &mdash; Backup is present in the portal',
+    nL:'No &mdash; No backup found in the portal',
+    y:'R_ATTACH1', n:'NB_P_GCIT'},
+
+  R_ATTACH1: {type:'res', hdr:{c:'ch-green', l:'&#x1F4C2; No BU &mdash; Portal'}, col:'green', icon:'&#x2705;',
+    t:'Attach Backup &amp; Send Back to GCC/Deduction', sub:'No BU &#x2192; Portal &#x2192; Backup Present',
+    dc:'done-green', dt:'&#x2705; Mark All Actions Complete to Proceed',
+    a:['Update status in HR (High Radius) to RRV (Research and Validate)',
+       'Upload BU (Back Up) in HR (High Radius)',
+       'Add comment indicating BU is attached'],
+    note:null},
+
+  NB_P_GCIT: {type:'yn', hdr:{c:'ch-yellow', l:'&#x1F4C2; No BU &mdash; Portal'}, stepN:'3 of 4',
+    q:'Does GCIT have an existing request for BU (Back Up)?',
+    s:'Check Jira to confirm whether a GCIT backup request has already been submitted.',
+    note:'Jira &mdash; <a href="https://jiraservice.ihost.com/" target="_blank" rel="noopener">https://jiraservice.ihost.com/</a>',
+    yL:'Yes &mdash; A GCIT Jira request exists for BU backup',
+    nL:'No &mdash; No GCIT Jira request found',
+    y:'NB_GCIT_BU', n:'R_ATTACH2'},
+
+  NB_GCIT_BU: {type:'yn', hdr:{c:'ch-yellow', l:'&#x1F4C2; No BU &mdash; Portal'}, stepN:'4 of 4',
+    q:'Is the Back Up (BU) attached?',
+    s:'Check whether the backup documentation has been attached to the case.',
+    yL:'Yes &mdash; Back Up is attached',
+    nL:'No &mdash; Back Up is not attached',
+    y:'R_GCIT_BU_YES', n:'R_GCIT_INV'},
+
+  R_GCIT_BU_YES: {type:'res', hdr:{c:'ch-green', l:'&#x1F4C2; No BU &mdash; Portal'}, col:'green', icon:'&#x2705;',
+    t:'Send Back to Deduction/GCC/TS for Processing', sub:'No BU &#x2192; Portal &#x2192; GCIT Request &#x2192; BU Attached',
+    dc:'done-green', dt:'&#x2705; Mark All Actions Complete to Proceed',
+    a:['Update status in HR (High Radius) to RRV (Research and Validate)',
+       'Upload BU (Back Up) in HR (High Radius)',
+       'Add comment indicating BU is attached'],
+    note:'&#x26A0; <strong>Important:</strong> Ensure all three checklist items above are completed before clicking DONE.'},
+
+  R_GCIT_INV: {type:'res', hdr:{c:'ch-orange', l:'&#x1F4C2; No BU &mdash; Portal'}, col:'orange', icon:'&#x27A1;',
+    t:'Proceed to the Invalid Process', sub:'No BU &#x2192; Portal &#x2192; GCIT Request &#x2192; No BU Attached',
+    dc:'done-orange', dt:'&#x27A1; Actions Complete &mdash; Proceed to Invalid Process',
+    next:'INV_TP',
+    a:['Back Up is not attached &mdash; proceed to the Invalid Process workflow',
+       'Do NOT create a duplicate Jira request'],
+    note:null},
+
+  R_ATTACH2: {type:'res', hdr:{c:'ch-green', l:'&#x1F4C2; No BU &mdash; Portal'}, col:'green', icon:'&#x2705;',
+    t:'Attach Backup &amp; Send Back to GCC/Deduction', sub:'No BU &#x2192; Portal &#x2192; No Backup &#x2192; No GCIT Request',
+    dc:'done-green', dt:'&#x2705; Mark All Actions Complete to Proceed',
+    a:['No GCIT request found &mdash; attach all available documentation to the case',
+       'Send the case back to the Deduction/GCC team for processing',
+       'Add notes explaining the absence of BU backup',
+       'Update the case status accordingly'],
+    note:null},
+
+  NB_NP_JIRA: {type:'yn', hdr:{c:'ch-yellow', l:'&#x1F4C2; No BU &mdash; No Portal'}, stepN:'2 of 4',
+    q:'Has a Jira ticket been created?',
+    s:'Mandatory check before proceeding. Confirm the contact details listed on the ticket.',
+    note:'MANDATORY CHECK &mdash; Confirm the contact details on the ticket before proceeding.<br>You may verify this using the eLS tool.<br>Jira: <a href="https://jiraservice.ihost.com/" target="_blank" rel="noopener">https://jiraservice.ihost.com/</a>',
+    yL:'Yes &mdash; A Jira ticket exists',
+    nL:'No &mdash; No Jira ticket has been created',
+    y:'NB_NP_CLOSED', n:'R_NO_JIRA'},
+
+  NB_NP_CLOSED: {type:'yn', hdr:{c:'ch-yellow', l:'&#x1F4C2; No BU &mdash; No Portal'}, stepN:'3 of 4',
+    q:'Is the Jira ticket closed?',
+    s:'Check the status of the existing Jira ticket to determine the correct routing.',
+    yL:'Yes &mdash; Jira ticket is closed',
+    nL:'No &mdash; Jira ticket is still open or in progress',
+    y:'R_JIRA_CLOSED', n:'R_JIRA_OPEN'},
+
+  R_JIRA_CLOSED: {type:'res', hdr:{c:'ch-orange', l:'&#x1F4C2; No BU &mdash; No Portal'}, col:'orange', icon:'&#x27A1;',
+    t:'Proceed to Invalid Process', sub:'No BU &#x2192; No Portal &#x2192; Jira Closed &#x2192; Invalid Process',
+    dc:'done-orange', dt:'&#x27A1; Actions Complete &mdash; Proceed to Invalid Process',
+    next:'INV_TP',
+    a:['The Jira ticket is closed &mdash; the matter has been resolved',
+       'Update stage reason to Invalids in CCP',
+       'Attach the closed Jira ticket reference number to the case',
+       'Proceed to the Invalid Process workflow'],
+    note:null},
+
+  R_JIRA_OPEN: {type:'res', hdr:{c:'ch-blue', l:'&#x1F4C2; No BU &mdash; No Portal'}, col:'blue', icon:'&#x1F504;',
+    t:'Send Back to Deduction/GCC/TS for Follow-Up', sub:'No BU &#x2192; No Portal &#x2192; Jira Still Open',
+    dc:'done-blue', dt:'&#x1F504; Mark All Actions Complete to Proceed',
+    a:['The Jira ticket is still open &mdash; further follow-up is required',
+       'Send the case back to Deduction/GCC/TS for follow-up',
+       'Include the open Jira ticket number in the routing notes'],
+    note:null},
+
+  R_NO_JIRA: {type:'res', hdr:{c:'ch-green', l:'&#x1F4C2; No BU &mdash; No Portal'}, col:'green', icon:'&#x2705;',
+    t:'Send Back to Deduction/GCC/TS for Processing', sub:'No BU &#x2192; No Portal &#x2192; No Jira Ticket',
+    dc:'done-green', dt:'&#x2705; Mark All Actions Complete to Proceed',
+    a:['Notify GCIT for a request for Back Up',
+       'Update status in HR (High Radius) into RRV (Research and Validate)'],
+    note:null},
+
+  // INVALID PROCESS branch
+  INV_TP: {type:'yn', hdr:{c:'ch-red', l:'&#x1F6AB; Invalid Process'}, stepN:'1 of 3',
+    q:'Is this a Trade / Promo-related invalid?',
+    s:'Determine whether the invalid deduction is related to a trade promotion or pricing agreement.',
+    yL:'Yes &mdash; This is Trade/Promo related',
+    nL:'No &mdash; This is not Trade/Promo related',
+    y:'INV_TP_APPR', n:'INV_NTP_JMS'},
+
+  INV_TP_APPR: {type:'yn', hdr:{c:'ch-red', l:'&#x1F6AB; Invalid &mdash; Trade/Promo'}, stepN:'2 of 3',
+    q:'Is approval from BM/LTS present?',
+    s:'Check whether Brand Manager (BM) or ALTS approval has been provided for this invalid.',
+    yL:'Yes &mdash; BM/LTS approval is present',
+    nL:'No &mdash; BM/LTS approval is not present',
+    y:'INV_TP_PORT', n:'R_VERIFY_SOP'},
+
+  R_VERIFY_SOP: {type:'res', hdr:{c:'ch-yellow', l:'&#x1F6AB; Invalid &mdash; Trade/Promo'}, col:'yellow', icon:'&#x26A0;',
+    t:'Verify SOP &mdash; Email Approval Required from BM/LTS', sub:'Invalid &mdash; Trade/Promo &#x2192; No BM/LTS Approval',
+    dc:'done-yellow', dt:'&#x26A0; Mark All Actions Complete to Proceed',
+    a:['Verify the SOP for the specified repayment process',
+       'Email approval is required from BM/LTS before proceeding',
+       'Do NOT process the case until written BM/LTS approval is received',
+       'Log the approval request in the case notes with the date and contact name'],
+    note:'Approval must be provided in writing (email). Do not process based on verbal approval.'},
+
+  INV_TP_PORT: {type:'yn', hdr:{c:'ch-red', l:'&#x1F6AB; Invalid &mdash; Trade/Promo'}, stepN:'3 of 3',
+    q:'Is a customer portal present and active?',
+    s:'BM/LTS approval is confirmed. Now determine the customer portal status.',
+    yL:'Yes &mdash; Customer portal is present and active',
+    nL:'No &mdash; Customer portal is not present or active',
+    y:'R_DISP1', n:'R_EMAIL1'},
+
+  R_DISP1: {type:'res', hdr:{c:'ch-green', l:'&#x1F6AB; Invalid &mdash; Trade/Promo'}, col:'green', icon:'&#x2705;',
+    t:'Dispute in Portal', sub:'Invalid &mdash; Trade/Promo &#x2192; BM/LTS Approved &#x2192; Portal Active',
+    dc:'done-green', dt:'&#x2705; Mark All Actions Complete to Proceed',
+    a:['The customer portal is present and active &mdash; file the dispute directly in the portal',
+       'Submit all required documentation through the portal',
+       'Save the portal confirmation number to the case',
+       'Update the case status to reflect that the portal dispute has been submitted'],
+    note:null},
+
+  R_EMAIL1: {type:'res', hdr:{c:'ch-blue', l:'&#x1F6AB; Invalid &mdash; Trade/Promo'}, col:'blue', icon:'&#x1F4E7;',
+    t:'Send Email &mdash; BM/LTS Approval for Repayment Request', sub:'Invalid &mdash; Trade/Promo &#x2192; BM/LTS Approved &#x2192; No Portal',
+    dc:'done-blue', dt:'&#x1F4E7; Mark All Actions Complete to Proceed',
+    a:['Verify on Directory or Customer SOP for accurate contact information',
+       'Update the Action code in HR (High Radius) accordingly',
+       'Use the eLS tool as your reference when drafting the email',
+       'Send the repayment request to the customer by email',
+       'Log all correspondence in the case notes'],
+    note:'You may utilize the eLS tool as your reference for the email template.'},
+
+  INV_NTP_JMS: {type:'yn', hdr:{c:'ch-red', l:'&#x1F6AB; Invalid &mdash; Non-Trade/Promo'}, stepN:'2 of 3',
+    q:'Has this case been validated by JMS/DRS?',
+    s:'Confirm whether this invalid has been validated by JMS (JM Smucker Company) or DRS (Deduction Resolution System).',
+    yL:'Yes &mdash; Validated by JMS/DRS',
+    nL:'No &mdash; Not validated by JMS/DRS',
+    y:'INV_NTP_PORT', n:'R_EMAIL_APPR'},
+
+  INV_NTP_PORT: {type:'yn', hdr:{c:'ch-red', l:'&#x1F6AB; Invalid &mdash; Non-Trade/Promo'}, stepN:'3 of 3',
+    q:'Is a customer portal present and active?',
+    s:'JMS/DRS validation is confirmed. Now determine the customer portal status.',
+    yL:'Yes &mdash; Customer portal is present and active',
+    nL:'No &mdash; Customer portal is not present or active',
+    y:'R_DISP2', n:'R_EMAIL_SOP'},
+
+  R_DISP2: {type:'res', hdr:{c:'ch-green', l:'&#x1F6AB; Invalid &mdash; Non-Trade/Promo'}, col:'green', icon:'&#x2705;',
+    t:'Dispute in Portal', sub:'Invalid &mdash; Non-Trade/Promo &#x2192; JMS/DRS Validated &#x2192; Portal Active',
+    dc:'done-green', dt:'&#x2705; Mark All Actions Complete to Proceed',
+    a:['JMS/DRS validation is confirmed and the customer portal is active',
+       'File the dispute directly in the customer portal',
+       'Submit all required documentation through the portal',
+       'Save the portal confirmation number and update the case'],
+    note:null},
+
+  R_EMAIL_SOP: {type:'res', hdr:{c:'ch-blue', l:'&#x1F6AB; Invalid &mdash; Non-Trade/Promo'}, col:'blue', icon:'&#x1F4E7;',
+    t:'Send Email &mdash; Per SOP Guidelines', sub:'Invalid &mdash; Non-Trade/Promo &#x2192; JMS/DRS Validated &#x2192; No Portal',
+    dc:'done-blue', dt:'&#x1F4E7; Mark All Actions Complete to Proceed',
+    a:['JMS/DRS validation is confirmed but the customer does not have an active portal',
+       'Send an email if the SOP requires this method for this customer',
+       'Use the eLS tool as your reference for email content and routing',
+       'Log all correspondence and update the case status'],
+    note:'You may utilize the eLS tool as your reference.'},
+
+  R_EMAIL_APPR: {type:'res', hdr:{c:'ch-yellow', l:'&#x1F6AB; Invalid &mdash; Non-Trade/Promo'}, col:'yellow', icon:'&#x26A0;',
+    t:'Email Approval Required from BM/LTS', sub:'Invalid &mdash; Non-Trade/Promo &#x2192; Not Validated by JMS/DRS',
+    dc:'done-yellow', dt:'&#x26A0; Mark All Actions Complete to Proceed',
+    a:['This case has not been validated by JMS/DRS',
+       'Email approval is required from BM/LTS before proceeding',
+       'Do NOT process the invalid until written approval is received from BM/LTS',
+       'Log the approval request with the date, contact name, and email in the case notes',
+       'Once approval is received, return to the workflow and proceed'],
+    note:'Approval must be provided in writing (email). Do not process based on verbal approval.'}
+};
+
+// SEARCH INDEX
+var SEARCH_INDEX = [
+  {k:'MAIN',        l:'Main Option',                          cat:'Hub'},
+  {k:'FU_REQ',      l:'Follow Up',                            cat:'Follow Up'},
+  {k:'FU_POCKET',   l:'Follow Up &#x2192; Repay Packet',      cat:'Follow Up'},
+  {k:'NB_PORTAL',   l:'No BU &#x2192; Portal Check',          cat:'No BU (Back Up)'},
+  {k:'NB_P_BACKUP', l:'No BU &#x2192; Portal Backup',         cat:'No BU (Back Up)'},
+  {k:'NB_P_GCIT',   l:'No BU &#x2192; GCIT / Jira Check',    cat:'No BU (Back Up)'},
+  {k:'NB_NP_JIRA',  l:'No BU &#x2192; No Portal &#x2192; Jira', cat:'No BU (Back Up)'},
+  {k:'NB_NP_CLOSED',l:'No BU &#x2192; Jira Closed Check',     cat:'No BU (Back Up)'},
+  {k:'INV_JIRA',      l:'Invalid Process &#x2192; Jira Check',          cat:'Invalid Process'},
+  {k:'INV_JIRA_CLOSED',l:'Invalid &#x2192; Jira Closed Check',          cat:'Invalid Process'},
+  {k:'INV_TP',        l:'Invalid Process &#x2192; Trade/Promo',          cat:'Invalid Process'},
+  {k:'INV_TP_APPR',   l:'Invalid &#x2192; BM/LTS Approval',             cat:'Invalid Process'},
+  {k:'INV_TP_PORT',   l:'Invalid &#x2192; Trade/Promo Portal',            cat:'Invalid Process'},
+  {k:'INV_NTP_JMS',   l:'Invalid &#x2192; Non-Trade &#x2192; JMS/DRS',   cat:'Invalid Process'},
+  {k:'INV_NTP_PORT',  l:'Invalid &#x2192; Non-Trade &#x2192; Portal',     cat:'Invalid Process'}
+];
+
+// STATE
+var H = [], C = [], cur = 'START';
+var _lsOk = (function(){ try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return true; } catch(e){ return false; } })();
+var STATS = loadStats();
+
+function loadStats() {
+  if (!_lsOk) return {total:0, paths:{}, resolutions:{}};
+  try {
+    var raw = localStorage.getItem('els_stats');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {total:0, paths:{}, resolutions:{}};
+}
+function saveStats() {
+  if (!_lsOk) return;
+  try { localStorage.setItem('els_stats', JSON.stringify(STATS)); } catch(e) {}
+}
+function recordResolution(resKey, pathArr) {
+  STATS.total = (STATS.total || 0) + 1;
+  var pathStr = pathArr.join(' > ');
+  STATS.paths[pathStr] = (STATS.paths[pathStr] || 0) + 1;
+  STATS.resolutions[resKey] = (STATS.resolutions[resKey] || 0) + 1;
+  saveStats();
+}
+
+// HELPERS
+function el(id) { return document.getElementById(id); }
+
+// RENDER
+function render(id) {
+  cur = id;
+  var n = T[id];
+  if (!n) { alert('Missing node: ' + id); return; }
+  var isHome = (id === 'START');
+  var d = H.length;
+  var pct = isHome ? 0 : Math.min(Math.round(d / 10 * 100), 95);
+  el('prog-wrap').style.display = isHome ? 'none' : 'block';
+  el('prog-fill').style.width = pct + '%';
+  el('step-lbl').textContent = 'Step ' + (d + 1);
+  el('pct-lbl').textContent = pct + '%';
+
+  var bcEl = el('bc');
+  if (!C.length) {
+    bcEl.innerHTML = '';
+  } else {
+    bcEl.innerHTML = C.map(function(c, i) {
+      var last = (i === C.length - 1);
+      return (i > 0 ? '<span class="bc-sep"> &#x203A; </span>' : '') +
+        (last ? '<span class="bc-cur">' + c + '</span>'
+               : '<span class="bc-lnk" onclick="jumpBC(' + i + ')">' + c + '</span>');
+    }).join('');
+  }
+
+  var cardEl = el('card');
+  if (n.type === 'home')  { cardEl.innerHTML = buildHome(); }
+  if (n.type === 'yn')    { cardEl.innerHTML = buildYN(n); }
+  if (n.type === 'multi') { cardEl.innerHTML = buildMulti(n); }
+  if (n.type === 'res')   { recordResolution(id, C); cardEl.innerHTML = buildRes(n); }
+}
+
+// BUILD HOME
+function buildHome() {
+  return '<div class="home-card">' +
+    '<div class="home-top">' +
+      '<div class="home-logo">&#x1F9ED; eLS Compass</div>' +
+      '<div class="home-tag">Navigate Every Case with Confidence.</div>' +
+    '</div>' +
+    '<div style="padding:24px 22px 10px;">' +
+      '<div class="htile" style="max-width:100%;border-color:#1d4ed8;background:#eff6ff;" onclick="go(\'MAIN\',\'Main Option\')">' +
+        '<div class="htile-dot" style="background:#1d4ed8;"></div>' +
+        '<div class="htile-t" style="font-size:15px;">&#x1F9ED; Start &mdash; Main Option</div>' +
+        '<div class="htile-d">Tap to begin processing your case step by step.</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="home-leg">' +
+      '<span class="leg"><span class="ldot" style="background:#16a34a;"></span>Done</span>' +
+      '<span class="leg"><span class="ldot" style="background:#1d4ed8;"></span>Follow-Up</span>' +
+      '<span class="leg"><span class="ldot" style="background:#d97706;"></span>Action Required</span>' +
+      '<span class="leg"><span class="ldot" style="background:#dc2626;"></span>Invalid</span>' +
+    '</div>' +
+  '</div>';
+}
+function htile(color, title, desc, onclick) {
+  return '<div class="htile" onclick="' + onclick + '">' +
+    '<div class="htile-dot" style="background:' + color + ';"></div>' +
+    '<div class="htile-t">' + title + '</div>' +
+    '<div class="htile-d">' + desc + '</div>' +
+  '</div>';
+}
+
+// BUILD YES/NO
+function buildYN(n) {
+  var cl = n.cklist
+    ? '<div class="cklist"><div class="cklist-t">' + n.cklist.t + '</div><ul>' +
+        n.cklist.items.map(function(i){ return '<li>' + i + '</li>'; }).join('') +
+      '</ul></div>'
+    : '';
+  var nt = n.note ? '<div class="notebox"><strong>&#x1F4CC; Note:</strong> ' + n.note + '</div>' : '';
+  var stepBadge = n.stepN ? '<span class="ch-step">Step ' + n.stepN + '</span>' : '';
+  return '<div class="phone-card">' +
+    '<div class="ch ' + n.hdr.c + '">' +
+      '<span class="ch-dot"></span>' +
+      '<span class="ch-lbl">' + n.hdr.l + '</span>' +
+      stepBadge +
+    '</div>' +
+    '<div class="cb">' +
+      '<div class="qbox">' +
+        '<div class="qbox-t">' + n.q + '</div>' +
+        '<div class="qbox-s">' + n.s + '</div>' +
+      '</div>' +
+      cl + nt +
+      '<div class="opts">' +
+        '<div class="opt yes" onclick="go(\'' + n.y + '\',\'' + n.yL + '\')">' +
+          '<div class="radio"><div class="rdot"></div></div>' +
+          '<div class="opt-body"><div class="opt-l">YES</div><div class="opt-d">' + n.yL + '</div></div>' +
+        '</div>' +
+        '<div class="opt no" onclick="go(\'' + n.n + '\',\'' + n.nL + '\')">' +
+          '<div class="radio"><div class="rdot"></div></div>' +
+          '<div class="opt-body"><div class="opt-l">NO</div><div class="opt-d">' + n.nL + '</div></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="nav">' +
+        '<button class="nbtn" onclick="back()">&#x2190; Back</button>' +
+        '<button class="nbtn nr" onclick="restart()">&#x21BA; Restart</button>' +
+        '<button class="nbtn nh" onclick="goHome()">&#x229E; Home</button>' +
+      '</div>' +
+    '</div></div>';
+}
+
+// BUILD MULTI
+function buildMulti(n) {
+  var stepBadge = n.stepN ? '<span class="ch-step">Step ' + n.stepN + '</span>' : '';
+  var opts = n.opts.map(function(o) {
+    return '<div class="opt ' + o.c + '" onclick="go(\'' + o.n + '\',\'' + o.l + '\')">' +
+      '<div class="radio"><div class="rdot"></div></div>' +
+      '<div class="opt-body"><div class="opt-l">' + o.l + '</div><div class="opt-d">' + o.d + '</div></div>' +
+    '</div>';
+  }).join('');
+  return '<div class="phone-card">' +
+    '<div class="ch ' + n.hdr.c + '">' +
+      '<span class="ch-dot"></span>' +
+      '<span class="ch-lbl">' + n.hdr.l + '</span>' +
+      stepBadge +
+    '</div>' +
+    '<div class="cb">' +
+      '<div class="qbox">' +
+        '<div class="qbox-t">' + n.q + '</div>' +
+        '<div class="qbox-s">' + n.s + '</div>' +
+      '</div>' +
+      '<div class="opts">' + opts + '</div>' +
+      '<div class="nav">' +
+        (H.length ? '<button class="nbtn" onclick="back()">&#x2190; Back</button>' : '') +
+        '<button class="nbtn nr" onclick="restart()">&#x21BA; Restart</button>' +
+        '<button class="nbtn nh" onclick="goHome()">&#x229E; Home</button>' +
+      '</div>' +
+    '</div></div>';
+}
+
+// BUILD RESOLUTION (interactive checklist - DONE locked until all items checked)
+function buildRes(n) {
+  var trail = C.map(function(c, i) {
+    return (i > 0 ? '<span class="ta"> &#x2192; </span>' : '') +
+      '<span class="tn">' + c + '</span>';
+  }).join('') +
+  '<span class="ta"> &#x2192; </span><span class="tn e ' + n.col + '">' + n.t + '</span>' +
+  '<span class="ta"> &#x2192; </span><span class="tn e ' + n.col + '">DONE</span>';
+
+  var nt = n.note ? '<div class="rn"><strong>&#x1F4CC; Note</strong>' + n.note + '</div>' : '';
+
+  var items = n.a.map(function(a, i) {
+    return '<div class="ra-item" id="ra-item-' + i + '" onclick="toggleCheck(' + i + ',' + n.a.length + ')">' +
+      '<div class="ra-cb"><span class="ra-check">&#x2713;</span></div>' +
+      '<div class="ra-text">' + a + '</div>' +
+    '</div>';
+  }).join('');
+
+  return '<div class="phone-card">' +
+    '<div class="ch ' + n.hdr.c + '">' +
+      '<span class="ch-dot"></span>' +
+      '<span class="ch-lbl">' + n.hdr.l + '</span>' +
+      '<span class="ch-step">Resolution</span>' +
+    '</div>' +
+    '<div class="cb">' +
+      '<div class="qbox" style="margin-bottom:14px;">' +
+        '<div style="font-size:24px;margin-bottom:7px;">' + n.icon + '</div>' +
+        '<div class="qbox-t">' + n.t + '</div>' +
+        '<div class="qbox-s">' + n.sub + '</div>' +
+      '</div>' +
+      '<div class="path-blk">' +
+        '<div class="path-blk-t">&#x1F4CD; Path Taken</div>' +
+        '<div class="trail">' + trail + '</div>' +
+      '</div>' +
+      '<div class="ra">' +
+        '<div class="ra-t">&#x26A1; Required Actions &mdash; Check Each Item to Unlock DONE</div>' +
+        '<div class="ra-hint">&#x1F4CC; Check off each action below after completing it. The DONE button will unlock once all items are checked.</div>' +
+        items +
+      '</div>' +
+      nt +
+      '<button class="done-btn ' + n.dc + '" id="done-btn" onclick="' + (n.next ? 'render(\'' + n.next + '\')' : 'goHome()') + '" disabled>' + n.dt + '</button>' +
+      '<div class="nav" style="margin-top:4px;">' +
+        '<button class="nbtn" onclick="back()">&#x2190; Back</button>' +
+        '<button class="nbtn nr" onclick="restart()">&#x21BA; Restart</button>' +
+        '<button class="nbtn nh" onclick="goHome()">&#x229E; New Case</button>' +
+      '</div>' +
+    '</div></div>';
+}
+
+// CHECKLIST TOGGLE
+function toggleCheck(idx, total) {
+  var item = el('ra-item-' + idx);
+  if (!item) return;
+  if (item.classList.contains('checked')) {
+    item.classList.remove('checked');
+  } else {
+    item.classList.add('checked');
+  }
+  var checked = 0;
+  for (var i = 0; i < total; i++) {
+    var it = el('ra-item-' + i);
+    if (it && it.classList.contains('checked')) checked++;
+  }
+  var btn = el('done-btn');
+  if (btn) btn.disabled = (checked < total);
+}
+
+// DASHBOARD
+var RES_LABELS = {
+  R_FU_WITH:     {l:'Open Repay Packet &amp; Reply',      c:'#1d4ed8'},
+  R_FU_WITHOUT:  {l:'Proceed &#x2192; Invalid Process',   c:'#ea580c'},
+  R_ATTACH1:     {l:'Attach &amp; Send to GCC (Portal)',  c:'#16a34a'},
+  R_GCIT_INV:    {l:'Proceed &#x2192; Invalid (GCIT)',    c:'#ea580c'},
+  R_ATTACH2:     {l:'Attach &amp; Send to GCC (No GCIT)', c:'#16a34a'},
+  R_JIRA_CLOSED: {l:'Send to GCC/TS (Jira Closed)',      c:'#16a34a'},
+  R_JIRA_OPEN:   {l:'Send to GCC/TS (Jira Open)',        c:'#1d4ed8'},
+  R_NO_JIRA:     {l:'Send to GCC/TS (No Jira)',          c:'#16a34a'},
+  R_VERIFY_SOP:  {l:'Verify SOP &#x2192; BM/LTS Email',  c:'#d97706'},
+  R_DISP1:       {l:'Dispute in Portal (Trade)',          c:'#16a34a'},
+  R_EMAIL1:      {l:'Email BM/LTS Approval (Trade)',     c:'#1d4ed8'},
+  R_DISP2:       {l:'Dispute in Portal (Non-Trade)',      c:'#16a34a'},
+  R_EMAIL_SOP:   {l:'Email per SOP (Non-Trade)',          c:'#1d4ed8'},
+  R_EMAIL_APPR:  {l:'BM/LTS Approval Required',         c:'#d97706'}
+};
+
+function buildDash() {
+  var total = STATS.total || 0;
+  if (total === 0) {
+    return '<div class="empty-dash">' +
+      '<div style="font-size:40px;margin-bottom:12px;">&#x1F4CA;</div>' +
+      '<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:6px;">No Cases Processed Yet</div>' +
+      '<div style="font-size:12px;">Complete your first case using the Wizard tab to see statistics here.</div>' +
+    '</div>';
+  }
+  var resSorted = [];
+  var rk;
+  for (rk in STATS.resolutions) { resSorted.push({k:rk, v:STATS.resolutions[rk]}); }
+  resSorted.sort(function(a,b){ return b.v - a.v; });
+  var maxRes = resSorted.length ? resSorted[0].v : 1;
+
+  var pathSorted = [];
+  var pk;
+  for (pk in STATS.paths) { pathSorted.push({k:pk, v:STATS.paths[pk]}); }
+  pathSorted.sort(function(a,b){ return b.v - a.v; });
+  var top4 = pathSorted.slice(0, 4);
+  var maxPath = top4.length ? top4[0].v : 1;
+
+  var greenKeys = {R_FU_WITH:1,R_ATTACH1:1,R_ATTACH2:1,R_JIRA_CLOSED:1,R_NO_JIRA:1,R_DISP1:1,R_DISP2:1};
+  var doneCount = 0;
+  var rk2;
+  for (rk2 in STATS.resolutions) { if (greenKeys[rk2]) doneCount += STATS.resolutions[rk2]; }
+  var donePct = total > 0 ? Math.round(doneCount / total * 100) : 0;
+
+  var statsHtml =
+    '<div class="dash-grid">' +
+      '<div class="dstat"><div class="dstat-n" style="color:#1d4ed8;">' + total + '</div><div class="dstat-l">Cases Processed</div></div>' +
+      '<div class="dstat"><div class="dstat-n" style="color:#16a34a;">' + donePct + '%</div><div class="dstat-l">Completed (DONE)</div></div>' +
+      '<div class="dstat"><div class="dstat-n" style="color:#d97706;">' + resSorted.length + '</div><div class="dstat-l">Unique Resolutions Used</div></div>' +
+      '<div class="dstat"><div class="dstat-n" style="color:#ea580c;">' + pathSorted.length + '</div><div class="dstat-l">Unique Paths Taken</div></div>' +
+    '</div>';
+
+  var resHtml = '<div class="dash-section"><div class="dash-sec-t">&#x1F3AF; Resolution Breakdown</div>';
+  for (var ri = 0; ri < resSorted.length; ri++) {
+    var ritem = resSorted[ri];
+    var rlbl = RES_LABELS[ritem.k] ? RES_LABELS[ritem.k].l : ritem.k;
+    var rcol = RES_LABELS[ritem.k] ? RES_LABELS[ritem.k].c : '#6b7280';
+    var rpct = Math.round(ritem.v / maxRes * 100);
+    resHtml += '<div class="bar-row">' +
+      '<div class="bar-lbl">' + rlbl + '</div>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + rpct + '%;background:' + rcol + ';"></div></div>' +
+      '<div class="bar-val">' + ritem.v + '</div>' +
+    '</div>';
+  }
+  resHtml += '</div>';
+
+  var pathHtml = '<div class="dash-section"><div class="dash-sec-t">&#x1F5FA; Most Common Paths</div>';
+  if (!top4.length) {
+    pathHtml += '<div style="font-size:12px;color:#6b7280;">No paths recorded yet.</div>';
+  } else {
+    for (var pi = 0; pi < top4.length; pi++) {
+      var pitem = top4[pi];
+      var ppct = Math.round(pitem.v / maxPath * 100);
+      pathHtml += '<div class="bar-row">' +
+        '<div class="bar-lbl" title="' + pitem.k + '">' + pitem.k + '</div>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + ppct + '%;background:#1d4ed8;"></div></div>' +
+        '<div class="bar-val">' + pitem.v + '</div>' +
+      '</div>';
+    }
+  }
+  pathHtml += '</div>';
+
+  return statsHtml + resHtml + pathHtml +
+    '<button class="dash-reset" onclick="resetStats()">&#x1F5D1; Reset All Statistics</button>';
+}
+
+function resetStats() {
+  if (!confirm('Reset all statistics? This cannot be undone.')) return;
+  STATS = {total:0, paths:{}, resolutions:{}};
+  saveStats();
+  el('dash-content').innerHTML = buildDash();
+}
+
+// TABS
+function switchTab(tab) {
+  el('tab-wizard').className = 'tab' + (tab === 'wizard' ? ' active' : '');
+  el('tab-dash').className   = 'tab' + (tab === 'dash'   ? ' active' : '');
+  el('view-wizard').style.display = tab === 'wizard' ? 'block' : 'none';
+  el('view-dash').style.display   = tab === 'dash'   ? 'block' : 'none';
+  if (tab === 'dash') { el('dash-content').innerHTML = buildDash(); }
+}
+
+// SEARCH
+function onSearch(val) {
+  var v = val.toLowerCase().trim();
+  var sr = el('search-results');
+  if (!v) { sr.style.display = 'none'; return; }
+  var matches = SEARCH_INDEX.filter(function(item) {
+    return item.l.toLowerCase().indexOf(v) > -1 ||
+           item.cat.toLowerCase().indexOf(v) > -1 ||
+           item.k.toLowerCase().indexOf(v) > -1;
+  });
+  if (!matches.length) { sr.style.display = 'none'; return; }
+  sr.innerHTML = matches.map(function(m) {
+    return '<div class="sr-item" onmousedown="jumpSearch(\'' + m.k + '\',\'' + m.l + '\')">' +
+      m.l + '<div class="sr-cat">' + m.cat + '</div></div>';
+  }).join('');
+  sr.style.display = 'block';
+}
+function hideSearch() {
+  setTimeout(function(){ el('search-results').style.display = 'none'; }, 150);
+}
+function searchKey(e) {
+  if (e.key === 'Escape') { el('search-results').style.display = 'none'; el('search-input').value = ''; }
+}
+function jumpSearch(key, label) {
+  el('search-input').value = '';
+  el('search-results').style.display = 'none';
+  H = []; C = [];
+  go(key, label);
+  if (el('view-wizard').style.display === 'none') switchTab('wizard');
+}
+
+// RESOURCE PANEL
+function toggleResources() {
+  var sp = el('side-panel');
+  if (sp.classList.contains('open')) { sp.classList.remove('open'); }
+  else { sp.classList.add('open'); }
+}
+
+// NAVIGATION
+function go(id, label) {
+  H.push(cur); C.push(label);
+  render(id);
+  window.scrollTo(0, 0);
+}
+function back() {
+  if (!H.length) { goHome(); return; }
+  cur = H.pop(); C.pop();
+  render(cur);
+  window.scrollTo(0, 0);
+}
+function restart() {
+  if (!H.length) { goHome(); return; }
+  var i = 0;
+  while (i < H.length && H[i] === 'START') i++;
+  var r = H[i] || 'MAIN';
+  var rl = C[i] || 'Main Option';
+  H = []; C = [];
+  go(r, rl);
+}
+function goHome() {
+  H = []; C = [];
+  render('START');
+  window.scrollTo(0, 0);
+}
+function jumpBC(i) {
+  var snap = H[i + 1] || 'START';
+  H = H.slice(0, i + 1);
+  C = C.slice(0, i + 1);
+  cur = H.pop() || 'START';
+  C.pop();
+  render(snap);
+  window.scrollTo(0, 0);
+}
+
+// BOOT
+render('START');
+</script>
+
+</body>
+</html>

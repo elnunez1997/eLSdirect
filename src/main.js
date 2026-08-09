@@ -1170,64 +1170,63 @@ function lbDownload() {
   var type = (document.getElementById("lb-type").value.replace(/^repay_/,"") || "custom").replace(/_/g," ");
   var filename = "repay_" + (document.getElementById("lb-type").value.replace(/^repay_/,"") || "custom") + "_" + customer.replace(/[^a-z0-9]/gi,"_") + ".pdf";
 
-  try {
-    var jsPDF = window.jspdf.jsPDF;
-    var doc = new jsPDF({ unit:"pt", format:"letter" });
+  /* sanitize text for jsPDF helvetica (no em-dash, smart quotes, etc.) */
+  function pdfSafe(s){ return s.replace(/\u2014/g,"--").replace(/\u2013/g,"-").replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/\u00B7/g,"-"); }
 
-    /* ── header bar ── */
-    doc.setFillColor(28, 43, 58);
-    doc.rect(0, 0, 612, 52, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(16);
-    doc.setFont("helvetica","bold");
-    doc.text("eLS — Enhanced Link Support", 36, 33);
-    doc.setFontSize(9);
-    doc.setFont("helvetica","normal");
-    doc.setTextColor(154, 180, 204);
-    doc.text("Invalid Claims & Repay Management  ·  Internal Use Only", 36, 46);
-
-    /* ── meta line ── */
-    doc.setFontSize(9);
-    doc.setTextColor(87, 96, 106);
-    var today = new Date();
-    var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    doc.text("Type: Repay Request — " + type.charAt(0).toUpperCase() + type.slice(1) +
-             "     Customer: " + (document.getElementById("lb-customer").value.trim() || "—") +
-             "     Date: " + months[today.getMonth()] + " " + today.getDate() + ", " + today.getFullYear(),
-             36, 74);
-
-    /* ── divider ── */
-    doc.setDrawColor(229, 231, 235);
-    doc.line(36, 80, 576, 80);
-
-    /* ── body text ── */
-    doc.setFontSize(11);
-    doc.setTextColor(31, 35, 40);
-    doc.setFont("helvetica","normal");
-    var lines = doc.splitTextToSize(text, 504);
-    doc.text(lines, 54, 104);
-
-    /* ── footer ── */
-    var pageHeight = doc.internal.pageSize.height;
-    doc.setDrawColor(229, 231, 235);
-    doc.line(36, pageHeight - 36, 576, pageHeight - 36);
-    doc.setFontSize(8);
-    doc.setTextColor(154, 180, 204);
-    doc.text("eLS — Enhanced Link Support  ·  IBM Acosta  ·  Confidential", 36, pageHeight - 20);
-
-    doc.save(filename);
-    hint.textContent = "Downloaded: " + filename;
-    hint.style.color = "#065f46";
-  } catch(e) {
-    /* fallback to txt if jsPDF fails to load */
-    var blob = new Blob([text], {type:"text/plain"});
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename.replace(".pdf",".txt");
-    a.click();
-    hint.textContent = "PDF unavailable — downloaded as .txt";
+  if (!window.jspdf) {
+    hint.textContent = "PDF library not loaded yet - please refresh the page and try again.";
     hint.style.color = "#92400e";
+    return;
   }
+
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF({ unit:"pt", format:"letter" });
+
+  /* ── header bar ── */
+  doc.setFillColor(28, 43, 58);
+  doc.rect(0, 0, 612, 52, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont("helvetica","bold");
+  doc.text("eLS - Enhanced Link Support", 36, 33);
+  doc.setFontSize(9);
+  doc.setFont("helvetica","normal");
+  doc.setTextColor(154, 180, 204);
+  doc.text("Invalid Claims & Repay Management  -  Internal Use Only", 36, 46);
+
+  /* ── meta line ── */
+  doc.setFontSize(9);
+  doc.setTextColor(87, 96, 106);
+  var today = new Date();
+  var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  doc.text("Type: Repay Request - " + type.charAt(0).toUpperCase() + type.slice(1) +
+           "     Customer: " + pdfSafe(document.getElementById("lb-customer").value.trim() || "-") +
+           "     Date: " + months[today.getMonth()] + " " + today.getDate() + ", " + today.getFullYear(),
+           36, 74);
+
+  /* ── divider ── */
+  doc.setDrawColor(229, 231, 235);
+  doc.line(36, 80, 576, 80);
+
+  /* ── body text ── */
+  doc.setFontSize(11);
+  doc.setTextColor(31, 35, 40);
+  doc.setFont("helvetica","normal");
+  var safeText = pdfSafe(text);
+  var lines = doc.splitTextToSize(safeText, 504);
+  doc.text(lines, 54, 104);
+
+  /* ── footer ── */
+  var pageHeight = doc.internal.pageSize.height;
+  doc.setDrawColor(229, 231, 235);
+  doc.line(36, pageHeight - 36, 576, pageHeight - 36);
+  doc.setFontSize(8);
+  doc.setTextColor(154, 180, 204);
+  doc.text("eLS - Enhanced Link Support  -  IBM Acosta  -  Confidential", 36, pageHeight - 20);
+
+  doc.save(filename);
+  hint.textContent = "Downloaded: " + filename;
+  hint.style.color = "#065f46";
 }
 
 function lbCopyClipboard() {

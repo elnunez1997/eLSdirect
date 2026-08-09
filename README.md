@@ -5,13 +5,9 @@ Covers customer directories, portals, reason codes, job aids, templates, and the
 
 ---
 
-## Deploying to GitHub Pages (Personal — github.com)
+## Deploying to GitHub Pages
 
-### Prerequisites
-- A **github.com** account
-- Git installed on your machine
-
-### Steps
+### One-time setup
 
 **1. Create the repository on github.com**
 
@@ -20,15 +16,13 @@ Go to → https://github.com/new
 ```
 Repository name:  els-portal       (or any name you prefer)
 Visibility:       Private          ← keeps it off the public internet
-                                     (GitHub Pages still works on private repos)
 ```
+
 Click **Create repository**.
 
 ---
 
 **2. Push this folder from PowerShell**
-
-Open PowerShell, navigate to this folder, then run:
 
 ```powershell
 cd "C:\Users\eLNunez\.bob\playground\eLS\Operations\Reports\els-app"
@@ -40,8 +34,7 @@ git remote add origin https://github.com/<YOUR-USERNAME>/els-portal.git
 git push -u origin main
 ```
 
-> Replace `<YOUR-USERNAME>` with your GitHub username.  
-> GitHub will prompt for your credentials the first time.
+> Replace `<YOUR-USERNAME>` with your GitHub username.
 
 ---
 
@@ -54,8 +47,8 @@ github.com/<YOUR-USERNAME>/els-portal
       → Source: GitHub Actions    ← select this
 ```
 
-The workflow in `.github/workflows/deploy.yml` triggers automatically.  
-Wait ~1 minute, then refresh the Pages settings — your URL will appear.
+The workflow in `.github/workflows/deploy.yml` runs automatically on every push.  
+Wait ~1 minute, then refresh Pages settings — your URL will appear.
 
 ---
 
@@ -65,27 +58,17 @@ Wait ~1 minute, then refresh the Pages settings — your URL will appear.
 https://<YOUR-USERNAME>.github.io/els-portal/
 ```
 
-Share this link with your team. Anyone with the link can access it  
-(no login required — it is URL-access only since GitHub Pages on private  
-repos is still publicly reachable by URL).
-
-> **Want stricter access?** Upgrade to GitHub Pro ($4/mo) to enable  
-> "Private Pages" — which requires a GitHub login to view.  
-> For a free alternative, see the section below.
-
 ---
 
 ## Updating Content
 
-After editing any source file, rebuild `index.html` then push:
+Edit `src/main.js` (or any source file), then push. **No local build step needed** —  
+GitHub Actions inlines everything and deploys automatically.
 
 ```powershell
-# 1. Edit src/main.js, src/style.css, or public/compass.html
+# 1. Edit src/main.js  (data), public/compass.html, or index.html (layout)
 
-# 2. Rebuild the self-contained index.html
-.\build-inline.ps1
-
-# 3. Commit and push — site redeploys automatically in ~1 min
+# 2. Commit and push — site redeploys in ~1 minute
 git add .
 git commit -m "Update portal content"
 git push
@@ -104,11 +87,26 @@ git push
 
 ---
 
+## How the build works
+
+On every push to `main`, GitHub Actions runs `.github/workflows/deploy.yml`:
+
+1. Checks out the repo
+2. Runs an inline Python script that:
+   - Reads `src/main.js` and inlines it into `index.html`
+   - Reads `public/compass.html` and inlines it as an `srcdoc` iframe
+   - Writes the fully self-contained `index.html`
+3. Uploads and deploys to GitHub Pages
+
+The built `index.html` also works as a **local file** — double-click to open in a browser, no server needed.
+
+---
+
 ## Project Structure
 
 ```
 els-app/
-├── index.html              ← self-contained app (CSS + JS + compass inlined)
+├── index.html              ← page layout + CSS (JS/compass are inlined at build time)
 ├── src/
 │   ├── main.js             ← all data + application logic
 │   └── style.css           ← all styles
@@ -116,9 +114,9 @@ els-app/
 │   └── compass.html        ← eLS Compass decision wizard (source)
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml      ← GitHub Actions auto-deploy on push to main
+│       └── deploy.yml      ← GitHub Actions: builds index.html, deploys to Pages
 ├── .nojekyll               ← required for GitHub Pages to serve files correctly
-├── build-inline.ps1        ← PowerShell script: rebuild index.html from sources
+├── build-inline.ps1        ← optional: run locally to rebuild index.html manually
 └── README.md
 ```
 
@@ -128,7 +126,7 @@ els-app/
 
 - The portal contains **no backend, no database, no login system**.  
   All data lives in `src/main.js` as JavaScript arrays.
-- `index.html` is fully self-contained — works as a **local file** too  
-  (double-click to open in a browser, no server needed).
 - Since data includes internal contacts and emails, keep the repo **Private**  
   and share the Pages URL only with your team.
+- `index.html` is committed with a `src=` reference to `main.js` (not inlined).  
+  The inline build happens in CI. To build locally, run `.\build-inline.ps1`.

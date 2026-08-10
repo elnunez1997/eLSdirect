@@ -420,8 +420,8 @@ var RC=[
   {code:"SPOILS / LDI / RECLAMATION",desc:"Deduction for spoiled, unsellable, or reclaimed product.",q:"Is there documented proof of spoilage or reclamation with quantity and lot details?"},
   {code:"SSRS BROKERAGE",desc:"Brokerage fee deducted by customer.",q:"Is the brokerage fee authorized under an active SSRS or brokerage agreement?"},
   {code:"WRONG ALLOWANCE AMOUNT",desc:"Deduction amount does not match agreed allowance.",q:"What is the authorized allowance amount and does it match the deduction taken?"},
-  {code:"WRONG ALLOWANCE TYPE - BB",desc:"Wrong allowance type â€” Bill Back (BB) deducted instead of correct type.",q:"Is the allowance type designated as Bill Back in the trading agreement?"},
-  {code:"WRONG ALLOWANCE TYPE - SCAN",desc:"Wrong allowance type â€” Scan deducted instead of correct type.",q:"Is the allowance type designated as Scan in the trading agreement?"},
+  {code:"WRONG ALLOWANCE TYPE - BB",desc:"Wrong allowance type — Bill Back (BB) deducted instead of correct type.",q:"Is the allowance type designated as Bill Back in the trading agreement?"},
+  {code:"WRONG ALLOWANCE TYPE - SCAN",desc:"Wrong allowance type — Scan deducted instead of correct type.",q:"Is the allowance type designated as Scan in the trading agreement?"},
   {code:"WRONG PRICING",desc:"Deduction based on incorrect pricing applied by vendor.",q:"Was the correct price list in effect at time of order and does it match the invoice?"}
 ];
 
@@ -432,7 +432,7 @@ var PORTALS=[
   {name:"AWG",desc:"Associated Wholesale Grocers service portal for deduction management and vendor requests.",url:"https://awg.service-now.com/esc?id=awg_login",status:"active"},
   {name:"UNFI",desc:"UNFI supplier dashboard for deduction submissions and claim tracking.",url:"https://www.myunfi.com/supplier-dashboard",status:"active"},
   {name:"Meijer",desc:"Meijer VendorNet portal for deduction management, invoicing, and claim resolution.",url:"https://vendornet.meijer.com/",status:"active"},
-  {name:"C&S Wholesale",desc:"No portal available for C&S â€” contact your trade specialist directly.",url:"",status:"warn"},
+  {name:"C&S Wholesale",desc:"No portal available for C&S — contact your trade specialist directly.",url:"",status:"warn"},
   {name:"KEHE Connect",desc:"KEHE Connect portal for distributor deduction management and claims processing.",url:"https://connect.kehe.com/",status:"active"},
   {name:"Save A Lot",desc:"Save A Lot customer help portal for deduction submissions and account management.",url:"https://savealot.custhelp.com/app/account/overview",status:"active"}
 ];
@@ -742,7 +742,7 @@ var RL_LIST=[
   {label:"Freight",url:"repayletters/REPAYLETTERFreightAllow_20_6.xlsx"},
   {label:"Invalid Audit",url:"repayletters/REPAYLETTERInvalidAudit_20_7.xlsx"},
   {label:"Invalid Cash",url:"repayletters/REPAYLETTERInvalidCash_20_8.xlsx"},
-  {label:"No Backup Provided â€” Customer",url:"repayletters/REPAYLETTERNoBackupProvided_20_24.xlsx"},
+  {label:"No Backup Provided — Customer",url:"repayletters/REPAYLETTERNoBackupProvided_20_24.xlsx"},
   {label:"No Proof of Performance",url:"repayletters/REPAYLETTERNoProofofPerf_20_9.xlsx"},
   {label:"Not on Deal",url:"repayletters/REPAYLETTERNotonDeal_20_15.xlsx"},
   {label:"O, S, D",url:""},
@@ -763,8 +763,8 @@ var RL_LIST=[
   {label:"Spoils / LDI / Reclamation",url:""},
   {label:"SSRS Brokerage",url:""},
   {label:"Wrong Allowance Amount",url:"repayletters/REPAYLETTERWrongAllowAmt_20_21.xlsx"},
-  {label:"Wrong Allowance Type â€” BB",url:"repayletters/REPAYLETTERWrongAllowTypeBB_20_19.xlsx"},
-  {label:"Wrong Allowance Type â€” Scan",url:"repayletters/REPAYLETTERWrongAllowTypeScan_20_20.xlsx"},
+  {label:"Wrong Allowance Type — BB",url:"repayletters/REPAYLETTERWrongAllowTypeBB_20_19.xlsx"},
+  {label:"Wrong Allowance Type — Scan",url:"repayletters/REPAYLETTERWrongAllowTypeScan_20_20.xlsx"},
   {label:"Wrong Pricing",url:"repayletters/REPAYLETTERWrongPricing_20_22.xlsx"}
 ];
 function buildRepayLetterSelect(q){
@@ -776,14 +776,14 @@ function buildRepayLetterSelect(q){
   for(var i=0;i<filtered.length;i++){
     var hasUrl=filtered[i].url!=="";
     h+='<option value="'+filtered[i].url+'" '+(hasUrl?"":"style=\"color:#9ab4cc\"")+'>'
-      +filtered[i].label+(hasUrl?"":" â€” No PDF Â· Use Letter Builder")
+      +filtered[i].label+(hasUrl?"":" — No PDF · Use Letter Builder")
       +'</option>';
   }
   sel.innerHTML=h||'<option disabled>No matches</option>';
   var total=filtered.length;
   var withPdf=filtered.filter(function(x){return x.url!=="";}).length;
   var hint=document.getElementById("rl-hint");
-  if(hint)hint.textContent=total+" templates â€” "+withPdf+" with PDF, "+(total-withPdf)+" use Letter Builder below";
+  if(hint)hint.textContent=total+" templates — "+withPdf+" with PDF, "+(total-withPdf)+" use Letter Builder below";
 }
 function filterRepayLetters(q){buildRepayLetterSelect(q);}
 function openRepayLetter(){
@@ -791,7 +791,7 @@ function openRepayLetter(){
   if(!sel)return false;
   if(!sel.value){
     var hint=document.getElementById("rl-hint");
-    if(hint){hint.textContent="No PDF available for this template â€” scroll down to use the Letter Builder.";hint.style.color="#92400e";}
+    if(hint){hint.textContent="No PDF available for this template — scroll down to use the Letter Builder.";hint.style.color="#92400e";}
     return false;
   }
   window.open(sel.value,"_blank","noopener");
@@ -893,7 +893,7 @@ function renderRC(items){
     var rl=REPAY_LETTERS.hasOwnProperty(r.code.toUpperCase())?REPAY_LETTERS[r.code.toUpperCase()]:undefined;
     var btn=rl
       ?'<a href="'+esc(rl)+'" target="_blank" style="display:inline-block;padding:4px 10px;background:#1c2b3a;color:#fff;border-radius:4px;font-size:11px;font-weight:500;text-decoration:none;white-space:nowrap">ðŸ“¬ Open</a>'
-      :(rl===null?'<span style="font-size:11px;color:#9ab4cc;font-style:italic">Not Available</span>':'<span style="font-size:11px;color:#9ab4cc">â€”</span>');
+      :(rl===null?'<span style="font-size:11px;color:#9ab4cc;font-style:italic">Not Available</span>':'<span style="font-size:11px;color:#9ab4cc">—</span>');
     h+='<tr><td class="rc-name-cell">'+esc(r.code)+'</td><td>'+esc(r.desc)+'</td><td class="rc-q-cell">'+esc(r.q)+'</td><td>'+btn+'</td></tr>';
   }
   b.innerHTML=h;document.getElementById("rc-count").textContent=items.length+" codes";
@@ -991,11 +991,11 @@ function showJobAidSteps(id){
 function globalSearch(q){
   if(!q||q.length<2)return;
   var lq=q.toLowerCase(),results=[],seen={};
-  DIRECT.forEach(function(r){if(r[0].toLowerCase().indexOf(lq)>=0){var k=r[0]+"|direct|"+r[1];if(!seen[k]){seen[k]=1;results.push({customer:r[0],sba:r[1],section:"US Retail â€“ Direct",match:r[0]});}}});
+  DIRECT.forEach(function(r){if(r[0].toLowerCase().indexOf(lq)>=0){var k=r[0]+"|direct|"+r[1];if(!seen[k]){seen[k]=1;results.push({customer:r[0],sba:r[1],section:"US Retail – Direct",match:r[0]});}}});
   ACOSTA.forEach(function(r){if(r.join(" ").toLowerCase().indexOf(lq)>=0){var k=r[0]+"|acosta|"+r[1];if(!seen[k]){seen[k]=1;results.push({customer:r[0],sba:r[1],section:"Acosta Supported",match:r[2]||r[9]||r[0]});}}});
   NATDIST.forEach(function(r){if(r.join(" ").toLowerCase().indexOf(lq)>=0){results.push({customer:r[0],sba:r[4],section:"Natural Dist.",match:r[2]});}});
   RC.forEach(function(r){if((r.code+r.desc+r.q).toLowerCase().indexOf(lq)>=0){results.push({customer:r.code,sba:"",section:"Reason Code",match:r.desc});}});
-  PORTALS.forEach(function(p){if((p.name+p.desc).toLowerCase().indexOf(lq)>=0){results.push({customer:p.name,sba:"",section:"Customer Portal",match:p.desc.substring(0,60)+"â€¦"});}});
+  PORTALS.forEach(function(p){if((p.name+p.desc).toLowerCase().indexOf(lq)>=0){results.push({customer:p.name,sba:"",section:"Customer Portal",match:p.desc.substring(0,60)+"…"});}});
   navigate("search",null);
   document.getElementById("search-summary").textContent=results.length+' result(s) for "'+q+'"';
   var h="";
@@ -1140,7 +1140,7 @@ function lbCopilotAnalyze() {
   var text = document.getElementById("lb-editor").value.trim();
   var out = document.getElementById("lb-copilot-out");
   if (!text || text.length < 20) {
-    out.innerHTML = '<div class="cop-item" style="color:#9ab4cc;font-style:italic">Start typing or select a template â€” Copilot will review your letter here.</div>';
+    out.innerHTML = '<div class="cop-item" style="color:#9ab4cc;font-style:italic">Start typing or select a template — Copilot will review your letter here.</div>';
     return;
   }
   var items = [];
@@ -1148,38 +1148,38 @@ function lbCopilotAnalyze() {
   // Tone check
   var lower = text.toLowerCase();
   if (lower.indexOf("kindly") >= 0 || lower.indexOf("respectfully") >= 0 || lower.indexOf("please") >= 0)
-    items.push('<div class="cop-item"><span class="cop-good">Tone</span> â€” Professional and courteous tone detected.</div>');
+    items.push('<div class="cop-item"><span class="cop-good">Tone</span> — Professional and courteous tone detected.</div>');
   else
-    items.push('<div class="cop-item"><span class="cop-warn">Tone</span> â€” Consider adding polite phrases like "please" or "kindly" to keep a professional tone.</div>');
+    items.push('<div class="cop-item"><span class="cop-warn">Tone</span> — Consider adding polite phrases like "please" or "kindly" to keep a professional tone.</div>');
 
   // Placeholder check
   var placeholders = text.match(/\[.*?\]/g);
   if (placeholders && placeholders.length > 0)
-    items.push('<div class="cop-item"><span class="cop-warn">Placeholders</span> â€” Unfilled fields detected: <span class="cop-fix">' + placeholders.join(", ") + '</span>. Fill them in Step 2.</div>');
+    items.push('<div class="cop-item"><span class="cop-warn">Placeholders</span> — Unfilled fields detected: <span class="cop-fix">' + placeholders.join(", ") + '</span>. Fill them in Step 2.</div>');
   else
-    items.push('<div class="cop-item"><span class="cop-good">Fields</span> â€” All fields appear filled in.</div>');
+    items.push('<div class="cop-item"><span class="cop-good">Fields</span> — All fields appear filled in.</div>');
 
   // Greeting check
   if (!/^dear\s/i.test(text))
-    items.push('<div class="cop-item"><span class="cop-warn">Greeting</span> â€” Letter does not start with "Dear [Name]". Consider adding a proper salutation.</div>');
+    items.push('<div class="cop-item"><span class="cop-warn">Greeting</span> — Letter does not start with "Dear [Name]". Consider adding a proper salutation.</div>');
   else
-    items.push('<div class="cop-item"><span class="cop-good">Greeting</span> â€” Salutation present.</div>');
+    items.push('<div class="cop-item"><span class="cop-good">Greeting</span> — Salutation present.</div>');
 
   // Closing check
   if (/(sincerely|best regards|thank you|regards)/i.test(text))
-    items.push('<div class="cop-item"><span class="cop-good">Closing</span> â€” Professional closing statement detected.</div>');
+    items.push('<div class="cop-item"><span class="cop-good">Closing</span> — Professional closing statement detected.</div>');
   else
-    items.push('<div class="cop-item"><span class="cop-warn">Closing</span> â€” No closing statement found. Consider ending with "Sincerely," or "Best regards,".</div>');
+    items.push('<div class="cop-item"><span class="cop-warn">Closing</span> — No closing statement found. Consider ending with "Sincerely," or "Best regards,".</div>');
 
   // Claim number check
   if (text.indexOf("[Claim #]") >= 0 || (!(/ded-|claim #|deduction #|inv-/i.test(text)) && text.toLowerCase().indexOf("claim") >= 0))
-    items.push('<div class="cop-item"><span class="cop-warn">Claim Reference</span> â€” Confirm the deduction/claim number is included and correct.</div>');
+    items.push('<div class="cop-item"><span class="cop-warn">Claim Reference</span> — Confirm the deduction/claim number is included and correct.</div>');
 
   // Amount check
   if (text.indexOf("[Amount]") >= 0 || !(/\$[\d,]+/i.test(text)))
-    items.push('<div class="cop-item"><span class="cop-warn">Amount</span> â€” No dollar amount detected. Ensure the repay amount is clearly stated.</div>');
+    items.push('<div class="cop-item"><span class="cop-warn">Amount</span> — No dollar amount detected. Ensure the repay amount is clearly stated.</div>');
   else
-    items.push('<div class="cop-item"><span class="cop-good">Amount</span> â€” Dollar amount found in letter.</div>');
+    items.push('<div class="cop-item"><span class="cop-good">Amount</span> — Dollar amount found in letter.</div>');
 
   // Profanity / inappropriate language check
   var profanityList = [
@@ -1193,9 +1193,9 @@ function lbCopilotAnalyze() {
     if(profanityList.indexOf(w) >= 0 && foundProfanity.indexOf(w) < 0) foundProfanity.push(w);
   });
   if(foundProfanity.length > 0) {
-    items.push('<div class="cop-item" style="background:#fff1f2;border-left:3px solid #e11d48;padding:8px 10px;border-radius:4px"><span style="color:#e11d48;font-weight:700">Inappropriate Language</span> â€” This letter contains language that is <strong>not suitable for professional correspondence</strong>. Please remove or replace: <span style="color:#e11d48;font-weight:600">' + foundProfanity.join(", ") + '</span>. This letter should not be sent as-is.</div>');
+    items.push('<div class="cop-item" style="background:#fff1f2;border-left:3px solid #e11d48;padding:8px 10px;border-radius:4px"><span style="color:#e11d48;font-weight:700">Inappropriate Language</span> — This letter contains language that is <strong>not suitable for professional correspondence</strong>. Please remove or replace: <span style="color:#e11d48;font-weight:600">' + foundProfanity.join(", ") + '</span>. This letter should not be sent as-is.</div>');
   } else {
-    items.push('<div class="cop-item"><span class="cop-good">Language</span> â€” No inappropriate language detected. Letter is suitable for professional use.</div>');
+    items.push('<div class="cop-item"><span class="cop-good">Language</span> — No inappropriate language detected. Letter is suitable for professional use.</div>');
   }
 
   // Word count
@@ -1325,15 +1325,15 @@ var BPS_DATA=[
    "Wholesale / Distributor",
    "AWG charges $60/request for backup & repay (eff. 7/1/24). Step invalid claims to repay letter per standard process. $6 fee on Alliance deductions (grocery/dairy/frozen). VMC charges $25 or 10% (whichever greater) for deducting on behalf of an indirect. Non-compliance PO deductions may result in penalty repay. Invoice prefixes: IA=Post Audit, RC=Reclamation, SL=Slotting, TR=Freight, VC=Vendor Compliance.",
    "yes",
-   "PORTAL â€” AWG Connect (https://awg.service-now.com/esc?id=awg_login): Note 'Please pull initial invoice from AWG portal' â†’ GCIT pulls. | Alliance check requests: Note 'Please request missing check request #s for the Alliance Deduction Request process.' â†’ Sales. | Detail invoice: Note 'Please request detail invoice #xxx' â†’ Sales. | Rouse check requests: Note 'Please request list of check requests for Rouse.' â†’ Sales. | PO claims with no alpha in ref# / no hyperlink: Note no link and step for validation.",
-   "Wholesaler/distributor. AWG = ASSOKC (master); VMC = VALUKC; VMC Natural/specialty = VALUHU. Contracts by division or ZZGOLDKC (post 8/17/20). Indirect sign-ons in AWG_ACOSTA Relay Cheat Sheet under customer SOPs. âš  DO NOT change VMC sign-on to ASSOKC (even if invoice reads AWG Ft. Scott Division). AWG splits invoices across checks â€” duplicate ref# = split claim (Split Claim job aid). Alliance Deduction Request Process covers: Ball's, B&R, Cosentino's, Harp's, Harter House, Homeland HAC, McKeever's, Pyramid Foods, Queen's, Town & Country Salem. Last update: 7/13/2026."],
+   "PORTAL — AWG Connect (https://awg.service-now.com/esc?id=awg_login): Note 'Please pull initial invoice from AWG portal' → GCIT pulls. | Alliance check requests: Note 'Please request missing check request #s for the Alliance Deduction Request process.' → Sales. | Detail invoice: Note 'Please request detail invoice #xxx' → Sales. | Rouse check requests: Note 'Please request list of check requests for Rouse.' → Sales. | PO claims with no alpha in ref# / no hyperlink: Note no link and step for validation.",
+   "Wholesaler/distributor. AWG = ASSOKC (master); VMC = VALUKC; VMC Natural/specialty = VALUHU. Contracts by division or ZZGOLDKC (post 8/17/20). Indirect sign-ons in AWG_ACOSTA Relay Cheat Sheet under customer SOPs. ⚠ DO NOT change VMC sign-on to ASSOKC (even if invoice reads AWG Ft. Scott Division). AWG splits invoices across checks — duplicate ref# = split claim (Split Claim job aid). Alliance Deduction Request Process covers: Ball's, B&R, Cosentino's, Harp's, Harter House, Homeland HAC, McKeever's, Pyramid Foods, Queen's, Town & Country Salem. Last update: 7/13/2026."],
 
-  ["ADUSA Distr â€” The Giant Company / Giant Foods / Stop & Shop",
+  ["ADUSA Distr — The Giant Company / Giant Foods / Stop & Shop",
    "Indirect / Direct",
    "Split repay by individual invoice # in SAP. Fee repay policy tiers: $150 / 5% / $1,000. Step to repay letter per standard process.",
    "yes",
-   "BagelfulsAR@Acosta.com (Acosta contact); brigitte.mountz@retailbusinessservices.com (RBS â€” VARIOUS repay)",
-   "Indirect â€” buys through C&S; can also buy direct. Claims create under AHOLPH â€” update sign-on by buyer code on invoice: NXXX=SSAHNE, GXXX=AHOLPH, LXXX=GIANBW. AHOLDMST = master. ADUSNE for orders shipped to YORK/BETH, PA. Bill Payer Program (BPA) active. Check remit NOT required. Last update: 7/27/2026."],
+   "BagelfulsAR@Acosta.com (Acosta contact); brigitte.mountz@retailbusinessservices.com (RBS — VARIOUS repay)",
+   "Indirect — buys through C&S; can also buy direct. Claims create under AHOLPH — update sign-on by buyer code on invoice: NXXX=SSAHNE, GXXX=AHOLPH, LXXX=GIANBW. AHOLDMST = master. ADUSNE for orders shipped to YORK/BETH, PA. Bill Payer Program (BPA) active. Check remit NOT required. Last update: 7/27/2026."],
 
   ["Associated Supermarket Group (ASG)",
    "Indirect",
@@ -1344,98 +1344,98 @@ var BPS_DATA=[
 
   ["Brookshire Grocery Company",
    "Direct",
-   "Repay appears on same check â€” split line, close with note. No repay letter needed. Attach check remit as proof of repayment.",
+   "Repay appears on same check — split line, close with note. No repay letter needed. Attach check remit as proof of repayment.",
    "no",
    "bgc@atgaudits.com (ATG / Post Audit)",
-   "Direct. Sign-on: BROODA. NOT Brookshire Brothers â€” completely separate customers. Invoice = Contract for BB/Ads/Slotting (no separate customer invoice). All deals contracted in ORDER DATES. Price changes require 60-day notice. Check remit required. Last update: 05/04/2026."],
+   "Direct. Sign-on: BROODA. NOT Brookshire Brothers — completely separate customers. Invoice = Contract for BB/Ads/Slotting (no separate customer invoice). All deals contracted in ORDER DATES. Price changes require 60-day notice. Check remit required. Last update: 05/04/2026."],
 
   ["Delhaize (Food Lion / Hannaford)",
    "Direct",
    "Step invalid claims to repay letter per standard process.",
    "yes",
    "VMOSupport@adusa.com; fl@atgaudits.com; aholdusaclaims@cotiviti.com",
-   "Direct. Sign-ons: FOODLNE (Food Lion) Â· HANMNE (Hannaford). âš  Claims create under DELHZMST â€” validator must correct to FOODLNE or HANMNE based on DC # in top-right of invoice. Check remit NOT required. Last update: 7/27/2026."],
+   "Direct. Sign-ons: FOODLNE (Food Lion) · HANMNE (Hannaford). ⚠ Claims create under DELHZMST — validator must correct to FOODLNE or HANMNE based on DC # in top-right of invoice. Check remit NOT required. Last update: 7/27/2026."],
 
   ["Demoulas Supermarkets (Market Basket)",
    "Direct",
    "Step invalid claims to repay letter per standard process.",
    "no",
    "Request from Sales",
-   "Direct (except Frozen = indirect via C&S â€” use C&S SOP for frozen). Sign-on: DEMONE. Backup NOT required; check remit NOT required. BB invoice refs starting with BB: search using %[numeric portion]. PVendor contracts for C&S-passed deals start with 'NER' under CSWHNE. Last update: 7/13/2026."],
+   "Direct (except Frozen = indirect via C&S — use C&S SOP for frozen). Sign-on: DEMONE. Backup NOT required; check remit NOT required. BB invoice refs starting with BB: search using %[numeric portion]. PVendor contracts for C&S-passed deals start with 'NER' under CSWHNE. Last update: 7/13/2026."],
 
   ["General Trading",
    "Wholesale / Distributor",
    "Step to Sales for repay routing. Check remit must be linked to claim before requesting backup from Sales.",
    "no",
    "Request from Sales (check remit must be linked first)",
-   "Wholesaler/distributor. Grocery/dairy = GENENY; frozen (Burris Foods) = BURRPH. When deducting via Burris, two customer invoices are created â€” check remit will not show both CI numbers. Link PO # as reference â€” may not reflect all items being deducted. Last update: 1/8/2024."],
+   "Wholesaler/distributor. Grocery/dairy = GENENY; frozen (Burris Foods) = BURRPH. When deducting via Burris, two customer invoices are created — check remit will not show both CI numbers. Link PO # as reference — may not reflect all items being deducted. Last update: 1/8/2024."],
 
   ["Hy-Vee Corporate / Lomar / PDI",
    "Direct",
    "Step invalid claims to repay letter per standard process.",
    "yes",
    "PORTAL (6-digit invoice #): Pull from customer portal. | Automated TG: mhorabik@atgaudits.com | Automated RBC: audit@crimminsaudit.net | Non-Automated (all other formats): Request from Sales",
-   "Direct. Deduct-only â€” only DSD billback check requests received. Sign-on: HYVEDM (main); PERIDM (PDI â€” refrigerated); HYLODM (Lomar â€” specialty). CRC fees max $800 total. Once submitted, contracts cannot be revised. Fiscal year starts October. Hy-Vee terms: Janâ€“Apr / Mayâ€“Aug / Sepâ€“Dec. âš  Check remit required for Sales backup requests. 60-day notice required for price increases. Last update: 4/27/2026."],
+   "Direct. Deduct-only — only DSD billback check requests received. Sign-on: HYVEDM (main); PERIDM (PDI — refrigerated); HYLODM (Lomar — specialty). CRC fees max $800 total. Once submitted, contracts cannot be revised. Fiscal year starts October. Hy-Vee terms: Jan–Apr / May–Aug / Sep–Dec. ⚠ Check remit required for Sales backup requests. 60-day notice required for price increases. Last update: 4/27/2026."],
 
   ["K-V-A-T Food Stores (Food City / Mid Mountain)",
    "Direct",
    "Step invalid claims to repay letter per standard process.",
    "yes",
    "CLS/Inmar Portal (6-digit invoice #); Sales (all other)",
-   "Direct. Sign-on: MIDMKX (all K-VAT docs â€” Food City, K-VAT, Mid Mountain). If ordered through MDI (Merchants Distributors Inc.), claim comes in as MERCCN â€” contracts still under MIDMKX; POP runs at MERCCN level. SW suffix = swell allowance. PM prefix: S=spoils/scans, T=tracking (count/recount). KVAT splits invoices across checks â€” duplicate ref# = split claim. Last update: 06/08/2026."],
+   "Direct. Sign-on: MIDMKX (all K-VAT docs — Food City, K-VAT, Mid Mountain). If ordered through MDI (Merchants Distributors Inc.), claim comes in as MERCCN — contracts still under MIDMKX; POP runs at MERCCN level. SW suffix = swell allowance. PM prefix: S=spoils/scans, T=tracking (count/recount). KVAT splits invoices across checks — duplicate ref# = split claim. Last update: 06/08/2026."],
 
   ["Kroger / Ralphs / Jake's Finer Foods / Vitacost",
    "Direct",
    "Step invalid claims to repay letter per standard process.",
    "yes",
    "Supplier Connect Portal (kroger.com); www.auditlink.com (H invoices); www.verigon.prgx.com (R/Z/V invoices)",
-   "Direct. Sign-on determined by Kroger Sign-On Job Aid (in Acosta Relay under customer SOPs). KROMCI = master (used when division unclear or multi-division invoice). DBW lines must be updated to correct division sign-on. Harris Teeter claims â†’ change sign-on to HARRCN and follow Harris Teeter SOP. Weekly billing ends Saturday. Last update: 8/3/2026."],
+   "Direct. Sign-on determined by Kroger Sign-On Job Aid (in Acosta Relay under customer SOPs). KROMCI = master (used when division unclear or multi-division invoice). DBW lines must be updated to correct division sign-on. Harris Teeter claims → change sign-on to HARRCN and follow Harris Teeter SOP. Weekly billing ends Saturday. Last update: 8/3/2026."],
 
   ["McLane Company, Inc.",
    "Direct",
    "Step invalid claims to repay letter per standard process. If backup not in McLane portal or Relay, step to CRA before requesting from Cap.research@mclaneco.com.",
    "yes",
-   "Cap.research@mclaneco.com (backup â€” no fee within 90 days); mcaudit@mclaneco.com (Post Audit â€” ref begins 1 or 2); CLS Portal or RMS Portal (invoices beginning with R)",
-   "Direct. Sign-on: MCLAMST (Event Scheduler & master search). Customer reference prefix identifies division â€” use McLane Sign-On Job Aid. Update claim sign-on to correct division. Contracts entered via Event Scheduler; event #s in Quick Keys. Note: if backup unavailable from client, note claim 'unable to obtain backup from the client' before requesting from Cap.research. WAWA backup requests â€” no $50 research fee. Last update: current."],
+   "Cap.research@mclaneco.com (backup — no fee within 90 days); mcaudit@mclaneco.com (Post Audit — ref begins 1 or 2); CLS Portal or RMS Portal (invoices beginning with R)",
+   "Direct. Sign-on: MCLAMST (Event Scheduler & master search). Customer reference prefix identifies division — use McLane Sign-On Job Aid. Update claim sign-on to correct division. Contracts entered via Event Scheduler; event #s in Quick Keys. Note: if backup unavailable from client, note claim 'unable to obtain backup from the client' before requesting from Cap.research. WAWA backup requests — no $50 research fee. Last update: current."],
 
   ["Mitchell Grocery Company",
    "Direct",
    "Step invalid claims to repay letter per standard process.",
    "no",
    "Request from Sales (check remit must be linked first)",
-   "Direct. Sign-on: MITCBI. No customer portal. Check remit required â€” must be linked to claim before requesting backup from Sales. Mitchell may truncate first 1â€“2 digits of invoice # on PO claims â€” use wildcards + last 6 digits when searching. Last update: 2/1/2016 (SOP)."],
+   "Direct. Sign-on: MITCBI. No customer portal. Check remit required — must be linked to claim before requesting backup from Sales. Mitchell may truncate first 1–2 digits of invoice # on PO claims — use wildcards + last 6 digits when searching. Last update: 2/1/2016 (SOP)."],
 
   ["OK Grocery Co / Giant Eagle",
    "Direct",
    "Step invalid claims to repay letter per standard process.",
    "no",
-   "Deborah.Younkins@gianteagle.com; Deborah.Gerardi@gianteagle.com; rscott@acosta.com (Acosta â€” CCNA)",
-   "Direct. Sign-on: OKGEPI (Giant Eagle); ZZGETGPI (GetGo indirect â€” handled by Denver team). Check remit required. AR Settlement Letters discontinued 8/26/24. GetGo claims use ZZGETGPI sign-on. Last update: 5/4/2026."],
+   "Deborah.Younkins@gianteagle.com; Deborah.Gerardi@gianteagle.com; rscott@acosta.com (Acosta — CCNA)",
+   "Direct. Sign-on: OKGEPI (Giant Eagle); ZZGETGPI (GetGo indirect — handled by Denver team). Check remit required. AR Settlement Letters discontinued 8/26/24. GetGo claims use ZZGETGPI sign-on. Last update: 5/4/2026."],
 
   ["Save Mart / Yosemite / Food Maxx",
    "Indirect",
    "Step invalid claims to repay letter per standard process.",
    "yes",
    "APDC@savemart.com; VendorDeals@savemart.com; reclamation@savemart.com",
-   "Indirect â€” purchases through C&S. Sign-ons: SMMONC (Save Mart) Â· FOOMNC (Food Maxx â€” 'FMO' on invoice) Â· LUCKYNC Â· YOSENC Â· ZZEVSSNC Â· ZZMAS3NC Â· SMPLUSNC Â· SUPENC. âš  $50 fee per duplicate backup copy â€” search ALL sign-ons before requesting. IBM DemandTec contracts: YOSENC (Save Mart/Food Maxx), ZZMAS3NC (Lucky's). Invoice # ending in F = C&S service fee â€” do not escalate for missing invoice. C&S owned eff. 9/15/24. Last update: current."],
+   "Indirect — purchases through C&S. Sign-ons: SMMONC (Save Mart) · FOOMNC (Food Maxx — 'FMO' on invoice) · LUCKYNC · YOSENC · ZZEVSSNC · ZZMAS3NC · SMPLUSNC · SUPENC. ⚠ $50 fee per duplicate backup copy — search ALL sign-ons before requesting. IBM DemandTec contracts: YOSENC (Save Mart/Food Maxx), ZZMAS3NC (Lucky's). Invoice # ending in F = C&S service fee — do not escalate for missing invoice. C&S owned eff. 9/15/24. Last update: current."],
 
   ["Schnucks Markets, Inc.",
    "Direct",
    "Step invalid claims to repay letter per standard process.",
    "yes",
-   "schnucks@atgaudits.com (ATG â€” SBB/LSB/SRD invoices); schnucks@prgx.com (LL â€” 15-digit VGP invoices); accountspayable@schnucks.com (SRP); Sales (all other)",
-   "Direct. Sign-on: SCHNST. Cost changes must be submitted to Schnucks Trade Partners portal 60 days prior. Performance dates run Wedâ€“Tue. 8 Rockford IL stores moved from UNFI to AWG eff. 8/1/24 â€” UNFI-supplied contracts identified by Vendor # 179591. When contract shows Suggested Performance Type = AD but no ad money offered, search for ad â€” if none found, do not escalate for POP. Last update: current."],
+   "schnucks@atgaudits.com (ATG — SBB/LSB/SRD invoices); schnucks@prgx.com (LL — 15-digit VGP invoices); accountspayable@schnucks.com (SRP); Sales (all other)",
+   "Direct. Sign-on: SCHNST. Cost changes must be submitted to Schnucks Trade Partners portal 60 days prior. Performance dates run Wed–Tue. 8 Rockford IL stores moved from UNFI to AWG eff. 8/1/24 — UNFI-supplied contracts identified by Vendor # 179591. When contract shows Suggested Performance Type = AD but no ad money offered, search for ad — if none found, do not escalate for POP. Last update: current."],
 
   ["Smart & Final",
    "Direct",
-   "Step invalid claims to repay letter per standard process. Deduct-only â€” no check requests except DSD billbacks and Supplier Relations Partnership fees.",
+   "Step invalid claims to repay letter per standard process. Deduct-only — no check requests except DSD billbacks and Supplier Relations Partnership fees.",
    "yes",
    "veronica.jimenez@chedrauiUSA.com (A/B/C/Freight); AP.warehouse@smartandfinal.com (NW STR); smartandfinal@arginc.net (CL post audits)",
    "Direct. Sign-ons: SFLASM (grocery), SFHHSM (chilled), CASISM (frozen). Deduct-only customer. PO-related claims = no customer invoice; back into claim from client order invoice (2% cash discount on gross). 90-day price change notice required. Last update: 05/18/2026."],
 
   ["Stater Bros. Markets",
    "Direct",
-   "Post audit repays â†’ staterbros.audit@prgx.com. Step all other invalid claims to repay letter per standard process.",
+   "Post audit repays → staterbros.audit@prgx.com. Step all other invalid claims to repay letter per standard process.",
    "no",
    "staterbros.audit@prgx.com (D/G invoices); AccountsPayable@Staterbros.com (PO backup); Sherry.mohn@staterbros.com; couponclaim@staterbros.com (B/C coupons)",
    "Direct. Invoice prefix codes: A=Ad, B=Billback, C=$480 ReposiTrak fee, other=Coupon. Check remit required. Claims require BOTH summary AND detail pages. See Stater Bros. Sign-On Job Aid (SharePoint) for sign-ons. Last update: current."],
@@ -1444,22 +1444,22 @@ var BPS_DATA=[
    "Wholesale / Distributor",
    "After 2 failed backup attempts, CRA requests from client before sending repay letter.",
    "no",
-   "deductions@unfi.com; erap@unfi.com (Pre-Pay); whatmaker@acosta.com (quarterly rebate â€” Acosta)",
-   "Direct wholesaler. Master sign-on: ZZNASVMN. Region sign-ons: SUPMMN (Central) Â· SUPHRM (Eastern) Â· SUPVBI (South) Â· SVFLMI (Florida/Krasdale) Â· SVTACBL (Tacoma) Â· SUPEPT (Portland) Â· SUPCBL (Centralia) Â· SVCSDB (SoCal) Â· SVSTNC (NoCal/Stockton) Â· UWGRLI (Market Centre NorCal) Â· UWGRPN (Market Centre PNW) Â· UWGRSC (Market Centre SoCal). Customer ref # prefix determines region/sign-on â€” use UNFI Conventional Sign-On Job Aid. FI suffix = quarterly rebate. Most deductions are on behalf of indirects. Last update: 7/20/2026."],
+   "deductions@unfi.com; erap@unfi.com (Pre-Pay); whatmaker@acosta.com (quarterly rebate — Acosta)",
+   "Direct wholesaler. Master sign-on: ZZNASVMN. Region sign-ons: SUPMMN (Central) · SUPHRM (Eastern) · SUPVBI (South) · SVFLMI (Florida/Krasdale) · SVTACBL (Tacoma) · SUPEPT (Portland) · SUPCBL (Centralia) · SVCSDB (SoCal) · SVSTNC (NoCal/Stockton) · UWGRLI (Market Centre NorCal) · UWGRPN (Market Centre PNW) · UWGRSC (Market Centre SoCal). Customer ref # prefix determines region/sign-on — use UNFI Conventional Sign-On Job Aid. FI suffix = quarterly rebate. Most deductions are on behalf of indirects. Last update: 7/20/2026."],
 
   ["United Natural Foods, Inc. (UNFI West / AP)",
    "Wholesale / Distributor",
    "After 2 failed backup attempts, CRA requests from client before sending repay letter.",
    "no",
    "Deductionsbackup@UNFI.com",
-   "Direct wholesaler. All claims come in under UNFISC (West) or UNINNN (East/Hadden House) â€” update sign-on accordingly. ZZEVUNNN = national sign-on (East & West contracts). POP (Sales Analysis Reports) run under: UNFILI Â· UNFISC Â· UNFISW Â· UNFRIM Â· MOUNPN Â· UNINNN. If ref# contains 'Raleys': update to RALENC (grocery) or RALELI (natural/specialty). Check remit required. PP suffix = 1% pre-pay discount. Admin fee on reclamations: 20% cost, max $250/banner/month. IRI/Nielsen: NO. Last update: 7/13/2026."],
+   "Direct wholesaler. All claims come in under UNFISC (West) or UNINNN (East/Hadden House) — update sign-on accordingly. ZZEVUNNN = national sign-on (East & West contracts). POP (Sales Analysis Reports) run under: UNFILI · UNFISC · UNFISW · UNFRIM · MOUNPN · UNINNN. If ref# contains 'Raleys': update to RALENC (grocery) or RALELI (natural/specialty). Check remit required. PP suffix = 1% pre-pay discount. Admin fee on reclamations: 20% cost, max $250/banner/month. IRI/Nielsen: NO. Last update: 7/13/2026."],
 
   ["WinCo Foods, Inc.",
    "Direct",
-   "After 2 failed backup attempts, step to 'Request BU Assist â€“ Sales' before sending repay letter.",
+   "After 2 failed backup attempts, step to 'Request BU Assist – Sales' before sending repay letter.",
    "yes",
-   "backup@wincofoods.com; wincofoods@atgaudits.com (ATG â€” 87A/89A/91A/92A/94A); wincofoods.audit@prgx.com (2X/RCL/DUPX/AUD); CLS/INMAR portal (invoices ending in R); winco@e-reconcile.com (AVS invoices)",
-   "Direct. Sign-on: WINCPT (main); WINCPN (some NS Sales contracts). Check remit NOT required. Include vendor # in every backup request (see Winco Vendor List). Backup requests must be submitted per vendor individually. Cash discount = 2% on gross (back into from COI â€” no customer invoice provided). Price increases require 60-day notice. Backorder POs: original PO# ending 0 changes to 1. Last update: 06/22/2026."]
+   "backup@wincofoods.com; wincofoods@atgaudits.com (ATG — 87A/89A/91A/92A/94A); wincofoods.audit@prgx.com (2X/RCL/DUPX/AUD); CLS/INMAR portal (invoices ending in R); winco@e-reconcile.com (AVS invoices)",
+   "Direct. Sign-on: WINCPT (main); WINCPN (some NS Sales contracts). Check remit NOT required. Include vendor # in every backup request (see Winco Vendor List). Backup requests must be submitted per vendor individually. Cash discount = 2% on gross (back into from COI — no customer invoice provided). Price increases require 60-day notice. Backorder POs: original PO# ending 0 changes to 1. Last update: 06/22/2026."]
 ];
 
 // â”€â”€ BPS RENDER & FILTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -1475,7 +1475,7 @@ function bpsPortalPill(p){
 }
 function bpsSignOns(s){
   if(!s)return"";
-  return s.split(/[Â·,]/).map(function(x){
+  return s.split(/[·,]/).map(function(x){
     var t=x.trim();
     return t?'<span class="bps-signon">'+esc(t)+'</span>':'';
   }).filter(Boolean).join(" ");

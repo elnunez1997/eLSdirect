@@ -1076,11 +1076,71 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       Sign In
     </button>
 
+    <div style="text-align:center;margin-top:6px">
+      <button onclick="showRegister()" style="background:none;border:none;color:#4a9eff;font-size:12px;cursor:pointer;text-decoration:underline;letter-spacing:.3px">Create Account</button>
+    </div>
+
     <div class="login-divider"><span>INTERNAL USE ONLY</span></div>
 
     <div class="login-footer-note">
       <strong>IBM Acosta</strong> · Invalid Claims &amp; Repay Management<br>
       For access, contact your team lead
+    </div>
+  </div>
+
+  <!-- ── REGISTER PANEL (hidden by default) ── -->
+  <div class="login-right" id="register-panel" style="display:none">
+    <div class="login-right-top">
+      <div class="login-ibm-mark">
+        <div class="login-ibm-bars">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="login-ibm-label">IBM</div>
+      </div>
+      <div class="login-secure-badge">● SECURE</div>
+    </div>
+
+    <div class="login-form-title">Create Account</div>
+    <div class="login-form-sub">IBM email + choose a 4-digit PIN</div>
+
+    <div class="login-field">
+      <label class="login-label" for="reg-email">IBM Email</label>
+      <div class="login-input-wrap">
+        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <input class="login-input" id="reg-email" type="email" placeholder="yourname@ibm.com" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('reg-pin').focus()">
+      </div>
+    </div>
+
+    <div class="login-field">
+      <label class="login-label" for="reg-pin">Choose 4-Digit PIN</label>
+      <div class="login-input-wrap">
+        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input class="login-input" id="reg-pin" type="password" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="letter-spacing:8px;font-size:20px;padding-left:44px" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)" onkeydown="if(event.key==='Enter')document.getElementById('reg-pin2').focus()">
+      </div>
+    </div>
+
+    <div class="login-field">
+      <label class="login-label" for="reg-pin2">Confirm PIN</label>
+      <div class="login-input-wrap">
+        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input class="login-input" id="reg-pin2" type="password" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="letter-spacing:8px;font-size:20px;padding-left:44px" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)" onkeydown="if(event.key==='Enter')doRegister()">
+      </div>
+    </div>
+
+    <div class="login-error" id="reg-error"></div>
+
+    <button class="login-btn" onclick="doRegister()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      Create Account
+    </button>
+
+    <div style="text-align:center;margin-top:10px">
+      <button onclick="showLogin()" style="background:none;border:none;color:#7a92a8;font-size:12px;cursor:pointer;text-decoration:underline">← Back to Sign In</button>
+    </div>
+
+    <div class="login-divider"><span>INTERNAL USE ONLY</span></div>
+    <div class="login-footer-note">
+      <strong>IBM Acosta</strong> · Invalid Claims &amp; Repay Management
     </div>
   </div>
 
@@ -1173,6 +1233,55 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       inp.type='password';
       ico.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
     }
+  };
+
+  /* ── register panel toggle ── */
+  window.showRegister=function(){
+    document.querySelector('.login-right').style.display='none';
+    document.getElementById('register-panel').style.display='flex';
+    document.getElementById('reg-email').value='';
+    document.getElementById('reg-pin').value='';
+    document.getElementById('reg-pin2').value='';
+    document.getElementById('reg-error').textContent='';
+    document.getElementById('reg-email').focus();
+  };
+  window.showLogin=function(){
+    document.getElementById('register-panel').style.display='none';
+    document.querySelector('.login-right').style.display='flex';
+    document.getElementById('login-username').focus();
+  };
+
+  /* ── create account ── */
+  window.doRegister=function(){
+    var email=document.getElementById('reg-email').value.trim().toLowerCase();
+    var pin=document.getElementById('reg-pin').value.trim();
+    var pin2=document.getElementById('reg-pin2').value.trim();
+    var err=document.getElementById('reg-error');
+    if(!isValidEmail(email)||!email.endsWith('@ibm.com')){
+      err.textContent='Please enter a valid IBM email address (@ibm.com).'; return;
+    }
+    if(pin.length!==4||!/^\d{4}$/.test(pin)){
+      err.textContent='PIN must be exactly 4 digits.'; return;
+    }
+    if(pin!==pin2){
+      err.textContent='PINs do not match. Try again.';
+      document.getElementById('reg-pin2').value=''; return;
+    }
+    /* check if email already exists */
+    var allTeam=TEAM.concat(extraCreds().map(function(c){return{e:c.u,p:c.p};}));
+    if(allTeam.some(function(m){return m.e.toLowerCase()===email;})){
+      err.textContent='An account with this email already exists.'; return;
+    }
+    /* save to localStorage */
+    var existing=extraCreds();
+    existing.push({u:email,p:pin});
+    saveCreds(existing);
+    /* auto sign in */
+    try{sessionStorage.setItem(SESSION_KEY,'1');}catch(e){}
+    document.getElementById('register-panel').style.display='none';
+    document.querySelector('.login-right').style.display='flex';
+    document.getElementById('login-gate').classList.add('hidden');
+    err.textContent='';
   };
 
   /* ── logout ── */

@@ -1264,6 +1264,11 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     document.getElementById('login-username').focus();
   };
 
+  /* ── pending approvals ── */
+  var PENDING_KEY='els_pending_26';
+  function getPending(){ try{ return JSON.parse(localStorage.getItem(PENDING_KEY)||'[]'); }catch(e){ return []; } }
+  function savePending(arr){ try{ localStorage.setItem(PENDING_KEY, JSON.stringify(arr)); }catch(e){} }
+
   /* ── create account ── */
   window.doRegister=function(){
     var email=document.getElementById('reg-email').value.trim().toLowerCase();
@@ -1280,22 +1285,54 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       err.textContent='PINs do not match. Try again.';
       document.getElementById('reg-pin2').value=''; return;
     }
-    /* check if email already exists */
+    /* check if already exists in team, approved, or pending */
     var allTeam=TEAM.concat(extraCreds().map(function(c){return{e:c.u};}));
     if(allTeam.some(function(m){return m.e.toLowerCase()===email;})){
       err.textContent='An account with this email already exists.'; return;
     }
-    /* hash PIN then save */
+    if(getPending().some(function(p){return p.u===email;})){
+      err.textContent='A request for this email is already pending approval.'; return;
+    }
+    /* hash PIN then save as PENDING — do NOT grant access yet */
     sha256(pin).then(function(h){
-      var existing=extraCreds();
-      existing.push({u:email,h:h});
-      saveCreds(existing);
-      try{sessionStorage.setItem(SESSION_KEY,'1');}catch(e){}
+      var pend=getPending();
+      pend.push({u:email,h:h});
+      savePending(pend);
+      /* show pending message instead of logging in */
       document.getElementById('register-panel').style.display='none';
       document.querySelector('.login-right').style.display='flex';
-      document.getElementById('login-gate').classList.add('hidden');
+      document.getElementById('login-gate').classList.remove('hidden');
+      /* swap login form for a pending notice */
+      document.querySelector('.login-right').innerHTML=
+        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;gap:16px">'
+        +'<div style="font-size:40px">⏳</div>'
+        +'<div style="font-size:20px;font-weight:800;color:#fff">Request Submitted</div>'
+        +'<div style="font-size:13px;color:#7a92a8;line-height:1.7">Your account request for<br><strong style="color:#4a9eff">'+email+'</strong><br>is pending admin approval.<br><br>You will be able to sign in once approved.</div>'
+        +'<button onclick="location.reload()" style="margin-top:8px;padding:10px 24px;background:#1c2b3a;border:1px solid #2d3f52;border-radius:8px;color:#9ab4cc;font-size:13px;cursor:pointer">← Back to Sign In</button>'
+        +'</div>';
       err.textContent='';
     });
+  };
+
+  /* ── admin: approve / reject pending ── */
+  window.adminApprove=function(email){
+    var pend=getPending();
+    var found=pend.find(function(p){return p.u===email;});
+    if(!found) return;
+    /* move from pending to approved */
+    var approved=extraCreds();
+    approved.push({u:found.u,h:found.h});
+    saveCreds(approved);
+    savePending(pend.filter(function(p){return p.u!==email;}));
+    renderAdminPanel();
+    document.getElementById('admin-msg').textContent='Approved: '+email;
+    document.getElementById('admin-msg').style.color='#065f46';
+  };
+  window.adminReject=function(email){
+    savePending(getPending().filter(function(p){return p.u!==email;}));
+    renderAdminPanel();
+    document.getElementById('admin-msg').textContent='Rejected: '+email;
+    document.getElementById('admin-msg').style.color='#92400e';
   };
 
   /* ── logout ── */
@@ -1349,7 +1386,27 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
   function renderAdminPanel(){
     var tb=document.getElementById('admin-user-list');
     if(!tb) return;
-    /* show hardcoded TEAM members */
+    /* ── pending requests section ── */
+    var pend=getPending();
+    var pendSection=document.getElementById('admin-pending-section');
+    if(pendSection){
+      if(pend.length){
+        pendSection.style.display='block';
+        var pendRows=pend.map(function(p){
+          return '<tr style="background:#fffbeb">'
+            +'<td style="padding:9px 12px;font-size:13px;color:#92400e;border-bottom:1px solid #fef3c7">'+p.u
+            +' <span style="font-size:10px;font-weight:700;color:#92400e;background:#fef3c7;border-radius:8px;padding:2px 7px">PENDING</span></td>'
+            +'<td style="padding:9px 12px;border-bottom:1px solid #fef3c7;text-align:right;display:flex;gap:6px;justify-content:flex-end">'
+            +'<button onclick="adminApprove(\''+p.u+'\')" style="font-size:11px;font-weight:700;color:#065f46;background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:3px 10px;cursor:pointer">✓ Approve</button>'
+            +'<button onclick="adminReject(\''+p.u+'\')" style="font-size:11px;font-weight:700;color:#e53e3e;background:none;border:1px solid #fed7d7;border-radius:6px;padding:3px 10px;cursor:pointer">✕ Reject</button>'
+            +'</td></tr>';
+        }).join('');
+        document.getElementById('admin-pending-list').innerHTML=pendRows;
+      } else {
+        pendSection.style.display='none';
+      }
+    }
+    /* ── hardcoded TEAM members ── */
     var teamRows=TEAM.map(function(m){
       return '<tr style="background:#f7f9fc">'
         +'<td style="padding:9px 12px;font-size:13px;color:#1c2b3a;border-bottom:1px solid #f3f4f6">'+m.e
@@ -1357,7 +1414,7 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
         +'<td style="padding:9px 12px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:11px;color:#a0aec0">Edit in code</td>'
         +'</tr>';
     }).join('');
-    /* show locally-added users */
+    /* ── locally approved users ── */
     var arr=extraCreds();
     var localRows=arr.length ? arr.map(function(c){
       return '<tr><td style="padding:9px 12px;font-size:13px;color:#1c2b3a;border-bottom:1px solid #f3f4f6">'+c.u+'</td>'
@@ -1391,6 +1448,16 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       </div>
       <button onclick="adminAddUser()" style="padding:9px 20px;background:#1c2b3a;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px">Add Member</button>
       <div id="admin-msg" style="font-size:12px;min-height:18px;margin-top:10px;font-weight:500"></div>
+    </div>
+
+    <!-- Pending approvals -->
+    <div id="admin-pending-section" style="display:none;margin-bottom:20px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#92400e;text-transform:uppercase;margin-bottom:8px">⏳ Pending Approval</div>
+      <div style="border:1px solid #fde68a;border-radius:10px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+          <tbody id="admin-pending-list"></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- User list -->

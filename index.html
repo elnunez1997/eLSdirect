@@ -1096,10 +1096,11 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     try{ localStorage.setItem(CREDS_KEY, JSON.stringify(arr)); }catch(e){}
   }
   function validLogin(u,p){
-    if(u===_M[0] && p===_M[1]) return true;
-    return extraCreds().some(function(c){ return c.u===u && c.p===p; });
+    /* case-insensitive username, trimmed password */
+    if(u.toLowerCase()===_M[0].toLowerCase() && p===_M[1]) return true;
+    return extraCreds().some(function(c){ return c.u.toLowerCase()===u.toLowerCase() && c.p===p; });
   }
-  function isMaster(u,p){ return u===_M[0] && p===_M[1]; }
+  function isMaster(u,p){ return u.toLowerCase()===_M[0].toLowerCase() && p===_M[1]; }
 
   /* ── session check ── */
   function show(){document.getElementById('login-gate').classList.remove('hidden');}
@@ -1121,7 +1122,7 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
   /* ── sign in ── */
   window.doLogin=function(){
     var u=document.getElementById('login-username').value.trim();
-    var p=document.getElementById('login-input').value;
+    var p=document.getElementById('login-input').value.trim();
     if(validLogin(u,p)){
       try{sessionStorage.setItem(SESSION_KEY,'1');}catch(e){}
       /* show admin panel only for master account */

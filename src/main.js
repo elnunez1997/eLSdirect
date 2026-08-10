@@ -1116,18 +1116,9 @@ function lbLoadTemplate() {
 }
 
 function lbUpdatePreview() {
-  /* clear all input fields */
-  ["lb-to","lb-company","lb-claim","lb-amount","lb-customer","lb-from"].forEach(function(id){
-    document.getElementById(id).value = "";
-  });
-  /* reset editor */
+  /* re-render the letter preview using current field values */
   var type = document.getElementById("lb-type").value;
-  if (!type || type === "freeform") {
-    document.getElementById("lb-editor").value = "";
-    document.getElementById("lb-copilot-out").innerHTML = '<div class="cop-item" style="color:#9ab4cc;font-style:italic">Fields cleared. Fill in details and the letter will update.</div>';
-    document.getElementById("lb-dl-hint").textContent = "";
-    return;
-  }
+  if (!type || type === "freeform") return;
   var tpl = LB_TEMPLATES[type];
   if (!tpl) return;
   var fields = lbGetFields();

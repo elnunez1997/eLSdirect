@@ -1305,7 +1305,7 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       /* swap login form for a pending notice */
       document.querySelector('.login-right').innerHTML=
         '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;gap:16px">'
-        +'<div style="font-size:40px">⏳</div>'
+        +'<div style="font-size:40px">...</div>'
         +'<div style="font-size:20px;font-weight:800;color:#fff">Request Submitted</div>'
         +'<div style="font-size:13px;color:#7a92a8;line-height:1.7">Your account request for<br><strong style="color:#4a9eff">'+email+'</strong><br>is pending admin approval.<br><br>You will be able to sign in once approved.</div>'
         +'<button onclick="location.reload()" style="margin-top:8px;padding:10px 24px;background:#1c2b3a;border:1px solid #2d3f52;border-radius:8px;color:#9ab4cc;font-size:13px;cursor:pointer">← Back to Sign In</button>'
@@ -1397,8 +1397,8 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
             +'<td style="padding:9px 12px;font-size:13px;color:#92400e;border-bottom:1px solid #fef3c7">'+p.u
             +' <span style="font-size:10px;font-weight:700;color:#92400e;background:#fef3c7;border-radius:8px;padding:2px 7px">PENDING</span></td>'
             +'<td style="padding:9px 12px;border-bottom:1px solid #fef3c7;text-align:right;display:flex;gap:6px;justify-content:flex-end">'
-            +'<button onclick="adminApprove(\''+p.u+'\')" style="font-size:11px;font-weight:700;color:#065f46;background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:3px 10px;cursor:pointer">✓ Approve</button>'
-            +'<button onclick="adminReject(\''+p.u+'\')" style="font-size:11px;font-weight:700;color:#e53e3e;background:none;border:1px solid #fed7d7;border-radius:6px;padding:3px 10px;cursor:pointer">✕ Reject</button>'
+            +'<button onclick="adminApprove(\''+p.u+'\')" style="font-size:11px;font-weight:700;color:#065f46;background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:3px 10px;cursor:pointer">Approve</button>'
+            +'<button onclick="adminReject(\''+p.u+'\')" style="font-size:11px;font-weight:700;color:#e53e3e;background:none;border:1px solid #fed7d7;border-radius:6px;padding:3px 10px;cursor:pointer">Reject</button>'
             +'</td></tr>';
         }).join('');
         document.getElementById('admin-pending-list').innerHTML=pendRows;
@@ -1452,7 +1452,7 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
 
     <!-- Pending approvals -->
     <div id="admin-pending-section" style="display:none;margin-bottom:20px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#92400e;text-transform:uppercase;margin-bottom:8px">⏳ Pending Approval</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#92400e;text-transform:uppercase;margin-bottom:8px">Pending Approval</div>
       <div style="border:1px solid #fde68a;border-radius:10px;overflow:hidden">
         <table style="width:100%;border-collapse:collapse">
           <tbody id="admin-pending-list"></tbody>

@@ -1289,8 +1289,10 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(SESSION_KEY+'_master');
     document.getElementById('admin-panel-btn').style.display='none';
+    document.getElementById('register-panel').style.display='none';
+    document.querySelector('.login-right').style.display='flex';
     document.getElementById('login-gate').classList.remove('hidden');
-    document.getElementById('login-user').value='';
+    document.getElementById('login-username').value='';
     document.getElementById('login-input').value='';
     document.getElementById('login-error').textContent='';
   };

@@ -1044,21 +1044,21 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     </div>
 
     <div class="login-form-title">Welcome back</div>
-    <div class="login-form-sub">Sign in to access the eLS portal</div>
+    <div class="login-form-sub">Sign in with your IBM email and PIN</div>
 
     <div class="login-field">
-      <label class="login-label" for="login-username">Username</label>
+      <label class="login-label" for="login-username">IBM Email</label>
       <div class="login-input-wrap">
-        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <input class="login-input" id="login-username" type="text" placeholder="Enter your username" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('login-input').focus()">
+        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <input class="login-input" id="login-username" type="email" placeholder="yourname@ibm.com" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login-input').focus()">
       </div>
     </div>
 
     <div class="login-field">
-      <label class="login-label" for="login-input">Password</label>
+      <label class="login-label" for="login-input">4-Digit PIN</label>
       <div class="login-input-wrap">
         <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input class="login-input" id="login-input" type="password" placeholder="Enter your password" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+        <input class="login-input" id="login-input" type="password" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="letter-spacing:8px;font-size:20px;padding-left:44px" onkeydown="if(event.key==='Enter')doLogin()" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)">
         <button class="login-eye" id="login-eye" onclick="toggleLoginEye()" title="Show/hide">
           <svg id="eye-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
@@ -1084,8 +1084,16 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
 
 <script>
 (function(){
-  /* master credentials — split across array to avoid secret scanner triggers */
+  /* ── master admin account (username login, not email) ── */
   var _M=['Test2026','eLS'+'2026'];
+
+  /* ── team accounts: IBM email + 4-digit PIN ──
+     Add new members here: {e:'email@ibm.com', p:'1234'}
+     These work on any device / any browser.                */
+  var TEAM=[
+    {e:'elnunez@ibm.com', p:'2026'}
+  ];
+
   var SESSION_KEY='els_auth_26', CREDS_KEY='els_creds_26';
 
   /* ── helpers ── */
@@ -1095,10 +1103,15 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
   function saveCreds(arr){
     try{ localStorage.setItem(CREDS_KEY, JSON.stringify(arr)); }catch(e){}
   }
+  function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
   function validLogin(u,p){
-    /* case-insensitive username, trimmed password */
+    /* master admin (username) */
     if(u.toLowerCase()===_M[0].toLowerCase() && p===_M[1]) return true;
-    return extraCreds().some(function(c){ return c.u.toLowerCase()===u.toLowerCase() && c.p===p; });
+    /* team accounts (IBM email + PIN) — check hardcoded TEAM list */
+    var ul=u.toLowerCase();
+    if(TEAM.some(function(m){ return m.e.toLowerCase()===ul && m.p===p; })) return true;
+    /* also check locally added accounts (localStorage fallback) */
+    return extraCreds().some(function(c){ return c.u.toLowerCase()===ul && c.p===p; });
   }
   function isMaster(u,p){ return u.toLowerCase()===_M[0].toLowerCase() && p===_M[1]; }
 
@@ -1167,18 +1180,20 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     document.getElementById('admin-modal').style.display='none';
   };
   window.adminAddUser=function(){
-    var nu=document.getElementById('admin-new-user').value.trim();
-    var np=document.getElementById('admin-new-pass').value;
+    var ne=document.getElementById('admin-new-user').value.trim().toLowerCase();
+    var np=document.getElementById('admin-new-pass').value.trim();
     var msg=document.getElementById('admin-msg');
-    if(!nu||!np){ msg.textContent='Username and password are required.'; msg.style.color='#e53e3e'; return; }
-    if(nu===_M[0]){ msg.textContent='Cannot override the master account.'; msg.style.color='#e53e3e'; return; }
+    if(!ne||!np){ msg.textContent='Email and PIN are required.'; msg.style.color='#e53e3e'; return; }
+    if(!isValidEmail(ne)){ msg.textContent='Please enter a valid IBM email address.'; msg.style.color='#e53e3e'; return; }
+    if(!/^\d{4}$/.test(np)){ msg.textContent='PIN must be exactly 4 digits.'; msg.style.color='#e53e3e'; return; }
+    if(TEAM.some(function(m){ return m.e.toLowerCase()===ne; })){ msg.textContent='This email is already in the team list.'; msg.style.color='#e53e3e'; return; }
     var arr=extraCreds();
-    if(arr.some(function(c){ return c.u===nu; })){ msg.textContent='Username already exists.'; msg.style.color='#e53e3e'; return; }
-    arr.push({u:nu,p:np});
+    if(arr.some(function(c){ return c.u.toLowerCase()===ne; })){ msg.textContent='This email is already added.'; msg.style.color='#e53e3e'; return; }
+    arr.push({u:ne,p:np});
     saveCreds(arr);
     document.getElementById('admin-new-user').value='';
     document.getElementById('admin-new-pass').value='';
-    msg.textContent='User "'+nu+'" added.';
+    msg.textContent='Added: '+ne;
     msg.style.color='#065f46';
     renderAdminPanel();
   };
@@ -1186,63 +1201,70 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     var arr=extraCreds().filter(function(c){ return c.u!==u; });
     saveCreds(arr);
     renderAdminPanel();
-    document.getElementById('admin-msg').textContent='User "'+u+'" removed.';
+    document.getElementById('admin-msg').textContent='Removed: '+u;
     document.getElementById('admin-msg').style.color='#92400e';
   };
   function renderAdminPanel(){
-    var arr=extraCreds();
     var tb=document.getElementById('admin-user-list');
     if(!tb) return;
-    if(!arr.length){
-      tb.innerHTML='<tr><td colspan="2" style="text-align:center;color:#a0aec0;padding:14px;font-size:12px">No extra users added yet.</td></tr>';
-      return;
-    }
-    tb.innerHTML=arr.map(function(c){
+    /* show hardcoded TEAM members */
+    var teamRows=TEAM.map(function(m){
+      return '<tr style="background:#f7f9fc">'
+        +'<td style="padding:9px 12px;font-size:13px;color:#1c2b3a;border-bottom:1px solid #f3f4f6">'+m.e
+        +' <span style="font-size:10px;font-weight:700;color:#1d4ed8;background:#dbeafe;border-radius:8px;padding:2px 7px">TEAM</span></td>'
+        +'<td style="padding:9px 12px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:11px;color:#a0aec0">Edit in code</td>'
+        +'</tr>';
+    }).join('');
+    /* show locally-added users */
+    var arr=extraCreds();
+    var localRows=arr.length ? arr.map(function(c){
       return '<tr><td style="padding:9px 12px;font-size:13px;color:#1c2b3a;border-bottom:1px solid #f3f4f6">'+c.u+'</td>'
             +'<td style="padding:9px 12px;border-bottom:1px solid #f3f4f6;text-align:right">'
             +'<button onclick="adminRemoveUser(\''+c.u+'\')" style="font-size:11px;font-weight:700;color:#e53e3e;background:none;border:1px solid #fed7d7;border-radius:6px;padding:3px 10px;cursor:pointer">Remove</button>'
             +'</td></tr>';
-    }).join('');
+    }).join('') : '<tr><td colspan="2" style="text-align:center;color:#a0aec0;padding:10px;font-size:12px">No additional users added yet.</td></tr>';
+    tb.innerHTML=teamRows+localRows;
   }
 })();
 </script>
 
 <!-- ── ADMIN CREDENTIALS MODAL ─────────────────────────────────────────── -->
 <div id="admin-modal" style="display:none;position:fixed;inset:0;z-index:199999;background:rgba(0,0,0,.55);align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:14px;width:100%;max-width:480px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.25);position:relative">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:520px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.25);position:relative;max-height:90vh;overflow-y:auto">
     <button onclick="closeAdminPanel()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#a0aec0;line-height:1">✕</button>
-    <div style="font-size:18px;font-weight:800;color:#0f1c2a;margin-bottom:4px">Manage Credentials</div>
-    <div style="font-size:12px;color:#6b7a8d;margin-bottom:24px">Add or remove portal users. Stored locally in this browser.</div>
+    <div style="font-size:18px;font-weight:800;color:#0f1c2a;margin-bottom:4px">Manage Team Access</div>
+    <div style="font-size:12px;color:#6b7a8d;margin-bottom:24px">Add team members by IBM email and 4-digit PIN. They can sign in from any device.</div>
 
     <!-- Add user form -->
     <div style="background:#f7f9fc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-bottom:20px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#4a5568;text-transform:uppercase;margin-bottom:12px">Add New User</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#4a5568;text-transform:uppercase;margin-bottom:12px">Add Team Member</div>
       <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-        <input id="admin-new-user" type="text" placeholder="Username" autocomplete="off"
-          style="flex:1;min-width:120px;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:inherit"
+        <input id="admin-new-user" type="email" placeholder="name@ibm.com" autocomplete="off"
+          style="flex:2;min-width:180px;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:inherit"
           onkeydown="if(event.key==='Enter')document.getElementById('admin-new-pass').focus()">
-        <input id="admin-new-pass" type="password" placeholder="Password" autocomplete="off"
-          style="flex:1;min-width:120px;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:inherit"
+        <input id="admin-new-pass" type="password" placeholder="4-digit PIN" maxlength="4" inputmode="numeric"
+          style="flex:1;min-width:100px;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:16px;outline:none;font-family:inherit;letter-spacing:6px"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)"
           onkeydown="if(event.key==='Enter')adminAddUser()">
       </div>
-      <button onclick="adminAddUser()" style="padding:9px 20px;background:#1c2b3a;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px">Add User</button>
+      <button onclick="adminAddUser()" style="padding:9px 20px;background:#1c2b3a;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px">Add Member</button>
       <div id="admin-msg" style="font-size:12px;min-height:18px;margin-top:10px;font-weight:500"></div>
     </div>
 
     <!-- User list -->
-    <div style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#4a5568;text-transform:uppercase;margin-bottom:8px">Current Users</div>
-    <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:4px">
-      <!-- Master account row (always shown, cannot be removed) -->
+    <div style="font-size:11px;font-weight:700;letter-spacing:.8px;color:#4a5568;text-transform:uppercase;margin-bottom:8px">Team Roster</div>
+    <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:8px">
       <table style="width:100%;border-collapse:collapse">
         <tbody>
-          <tr style="background:#f7f9fc">
-            <td style="padding:9px 12px;font-size:13px;color:#1c2b3a;border-bottom:1px solid #f3f4f6">Test2026 <span style="font-size:10px;font-weight:700;color:#065f46;background:#d1fae5;border-radius:8px;padding:2px 7px;margin-left:6px">MASTER</span></td>
+          <tr style="background:#fff3cd">
+            <td style="padding:9px 12px;font-size:13px;color:#1c2b3a;border-bottom:1px solid #f3f4f6">Test2026 (Admin) &nbsp;<span style="font-size:10px;font-weight:700;color:#065f46;background:#d1fae5;border-radius:8px;padding:2px 7px">MASTER</span></td>
             <td style="padding:9px 12px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:11px;color:#a0aec0">Cannot remove</td>
           </tr>
         </tbody>
         <tbody id="admin-user-list"></tbody>
       </table>
     </div>
+    <div style="font-size:11px;color:#a0aec0">TEAM members (blue) are hardcoded and work on any device. Additional members added above are stored in this browser only.</div>
   </div>
 </div>
 <style>

@@ -1,6 +1,6 @@
 
 
-// â”€â”€ DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- DATA ----------------------------------------------------------------------
 var DIRECT=[
 ["Ahold","SBS","Matt Gorbach","matt.gorbach@jmsmucker.com","Allison Davenport - Director, East","allison.davenport@jmsmucker.com","Bill Brupbacher","bill.brupbacher@jmsmucker.com","Emily Andrassy","emily.andrassy@jmsmucker.com","Rowena Forte Molin","rfortemolin@acosta.com","Angelika Orobia","Erjay Molina","","",""],
 ["Ahold","Pet","Marco Manocchio","marco.manocchio@jmsmucker.com","Jason Oliver - Director, South","jason.oliver@jmsmucker.com","Scott Dacus","scott.dacus@jmsmucker.com","Haylee Rich","haylee.rich@jmsmucker.com","Rowena Forte Molin","rfortemolin@acosta.com","Angelika Orobia","Erjay Molina","","",""],
@@ -437,7 +437,7 @@ var PORTALS=[
   {name:"Save A Lot",desc:"Save A Lot customer help portal for deduction submissions and account management.",url:"https://savealot.custhelp.com/app/account/overview",status:"active"}
 ];
 
-// â”€â”€ JMS CONTACT CHAIN DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- JMS CONTACT CHAIN DATA ----------------------------------------------------
 // Columns: [0]client [1]branch [2]signon [3]custName [4]clientMgr [5]cmEmail [6]bma [7]bmaEmail [8]bmaSup [9]csCoord [10]cscEmail [11]csSup [12]coeSup [13]coeEmail
 var CONTACTS=[
 ["JMSFRZ","NATURAL/SPECIALTY NORTHEAST-810","ABRANN","ABRAHAM NATURAL FOODS CORP.","","","","","","CARRIE BASINGER","CBasinger@acosta.com","GAIL PRUSINSKI","TRACI GEISLER-STITZEL","tstitzel@acosta.com"],
@@ -692,7 +692,7 @@ var CONTACTS=[
 ];
 
 
-// â”€â”€ REPAY LETTERS DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- REPAY LETTERS DATA --------------------------------------------------------
 // null = no letter available; string = relative path to xlsx file
 var REPAY_LETTERS={
   "ALLOWANCE ON SHORTED PRODUCT":"repayletters/REPAYLETTERAllowShortedProd_20_1.xlsx",
@@ -799,12 +799,12 @@ function openRepayLetter(){
 }
 
 
-// â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- HELPERS -------------------------------------------------------------------
 function sba(s){var m={"F&B":"fb","SBS":"sbs","Pet":"pet","Coffee":"coffee","FHS":"fhs"};var c=m[s]||"other";return s?'<span class="badge '+c+'">'+s+'</span>':"";}
 function person(n,e){if(!n||!n.trim()||n.trim()===" ")return"";n=n.trim();if(e&&e.trim()&&e.trim()!=="No Acosta CS Support")return n+'<br><a class="em" href="mailto:'+e.trim()+'">'+e.trim()+'</a>';if(e&&e.trim()==="No Acosta CS Support")return n+'<br><span class="muted">No Acosta CS</span>';return n;}
 function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
-// â”€â”€ NAVIGATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- NAVIGATION ----------------------------------------------------------------
 function navigate(id, btn){
   document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");});
   document.querySelectorAll(".nav-item").forEach(function(n){n.classList.remove("active");});
@@ -825,7 +825,7 @@ function navigate(id, btn){
   if(id==="customersop"){renderBPS(BPS_DATA);}
 }
 
-// â”€â”€ DIRECTORY TABS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- DIRECTORY TABS ------------------------------------------------------------
 function switchDirTab(tab){
   ["direct","acosta","natdist","contacts"].forEach(function(t){
     document.getElementById("dpanel-"+t).classList.remove("active");
@@ -835,7 +835,7 @@ function switchDirTab(tab){
   document.getElementById("dtab-"+tab).classList.add("active");
 }
 
-// â”€â”€ RENDER TABLES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- RENDER TABLES -------------------------------------------------------------
 function renderDirect(rows){
   var b=document.getElementById("d-body"),h="";
   if(!rows.length){b.innerHTML='<tr><td colspan="12" class="empty">No results</td></tr>';document.getElementById("d-count").textContent="0 rows";return;}
@@ -925,7 +925,7 @@ function renderPortals(items){
   document.getElementById("portal-count").textContent=items.length+" portals";
 }
 
-// â”€â”€ FILTERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- FILTERS -------------------------------------------------------------------
 function filterDirect(){
   var q=document.getElementById("d-search").value.toLowerCase();
   var s=document.getElementById("d-sba").value;
@@ -987,7 +987,7 @@ function showJobAidSteps(id){
   }
 }
 
-// â”€â”€ GLOBAL SEARCH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- GLOBAL SEARCH -------------------------------------------------------------
 function globalSearch(q){
   if(!q||q.length<2)return;
   var lq=q.toLowerCase(),results=[],seen={};
@@ -1004,7 +1004,7 @@ function globalSearch(q){
   document.getElementById("search-body").innerHTML=h;
 }
 
-// â”€â”€ LETTER BUILDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- LETTER BUILDER ------------------------------------------------------------
 var LB_TEMPLATES = {
   repay_standard: "Dear {TO},\n\nWe are writing to formally request repayment of a deduction taken against our account.\n\nCustomer: {CUSTOMER}\nDeduction / Claim #: {CLAIM}\nAmount: {AMOUNT}\n\nUpon review, we have determined that this deduction does not meet the criteria for a valid claim. We kindly ask that you arrange for the repayment of {AMOUNT} at your earliest convenience.\n\nPlease feel free to reach out if you have any questions or need additional documentation to support this request.\n\nThank you for your prompt attention to this matter.\n\nSincerely,\n{FROM}\neLS - Enhanced Link Support\nInvalid Claims & Repay Management",
 
@@ -1293,14 +1293,14 @@ function lbCopyClipboard() {
   }
 }
 
-// â”€â”€ DATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- DATE ----------------------------------------------------------------------
 (function(){
   var d=new Date();
   var months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   document.getElementById("topbar-date").textContent=months[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();
 })();
 
-// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- INIT ----------------------------------------------------------------------
 buildRepayLetterSelect("");
 renderDirect(DIRECT);
 renderAcosta(ACOSTA);
@@ -1309,7 +1309,7 @@ renderContacts(CONTACTS);
 renderRC(RC);
 renderPortals(PORTALS);
 
-// â”€â”€ BPS TEAM INFORMATION DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- BPS TEAM INFORMATION DATA -------------------------------------------------
 // Cols: [0]customer [1]type [2]repay [3]portal [4]backupContact [5]bpsNotes
 var BPS_DATA=[
   ["Associated Wholesale Grocers (AWG) / Valu Merchandisers (VMC)",
@@ -1453,7 +1453,7 @@ var BPS_DATA=[
    "Direct. Sign-on: WINCPT (main); WINCPN (some NS Sales contracts). Check remit NOT required. Include vendor # in every backup request (see Winco Vendor List). Backup requests must be submitted per vendor individually. Cash discount = 2% on gross (back into from COI — no customer invoice provided). Price increases require 60-day notice. Backorder POs: original PO# ending 0 changes to 1. Last update: 06/22/2026."]
 ];
 
-// â”€â”€ BPS RENDER & FILTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- BPS RENDER & FILTER -------------------------------------------------------
 function bpsTypePill(t){
   if(!t)return"";
   var tl=t.toLowerCase();

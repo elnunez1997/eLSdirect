@@ -1150,17 +1150,26 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
 
 <script>
 (function(){
-  /* ── master admin account (username login, not email) ── */
-  var _M=['Test2026','20'+'26'];
+  /* ── master admin account — password stored as SHA-256 hash only ── */
+  var _M=['Test2026','158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab'];
 
-  /* ── team accounts: IBM email + 4-digit PIN ──
-     Add new members here: {e:'email@ibm.com', p:'1234'}
-     These work on any device / any browser.                */
+  /* ── team accounts — PINs stored as SHA-256 hashes only ──
+     To add a member: hash their PIN at https://emn178.github.io/online-tools/sha256.html
+     then add: {e:'email@ibm.com', h:'<sha256-of-pin>'}               */
   var TEAM=[
-    {e:'elnunez@ibm.com', p:'2026'}
+    {e:'elnunez@ibm.com', h:'158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab'}
   ];
 
   var SESSION_KEY='els_auth_26', CREDS_KEY='els_creds_26';
+
+  /* ── SHA-256 via Web Crypto API (built into every modern browser) ── */
+  function sha256(str){
+    var buf=[].reduce.call(new TextEncoder().encode(str),function(a,b){return a*256+b},0);
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+      .then(function(h){
+        return Array.from(new Uint8Array(h)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+      });
+  }
 
   /* ── helpers ── */
   function extraCreds(){
@@ -1170,16 +1179,17 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     try{ localStorage.setItem(CREDS_KEY, JSON.stringify(arr)); }catch(e){}
   }
   function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-  function validLogin(u,p){
-    /* master admin (username) */
-    if(u.toLowerCase()===_M[0].toLowerCase() && p===_M[1]) return true;
-    /* team accounts (IBM email + PIN) — check hardcoded TEAM list */
+
+  function validLogin(u, pinHash){
+    /* master admin */
+    if(u.toLowerCase()===_M[0].toLowerCase() && pinHash===_M[1]) return true;
+    /* hardcoded team list */
     var ul=u.toLowerCase();
-    if(TEAM.some(function(m){ return m.e.toLowerCase()===ul && m.p===p; })) return true;
-    /* also check locally added accounts (localStorage fallback) */
-    return extraCreds().some(function(c){ return c.u.toLowerCase()===ul && c.p===p; });
+    if(TEAM.some(function(m){ return m.e.toLowerCase()===ul && m.h===pinHash; })) return true;
+    /* locally registered accounts */
+    return extraCreds().some(function(c){ return c.u.toLowerCase()===ul && c.h===pinHash; });
   }
-  function isMaster(u,p){ return u.toLowerCase()===_M[0].toLowerCase() && p===_M[1]; }
+  function isMaster(u, pinHash){ return u.toLowerCase()===_M[0].toLowerCase() && pinHash===_M[1]; }
 
   /* ── session check ── */
   function show(){document.getElementById('login-gate').classList.remove('hidden');}
@@ -1202,26 +1212,27 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
   window.doLogin=function(){
     var u=document.getElementById('login-username').value.trim();
     var p=document.getElementById('login-input').value.trim();
-    if(validLogin(u,p)){
-      try{sessionStorage.setItem(SESSION_KEY,'1');}catch(e){}
-      /* show admin panel only for master account */
-      if(isMaster(u,p)){
-        try{sessionStorage.setItem(SESSION_KEY+'_master','1');}catch(e){}
-        showAdminBtn();
+    sha256(p).then(function(h){
+      if(validLogin(u,h)){
+        try{sessionStorage.setItem(SESSION_KEY,'1');}catch(e){}
+        if(isMaster(u,h)){
+          try{sessionStorage.setItem(SESSION_KEY+'_master','1');}catch(e){}
+          showAdminBtn();
+        }
+        hide();
+        document.getElementById('login-error').textContent='';
+      } else {
+        var el=document.getElementById('login-error');
+        el.textContent='Incorrect username or password. Try again.';
+        document.getElementById('login-username').value='';
+        document.getElementById('login-input').value='';
+        document.getElementById('login-username').focus();
+        var card=document.querySelector('.login-right');
+        card.classList.remove('lg-shake');
+        card.offsetHeight;
+        card.classList.add('lg-shake');
       }
-      hide();
-      document.getElementById('login-error').textContent='';
-    } else {
-      var el=document.getElementById('login-error');
-      el.textContent='Incorrect username or password. Try again.';
-      document.getElementById('login-username').value='';
-      document.getElementById('login-input').value='';
-      document.getElementById('login-username').focus();
-      var card=document.querySelector('.login-right');
-      card.classList.remove('lg-shake');
-      card.offsetHeight;
-      card.classList.add('lg-shake');
-    }
+    });
   };
 
   /* ── show/hide password ── */
@@ -1270,20 +1281,21 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       document.getElementById('reg-pin2').value=''; return;
     }
     /* check if email already exists */
-    var allTeam=TEAM.concat(extraCreds().map(function(c){return{e:c.u,p:c.p};}));
+    var allTeam=TEAM.concat(extraCreds().map(function(c){return{e:c.u};}));
     if(allTeam.some(function(m){return m.e.toLowerCase()===email;})){
       err.textContent='An account with this email already exists.'; return;
     }
-    /* save to localStorage */
-    var existing=extraCreds();
-    existing.push({u:email,p:pin});
-    saveCreds(existing);
-    /* auto sign in */
-    try{sessionStorage.setItem(SESSION_KEY,'1');}catch(e){}
-    document.getElementById('register-panel').style.display='none';
-    document.querySelector('.login-right').style.display='flex';
-    document.getElementById('login-gate').classList.add('hidden');
-    err.textContent='';
+    /* hash PIN then save */
+    sha256(pin).then(function(h){
+      var existing=extraCreds();
+      existing.push({u:email,h:h});
+      saveCreds(existing);
+      try{sessionStorage.setItem(SESSION_KEY,'1');}catch(e){}
+      document.getElementById('register-panel').style.display='none';
+      document.querySelector('.login-right').style.display='flex';
+      document.getElementById('login-gate').classList.add('hidden');
+      err.textContent='';
+    });
   };
 
   /* ── logout ── */
@@ -1317,13 +1329,15 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     if(TEAM.some(function(m){ return m.e.toLowerCase()===ne; })){ msg.textContent='This email is already in the team list.'; msg.style.color='#e53e3e'; return; }
     var arr=extraCreds();
     if(arr.some(function(c){ return c.u.toLowerCase()===ne; })){ msg.textContent='This email is already added.'; msg.style.color='#e53e3e'; return; }
-    arr.push({u:ne,p:np});
-    saveCreds(arr);
-    document.getElementById('admin-new-user').value='';
-    document.getElementById('admin-new-pass').value='';
-    msg.textContent='Added: '+ne;
-    msg.style.color='#065f46';
-    renderAdminPanel();
+    sha256(np).then(function(h){
+      arr.push({u:ne,h:h});
+      saveCreds(arr);
+      document.getElementById('admin-new-user').value='';
+      document.getElementById('admin-new-pass').value='';
+      msg.textContent='Added: '+ne;
+      msg.style.color='#065f46';
+      renderAdminPanel();
+    });
   };
   window.adminRemoveUser=function(u){
     var arr=extraCreds().filter(function(c){ return c.u!==u; });

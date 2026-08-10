@@ -334,6 +334,10 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       <div class="topbar-avatar" style="background:#1c2b3a;font-size:11px;letter-spacing:.5px;border:1px solid #4a9eff">eLS</div>
       <div class="topbar-username">Invalid Claims &amp; Repay</div>
     </div>
+    <button onclick="doLogout()" title="Log out" style="display:flex;align-items:center;gap:5px;padding:6px 12px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:7px;color:#f87171;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:background .15s" onmouseover="this.style.background='rgba(248,113,113,.22)'" onmouseout="this.style.background='rgba(248,113,113,.1)'">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Log Out
+    </button>
   </div>
 </div>
 
@@ -1169,6 +1173,17 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       inp.type='password';
       ico.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
     }
+  };
+
+  /* ── logout ── */
+  window.doLogout=function(){
+    sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY+'_master');
+    document.getElementById('admin-panel-btn').style.display='none';
+    document.getElementById('login-gate').classList.remove('hidden');
+    document.getElementById('login-user').value='';
+    document.getElementById('login-input').value='';
+    document.getElementById('login-error').textContent='';
   };
 
   /* ── admin panel ── */

@@ -1530,3 +1530,20 @@ window.lbCopilotAnalyze = lbCopilotAnalyze;
 window.lbDownload = lbDownload;
 window.lbCopyClipboard = lbCopyClipboard;
 window.showJobAidSteps = showJobAidSteps;
+
+window.lbClearAll = function() {
+  // Clear all fill-in fields
+  ["lb-to","lb-company","lb-claim","lb-amount","lb-customer","lb-from"].forEach(function(id){
+    document.getElementById(id).value = "";
+  });
+  // Deselect all type cards
+  document.querySelectorAll(".lb-type-card").forEach(function(c){ c.classList.remove("selected"); });
+  document.getElementById("lb-type").value = "";
+  // Reset editor and state
+  document.getElementById("lb-editor").value = "";
+  document.getElementById("lb-editor-area").style.display = "none";
+  document.getElementById("lb-empty-state").style.display = "block";
+  document.getElementById("lb-dl-hint").textContent = "";
+  document.getElementById("lb-copilot-out").innerHTML = '<div class="cop-item" style="color:#9ab4cc;font-style:italic">Fill in details — Copilot will review your letter here.</div>';
+};
+

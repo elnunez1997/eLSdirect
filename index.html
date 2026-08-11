@@ -331,8 +331,8 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       Manage Users
     </button>
     <div class="topbar-user">
-      <div class="topbar-avatar" style="background:#1c2b3a;font-size:11px;letter-spacing:.5px;border:1px solid #4a9eff">eLS</div>
-      <div class="topbar-username">Invalid Claims &amp; Repay</div>
+      <div class="topbar-avatar" id="topbar-avatar" style="background:#1c2b3a;font-size:11px;letter-spacing:.5px;border:1px solid #4a9eff">eLS</div>
+      <div class="topbar-username" id="topbar-username">Invalid Claims &amp; Repay</div>
     </div>
     <button onclick="doLogout()" title="Log out" style="display:flex;align-items:center;gap:5px;padding:6px 12px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:7px;color:#f87171;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:background .15s" onmouseover="this.style.background='rgba(248,113,113,.22)'" onmouseout="this.style.background='rgba(248,113,113,.1)'">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1038,7 +1038,7 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
   </div>
 
   <!-- Right form panel -->
-  <div class="login-right">
+  <div class="login-right" id="login-right-panel">
     <div class="login-right-top">
       <div class="login-ibm-mark">
         <div class="login-ibm-bars">
@@ -1050,99 +1050,49 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     </div>
 
     <div class="login-form-title">Welcome back</div>
-    <div class="login-form-sub">Sign in with your IBM email and PIN</div>
+    <div class="login-form-sub">Sign in with your IBM w3id account</div>
 
-    <div class="login-field">
-      <label class="login-label" for="login-username">IBM Email</label>
-      <div class="login-input-wrap">
-        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <input class="login-input" id="login-username" type="email" placeholder="yourname@ibm.com" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login-input').focus()">
-      </div>
-    </div>
-
-    <div class="login-field">
-      <label class="login-label" for="login-input">4-Digit PIN</label>
-      <div class="login-input-wrap">
-        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input class="login-input" id="login-input" type="password" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="letter-spacing:8px;font-size:20px;padding-left:44px" onkeydown="if(event.key==='Enter')doLogin()" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)">
-        <button class="login-eye" id="login-eye" onclick="toggleLoginEye()" title="Show/hide">
-          <svg id="eye-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="login-error" id="login-error"></div>
-
-    <button class="login-btn" onclick="doLogin()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      Sign In
+    <!-- IBM SSO button -->
+    <button class="login-btn" id="sso-btn" onclick="doSSOLogin()" style="background:#0f62fe;margin-bottom:8px;font-size:15px;padding:16px;letter-spacing:.3px">
+      <svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm0 2c6.627 0 12 5.373 12 12S22.627 28 16 28 4 22.627 4 16 9.373 4 16 4zm-1 4v2H9v2h6v2H9v2h6v2H8v2h8v2h2v-2h2v-2h-2v-2h2v-2h-2v-2h2V8h-2V6h-2z"/></svg>
+      Sign in with IBM w3id
     </button>
 
-    <div style="text-align:center;margin-top:6px">
-      <button onclick="showRegister()" style="background:none;border:none;color:#4a9eff;font-size:12px;cursor:pointer;text-decoration:underline;letter-spacing:.3px">Create Account</button>
+    <div class="login-error" id="login-error" style="margin-top:4px"></div>
+
+    <div class="login-divider"><span>ADMIN ACCESS</span></div>
+
+    <!-- Master PIN fallback (collapsed by default) -->
+    <div id="master-toggle" style="text-align:center;margin-bottom:8px">
+      <button onclick="toggleMasterForm()" style="background:none;border:none;color:#7a92a8;font-size:11px;cursor:pointer;letter-spacing:.3px">Admin / Master PIN sign-in ▾</button>
     </div>
-
-    <div class="login-divider"><span>INTERNAL USE ONLY</span></div>
-
-    <div class="login-footer-note">
-      <strong>IBM Acosta</strong> · Invalid Claims &amp; Repay Management<br>
-      For access, contact your team lead
-    </div>
-  </div>
-
-  <!-- ── REGISTER PANEL (hidden by default) ── -->
-  <div class="login-right" id="register-panel" style="display:none">
-    <div class="login-right-top">
-      <div class="login-ibm-mark">
-        <div class="login-ibm-bars">
-          <span></span><span></span><span></span><span></span><span></span>
+    <div id="master-form" style="display:none">
+      <div class="login-field" style="margin-bottom:12px">
+        <label class="login-label" for="login-username">IBM Email</label>
+        <div class="login-input-wrap">
+          <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input class="login-input" id="login-username" type="email" placeholder="yourname@ibm.com" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login-input').focus()">
         </div>
-        <div class="login-ibm-label">IBM</div>
       </div>
-      <div class="login-secure-badge">● SECURE</div>
-    </div>
-
-    <div class="login-form-title">Create Account</div>
-    <div class="login-form-sub">IBM email + choose a 4-digit PIN</div>
-
-    <div class="login-field">
-      <label class="login-label" for="reg-email">IBM Email</label>
-      <div class="login-input-wrap">
-        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <input class="login-input" id="reg-email" type="email" placeholder="yourname@ibm.com" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('reg-pin').focus()">
+      <div class="login-field" style="margin-bottom:12px">
+        <label class="login-label" for="login-input">4-Digit PIN</label>
+        <div class="login-input-wrap">
+          <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input class="login-input" id="login-input" type="password" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="letter-spacing:8px;font-size:20px;padding-left:44px" onkeydown="if(event.key==='Enter')doLogin()" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)">
+          <button class="login-eye" id="login-eye" onclick="toggleLoginEye()" title="Show/hide">
+            <svg id="eye-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
       </div>
+      <button class="login-btn" onclick="doLogin()" style="background:#1c2b3a">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In with PIN
+      </button>
     </div>
 
-    <div class="login-field">
-      <label class="login-label" for="reg-pin">Choose 4-Digit PIN</label>
-      <div class="login-input-wrap">
-        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input class="login-input" id="reg-pin" type="password" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="letter-spacing:8px;font-size:20px;padding-left:44px" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)" onkeydown="if(event.key==='Enter')document.getElementById('reg-pin2').focus()">
-      </div>
-    </div>
-
-    <div class="login-field">
-      <label class="login-label" for="reg-pin2">Confirm PIN</label>
-      <div class="login-input-wrap">
-        <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input class="login-input" id="reg-pin2" type="password" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="letter-spacing:8px;font-size:20px;padding-left:44px" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)" onkeydown="if(event.key==='Enter')doRegister()">
-      </div>
-    </div>
-
-    <div class="login-error" id="reg-error"></div>
-
-    <button class="login-btn" onclick="doRegister()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-      Create Account
-    </button>
-
-    <div style="text-align:center;margin-top:10px">
-      <button onclick="showLogin()" style="background:none;border:none;color:#7a92a8;font-size:12px;cursor:pointer;text-decoration:underline">← Back to Sign In</button>
-    </div>
-
-    <div class="login-divider"><span>INTERNAL USE ONLY</span></div>
-    <div class="login-footer-note">
-      <strong>IBM Acosta</strong> · Invalid Claims &amp; Repay Management
+    <div class="login-footer-note" style="margin-top:20px">
+      <strong>IBM Acosta</strong> · Invalid Claims &amp; Repay Management<br>
+      Sign in with your IBM w3id credentials
     </div>
   </div>
 
@@ -1150,28 +1100,55 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
 
 <script>
 (function(){
-  /* ── master admin account — password stored as SHA-256 hash only ── */
-  var _M=['Test2026','158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab'];
+  /* ══════════════════════════════════════════════════════════════════
+     IBM w3id OIDC (PKCE) — Authorization Code flow
+     No client secret is stored here; PKCE makes it safe for a
+     public static site.
+  ══════════════════════════════════════════════════════════════════ */
+  var OIDC = {
+    clientId    : 'NDVjY2U5OTctNGY3Ni00',
+    redirectUri : 'https://elnunez1997.github.io/eLSdirect',
+    issuer      : 'https://preprod.login.w3.ibm.com/oidc/endpoint/default',
+    authEndpoint: 'https://preprod.login.w3.ibm.com/oidc/endpoint/default/authorize',
+    tokenEndpoint:'https://preprod.login.w3.ibm.com/oidc/endpoint/default/token',
+    scope       : 'openid email profile'
+  };
 
-  /* ── team accounts — PINs stored as SHA-256 hashes only ──
-     To add a member: hash their PIN at https://emn178.github.io/online-tools/sha256.html
-     then add: {e:'email@ibm.com', h:'<sha256-of-pin>'}               */
-  var TEAM=[
+  /* ── master admin account — password stored as SHA-256 hash only ── */
+  var _M = ['Test2026','158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab'];
+
+  /* ── hardcoded team accounts (PIN SHA-256 hashes) ── */
+  var TEAM = [
     {e:'elnunez@ibm.com', h:'158a323a7ba44870f23d96f1516dd70aa48e9a72db4ebb026b0a89e212a208ab'}
   ];
 
-  var SESSION_KEY='els_auth_26', CREDS_KEY='els_creds_26';
+  var SESSION_KEY = 'els_auth_26', CREDS_KEY = 'els_creds_26';
 
-  /* ── SHA-256 via Web Crypto API (built into every modern browser) ── */
+  /* ── SHA-256 helper ── */
   function sha256(str){
-    var buf=[].reduce.call(new TextEncoder().encode(str),function(a,b){return a*256+b},0);
     return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
       .then(function(h){
         return Array.from(new Uint8Array(h)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
       });
   }
 
-  /* ── helpers ── */
+  /* ── base64url helpers for PKCE ── */
+  function b64url(buf){
+    return btoa(String.fromCharCode.apply(null,new Uint8Array(buf)))
+      .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  function randomBytes(n){
+    var a=new Uint8Array(n); crypto.getRandomValues(a); return a;
+  }
+
+  /* ── PKCE: generate verifier + challenge ── */
+  function generatePKCE(){
+    var verifier = b64url(randomBytes(32));
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))
+      .then(function(h){ return {verifier:verifier, challenge:b64url(h)}; });
+  }
+
+  /* ── helpers for locally-approved accounts ── */
   function extraCreds(){
     try{ return JSON.parse(localStorage.getItem(CREDS_KEY)||'[]'); }catch(e){ return []; }
   }
@@ -1180,65 +1157,175 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
   }
   function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
+  /* ── PIN login validation (master + team + local) ── */
   function validLogin(u, pinHash){
-    /* master admin */
     if(u.toLowerCase()===_M[0].toLowerCase() && pinHash===_M[1]) return true;
-    /* hardcoded team list */
     var ul=u.toLowerCase();
     if(TEAM.some(function(m){ return m.e.toLowerCase()===ul && m.h===pinHash; })) return true;
-    /* locally registered accounts */
     return extraCreds().some(function(c){ return c.u.toLowerCase()===ul && c.h===pinHash; });
   }
   function isMaster(u, pinHash){ return u.toLowerCase()===_M[0].toLowerCase() && pinHash===_M[1]; }
 
-  /* ── session check ── */
-  function show(){document.getElementById('login-gate').classList.remove('hidden');}
-  function hide(){document.getElementById('login-gate').classList.add('hidden');}
+  /* ── UI helpers ── */
+  function showGate(){ document.getElementById('login-gate').classList.remove('hidden'); }
+  function hideGate(){ document.getElementById('login-gate').classList.add('hidden'); }
   function showAdminBtn(){
     var btn=document.getElementById('admin-panel-btn');
     if(btn) btn.style.display='flex';
   }
+  function setTopbarUser(email){
+    var av=document.getElementById('topbar-avatar');
+    var un=document.getElementById('topbar-username');
+    if(av && email) av.textContent=email.substring(0,2).toUpperCase();
+    if(un && email) un.textContent=email;
+  }
+
+  /* ── session restore on page load ── */
   try{
     if(sessionStorage.getItem(SESSION_KEY)==='1'){
-      hide();
-      /* restore admin button if master session is flagged */
+      hideGate();
+      var savedEmail=sessionStorage.getItem(SESSION_KEY+'_email')||'';
+      if(savedEmail) setTopbarUser(savedEmail);
       if(sessionStorage.getItem(SESSION_KEY+'_master')==='1') showAdminBtn();
-      return;
+      return; /* already authenticated — skip everything below */
     }
   }catch(e){}
-  show();
 
-  /* ── sign in ── */
-  window.doLogin=function(){
-    var u=document.getElementById('login-username').value.trim();
-    var p=document.getElementById('login-input').value.trim();
+  /* ── handle OIDC callback (code + state in URL) ── */
+  (function handleCallback(){
+    var params = new URLSearchParams(window.location.search);
+    var code  = params.get('code');
+    var state = params.get('state');
+    if(!code) return; /* not a callback — show login gate normally */
+
+    var storedState    = sessionStorage.getItem('oidc_state');
+    var codeVerifier   = sessionStorage.getItem('oidc_verifier');
+    sessionStorage.removeItem('oidc_state');
+    sessionStorage.removeItem('oidc_verifier');
+
+    if(!state || state !== storedState){
+      showGate();
+      document.getElementById('login-error').textContent='Authentication failed: invalid state. Please try again.';
+      return;
+    }
+
+    /* clean the URL so the code doesn't sit in browser history */
+    history.replaceState({},'',window.location.pathname);
+
+    /* exchange code for tokens */
+    var body = new URLSearchParams({
+      grant_type   : 'authorization_code',
+      code         : code,
+      redirect_uri : OIDC.redirectUri,
+      client_id    : OIDC.clientId,
+      code_verifier: codeVerifier
+    });
+
+    fetch(OIDC.tokenEndpoint, {
+      method : 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      body   : body.toString()
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.error){
+        showGate();
+        document.getElementById('login-error').textContent='SSO error: '+data.error_description;
+        return;
+      }
+      /* decode id_token (JWT) — just the payload, no signature verification needed
+         because we received it directly from the IBM token endpoint over HTTPS */
+      var payload = JSON.parse(atob(data.id_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+      var email   = (payload.email || payload.preferred_username || payload.sub || '').toLowerCase();
+
+      if(!email.endsWith('@ibm.com')){
+        showGate();
+        document.getElementById('login-error').textContent='Access restricted to IBM (@ibm.com) accounts only.';
+        return;
+      }
+
+      /* grant session */
+      try{
+        sessionStorage.setItem(SESSION_KEY,'1');
+        sessionStorage.setItem(SESSION_KEY+'_email', email);
+      }catch(e){}
+      setTopbarUser(email);
+      hideGate();
+    })
+    .catch(function(){
+      showGate();
+      document.getElementById('login-error').textContent='Network error during sign-in. Please try again.';
+    });
+  })();
+
+  /* show the login gate only if no session and not mid-callback */
+  if(!sessionStorage.getItem(SESSION_KEY) && !new URLSearchParams(window.location.search).get('code')){
+    showGate();
+  }
+
+  /* ── IBM SSO button handler ── */
+  window.doSSOLogin = function(){
+    var btn = document.getElementById('sso-btn');
+    if(btn){ btn.textContent='Redirecting to IBM w3id…'; btn.disabled=true; }
+    generatePKCE().then(function(pkce){
+      var state = b64url(randomBytes(16));
+      try{
+        sessionStorage.setItem('oidc_state',    state);
+        sessionStorage.setItem('oidc_verifier', pkce.verifier);
+      }catch(e){}
+      var url = OIDC.authEndpoint
+        + '?response_type=code'
+        + '&client_id='     + encodeURIComponent(OIDC.clientId)
+        + '&redirect_uri='  + encodeURIComponent(OIDC.redirectUri)
+        + '&scope='         + encodeURIComponent(OIDC.scope)
+        + '&state='         + encodeURIComponent(state)
+        + '&code_challenge='+ encodeURIComponent(pkce.challenge)
+        + '&code_challenge_method=S256';
+      window.location.href = url;
+    });
+  };
+
+  /* ── toggle master PIN form ── */
+  window.toggleMasterForm = function(){
+    var f = document.getElementById('master-form');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  };
+
+  /* ── PIN sign-in (master/admin fallback) ── */
+  window.doLogin = function(){
+    var u = document.getElementById('login-username').value.trim();
+    var p = document.getElementById('login-input').value.trim();
     sha256(p).then(function(h){
       if(validLogin(u,h)){
-        try{sessionStorage.setItem(SESSION_KEY,'1');}catch(e){}
+        try{
+          sessionStorage.setItem(SESSION_KEY,'1');
+          sessionStorage.setItem(SESSION_KEY+'_email', u);
+        }catch(e){}
         if(isMaster(u,h)){
           try{sessionStorage.setItem(SESSION_KEY+'_master','1');}catch(e){}
           showAdminBtn();
         }
-        hide();
+        setTopbarUser(u);
+        hideGate();
         document.getElementById('login-error').textContent='';
       } else {
-        var el=document.getElementById('login-error');
-        el.textContent='Incorrect username or password. Try again.';
+        var el = document.getElementById('login-error');
+        el.textContent = 'Incorrect username or PIN. Try again.';
         document.getElementById('login-username').value='';
         document.getElementById('login-input').value='';
         document.getElementById('login-username').focus();
-        var card=document.querySelector('.login-right');
+        var card = document.getElementById('login-right-panel');
         card.classList.remove('lg-shake');
-        card.offsetHeight;
+        void card.offsetHeight;
         card.classList.add('lg-shake');
       }
     });
   };
 
-  /* ── show/hide password ── */
-  window.toggleLoginEye=function(){
-    var inp=document.getElementById('login-input');
-    var ico=document.getElementById('eye-icon');
+  /* ── show/hide PIN ── */
+  window.toggleLoginEye = function(){
+    var inp = document.getElementById('login-input');
+    var ico = document.getElementById('eye-icon');
     if(inp.type==='password'){
       inp.type='text';
       ico.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
@@ -1248,124 +1335,37 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
     }
   };
 
-  /* ── register panel toggle ── */
-  window.showRegister=function(){
-    document.querySelector('.login-right').style.display='none';
-    document.getElementById('register-panel').style.display='flex';
-    document.getElementById('reg-email').value='';
-    document.getElementById('reg-pin').value='';
-    document.getElementById('reg-pin2').value='';
-    document.getElementById('reg-error').textContent='';
-    document.getElementById('reg-email').focus();
-  };
-  window.showLogin=function(){
-    document.getElementById('register-panel').style.display='none';
-    document.querySelector('.login-right').style.display='flex';
-    document.getElementById('login-username').focus();
-  };
-
-  /* ── pending approvals ── */
-  var PENDING_KEY='els_pending_26';
-  function getPending(){ try{ return JSON.parse(localStorage.getItem(PENDING_KEY)||'[]'); }catch(e){ return []; } }
-  function savePending(arr){ try{ localStorage.setItem(PENDING_KEY, JSON.stringify(arr)); }catch(e){} }
-
-  /* ── create account ── */
-  window.doRegister=function(){
-    var email=document.getElementById('reg-email').value.trim().toLowerCase();
-    var pin=document.getElementById('reg-pin').value.trim();
-    var pin2=document.getElementById('reg-pin2').value.trim();
-    var err=document.getElementById('reg-error');
-    if(!isValidEmail(email)||!email.endsWith('@ibm.com')){
-      err.textContent='Please enter a valid IBM email address (@ibm.com).'; return;
-    }
-    if(pin.length!==4||!/^\d{4}$/.test(pin)){
-      err.textContent='PIN must be exactly 4 digits.'; return;
-    }
-    if(pin!==pin2){
-      err.textContent='PINs do not match. Try again.';
-      document.getElementById('reg-pin2').value=''; return;
-    }
-    /* check if already exists in team, approved, or pending */
-    var allTeam=TEAM.concat(extraCreds().map(function(c){return{e:c.u};}));
-    if(allTeam.some(function(m){return m.e.toLowerCase()===email;})){
-      err.textContent='An account with this email already exists.'; return;
-    }
-    if(getPending().some(function(p){return p.u===email;})){
-      err.textContent='A request for this email is already pending approval.'; return;
-    }
-    /* hash PIN then save as PENDING — do NOT grant access yet */
-    sha256(pin).then(function(h){
-      var pend=getPending();
-      pend.push({u:email,h:h});
-      savePending(pend);
-      /* show pending message instead of logging in */
-      document.getElementById('register-panel').style.display='none';
-      document.querySelector('.login-right').style.display='flex';
-      document.getElementById('login-gate').classList.remove('hidden');
-      /* swap login form for a pending notice */
-      document.querySelector('.login-right').innerHTML=
-        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;gap:16px">'
-        +'<div style="font-size:40px">...</div>'
-        +'<div style="font-size:20px;font-weight:800;color:#fff">Request Submitted</div>'
-        +'<div style="font-size:13px;color:#7a92a8;line-height:1.7">Your account request for<br><strong style="color:#4a9eff">'+email+'</strong><br>is pending admin approval.<br><br>You will be able to sign in once approved.</div>'
-        +'<button onclick="location.reload()" style="margin-top:8px;padding:10px 24px;background:#1c2b3a;border:1px solid #2d3f52;border-radius:8px;color:#9ab4cc;font-size:13px;cursor:pointer">← Back to Sign In</button>'
-        +'</div>';
-      err.textContent='';
-    });
-  };
-
-  /* ── admin: approve / reject pending ── */
-  window.adminApprove=function(email){
-    var pend=getPending();
-    var found=pend.find(function(p){return p.u===email;});
-    if(!found) return;
-    /* move from pending to approved */
-    var approved=extraCreds();
-    approved.push({u:found.u,h:found.h});
-    saveCreds(approved);
-    savePending(pend.filter(function(p){return p.u!==email;}));
-    renderAdminPanel();
-    document.getElementById('admin-msg').textContent='Approved: '+email;
-    document.getElementById('admin-msg').style.color='#065f46';
-  };
-  window.adminReject=function(email){
-    savePending(getPending().filter(function(p){return p.u!==email;}));
-    renderAdminPanel();
-    document.getElementById('admin-msg').textContent='Rejected: '+email;
-    document.getElementById('admin-msg').style.color='#92400e';
-  };
-
   /* ── logout ── */
-  window.doLogout=function(){
+  window.doLogout = function(){
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(SESSION_KEY+'_master');
+    sessionStorage.removeItem(SESSION_KEY+'_email');
     document.getElementById('admin-panel-btn').style.display='none';
-    document.getElementById('register-panel').style.display='none';
-    document.querySelector('.login-right').style.display='flex';
-    document.getElementById('login-gate').classList.remove('hidden');
-    document.getElementById('login-username').value='';
-    document.getElementById('login-input').value='';
+    document.getElementById('login-right-panel').style.display='flex';
+    var btn=document.getElementById('sso-btn');
+    if(btn){btn.textContent='Sign in with IBM w3id';btn.disabled=false;}
+    showGate();
     document.getElementById('login-error').textContent='';
   };
 
   /* ── admin panel ── */
-  window.openAdminPanel=function(){
+  window.openAdminPanel = function(){
     renderAdminPanel();
     document.getElementById('admin-modal').style.display='flex';
   };
-  window.closeAdminPanel=function(){
+  window.closeAdminPanel = function(){
     document.getElementById('admin-modal').style.display='none';
   };
-  window.adminAddUser=function(){
-    var ne=document.getElementById('admin-new-user').value.trim().toLowerCase();
-    var np=document.getElementById('admin-new-pass').value.trim();
-    var msg=document.getElementById('admin-msg');
+  window.adminAddUser = function(){
+    var ne  = document.getElementById('admin-new-user').value.trim().toLowerCase();
+    var np  = document.getElementById('admin-new-pass').value.trim();
+    var msg = document.getElementById('admin-msg');
     if(!ne||!np){ msg.textContent='Email and PIN are required.'; msg.style.color='#e53e3e'; return; }
     if(!isValidEmail(ne)){ msg.textContent='Please enter a valid IBM email address.'; msg.style.color='#e53e3e'; return; }
     if(!/^\d{4}$/.test(np)){ msg.textContent='PIN must be exactly 4 digits.'; msg.style.color='#e53e3e'; return; }
-    if(TEAM.some(function(m){ return m.e.toLowerCase()===ne; })){ msg.textContent='This email is already in the team list.'; msg.style.color='#e53e3e'; return; }
+    if(TEAM.some(function(m){ return m.e.toLowerCase()===ne; })){ msg.textContent='Already in team list.'; msg.style.color='#e53e3e'; return; }
     var arr=extraCreds();
-    if(arr.some(function(c){ return c.u.toLowerCase()===ne; })){ msg.textContent='This email is already added.'; msg.style.color='#e53e3e'; return; }
+    if(arr.some(function(c){ return c.u.toLowerCase()===ne; })){ msg.textContent='Already added.'; msg.style.color='#e53e3e'; return; }
     sha256(np).then(function(h){
       arr.push({u:ne,h:h});
       saveCreds(arr);
@@ -1376,9 +1376,8 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
       renderAdminPanel();
     });
   };
-  window.adminRemoveUser=function(u){
-    var arr=extraCreds().filter(function(c){ return c.u!==u; });
-    saveCreds(arr);
+  window.adminRemoveUser = function(u){
+    saveCreds(extraCreds().filter(function(c){ return c.u!==u; }));
     renderAdminPanel();
     document.getElementById('admin-msg').textContent='Removed: '+u;
     document.getElementById('admin-msg').style.color='#92400e';
@@ -1386,27 +1385,6 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
   function renderAdminPanel(){
     var tb=document.getElementById('admin-user-list');
     if(!tb) return;
-    /* ── pending requests section ── */
-    var pend=getPending();
-    var pendSection=document.getElementById('admin-pending-section');
-    if(pendSection){
-      if(pend.length){
-        pendSection.style.display='block';
-        var pendRows=pend.map(function(p){
-          return '<tr style="background:#fffbeb">'
-            +'<td style="padding:9px 12px;font-size:13px;color:#92400e;border-bottom:1px solid #fef3c7">'+p.u
-            +' <span style="font-size:10px;font-weight:700;color:#92400e;background:#fef3c7;border-radius:8px;padding:2px 7px">PENDING</span></td>'
-            +'<td style="padding:9px 12px;border-bottom:1px solid #fef3c7;text-align:right;display:flex;gap:6px;justify-content:flex-end">'
-            +'<button onclick="adminApprove(\''+p.u+'\')" style="font-size:11px;font-weight:700;color:#065f46;background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:3px 10px;cursor:pointer">Approve</button>'
-            +'<button onclick="adminReject(\''+p.u+'\')" style="font-size:11px;font-weight:700;color:#e53e3e;background:none;border:1px solid #fed7d7;border-radius:6px;padding:3px 10px;cursor:pointer">Reject</button>'
-            +'</td></tr>';
-        }).join('');
-        document.getElementById('admin-pending-list').innerHTML=pendRows;
-      } else {
-        pendSection.style.display='none';
-      }
-    }
-    /* ── hardcoded TEAM members ── */
     var teamRows=TEAM.map(function(m){
       return '<tr style="background:#f7f9fc">'
         +'<td style="padding:9px 12px;font-size:13px;color:#1c2b3a;border-bottom:1px solid #f3f4f6">'+m.e
@@ -1414,7 +1392,6 @@ footer{text-align:center;font-size:11px;color:#9ab4cc;border-top:1px solid #e5e7
         +'<td style="padding:9px 12px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:11px;color:#a0aec0">Edit in code</td>'
         +'</tr>';
     }).join('');
-    /* ── locally approved users ── */
     var arr=extraCreds();
     var localRows=arr.length ? arr.map(function(c){
       return '<tr><td style="padding:9px 12px;font-size:13px;color:#1c2b3a;border-bottom:1px solid #f3f4f6">'+c.u+'</td>'

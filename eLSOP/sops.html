@@ -5,6 +5,271 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>eLSOP — Formal SOPs</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  /* ── SOP Viewer Layout ── */
+  .sop-viewer {
+    display: flex;
+    height: calc(100vh - 52px);
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sop-sidebar {
+    width: 240px;
+    min-width: 200px;
+    background: #fff;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .sop-sidebar-header {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f7f8fa;
+  }
+  .sop-sidebar-header h2 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #57606a;
+    margin-bottom: 8px;
+  }
+  .sop-sidebar-search {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 12px;
+    outline: none;
+    background: #fff;
+    color: #1f2328;
+  }
+  .sop-sidebar-search:focus { border-color: #3b82d4; }
+
+  .sop-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+  }
+  .sop-list-item {
+    padding: 9px 14px;
+    font-size: 12.5px;
+    color: #374151;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.1s, border-color 0.1s;
+    line-height: 1.4;
+  }
+  .sop-list-item:hover { background: #f0f7ff; }
+  .sop-list-item.active {
+    background: #eff6ff;
+    border-left-color: #3b82d4;
+    color: #1c2d4f;
+    font-weight: 600;
+  }
+
+  /* Main panel */
+  .sop-main {
+    flex: 1;
+    overflow-y: auto;
+    background: #f0f2f5;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sop-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    color: #9ca3af;
+    font-size: 14px;
+  }
+  .sop-empty svg { opacity: 0.3; }
+
+  /* Page header */
+  .sop-page-header {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 28px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .sop-page-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1c2d4f;
+    line-height: 1.3;
+  }
+  .sop-page-header .meta {
+    font-size: 12px;
+    color: #57606a;
+    margin-top: 4px;
+  }
+  .sop-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: #3b82d4;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 7px 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    background: #eff6ff;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .sop-download-btn:hover { background: #dbeafe; }
+
+  /* Page tabs */
+  .sop-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+    padding: 0 28px;
+  }
+  .sop-tab {
+    padding: 9px 18px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #57606a;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .sop-tab:hover { color: #1c2d4f; }
+  .sop-tab.active { color: #1c2d4f; border-bottom-color: #3b82d4; font-weight: 600; }
+
+  /* Content area */
+  .sop-content {
+    padding: 24px 28px 48px;
+    max-width: 860px;
+  }
+
+  /* Sections */
+  .info-section {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .info-section-header {
+    background: #f7f8fa;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 10px 18px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #57606a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .info-section-body {
+    padding: 16px 18px;
+    font-size: 13px;
+    color: #1f2328;
+    line-height: 1.65;
+  }
+  .info-section-body p { margin-bottom: 8px; }
+  .info-section-body p:last-child { margin-bottom: 0; }
+
+  /* IRI/Nielsen toggle row */
+  .iri-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #1f2328;
+  }
+  .iri-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid;
+  }
+  .iri-yes { background: #dcfce7; color: #15803d; border-color: #86efac; }
+  .iri-no  { background: #fef2f2; color: #b91c1c; border-color: #fca5a5; }
+  .iri-na  { background: #f3f4f6; color: #6b7280; border-color: #d1d5db; }
+
+  /* Backup detail list */
+  .backup-detail { list-style: none; margin: 8px 0 0; }
+  .backup-detail li {
+    display: flex;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 12.5px;
+  }
+  .backup-detail li:last-child { border-bottom: none; }
+  .backup-detail .bk-label {
+    color: #57606a;
+    font-weight: 600;
+    min-width: 260px;
+    flex-shrink: 0;
+  }
+  .backup-detail .bk-val { color: #1f2328; }
+
+  /* Client notes */
+  .client-note {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+  .client-note .client-name {
+    font-weight: 700;
+    color: #92400e;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .client-note:last-child { margin-bottom: 0; }
+
+  /* Signons */
+  .signon-group { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  /* Page 2 — invoice / deduction */
+  .field-row {
+    display: flex;
+    gap: 8px;
+    padding: 9px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 12.5px;
+    align-items: flex-start;
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-label {
+    color: #57606a;
+    font-weight: 600;
+    min-width: 220px;
+    flex-shrink: 0;
+  }
+  .field-val { color: #1f2328; line-height: 1.5; white-space: pre-wrap; }
+</style>
 </head>
 <body>
 
@@ -22,53 +287,367 @@
   </nav>
 </header>
 
-<div class="page">
-  <div class="page-title">
-    <h1>Formal SOP Documents</h1>
-    <p>Official Standard Operating Procedures for major customers — managed in ACOSTA Relay</p>
-  </div>
+<div class="sop-viewer">
 
-  <div class="sop-grid" id="sopGrid"></div>
+  <!-- Sidebar -->
+  <aside class="sop-sidebar">
+    <div class="sop-sidebar-header">
+      <h2>SOP Documents</h2>
+      <input class="sop-sidebar-search" id="sidebarSearch" type="search" placeholder="Filter customers…" oninput="filterSidebar()">
+    </div>
+    <div class="sop-list" id="sopList"></div>
+  </aside>
+
+  <!-- Main -->
+  <main class="sop-main" id="sopMain">
+    <div class="sop-empty" id="emptyState">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="9" y1="13" x2="15" y2="13"/>
+        <line x1="9" y1="17" x2="15" y2="17"/>
+      </svg>
+      <span>Select a customer to view their SOP</span>
+    </div>
+    <div id="sopDetail" style="display:none; flex-direction:column; flex:1;"></div>
+  </main>
+
 </div>
-
-<footer>
-  <p>eLSOP — GCIT Customer SOP Matrix &nbsp;·&nbsp; ACOSTA customers only</p>
-  <p class="footer-made">Made with IBM Bob</p>
-</footer>
 
 <script src="customers.js"></script>
 <script>
-const SOPS = [
-  { name: "ADUSA Distribution / The Giant Company / Giant Foods / Stop & Shop", file: "ADUSA_Distr_The_Giant_Company_Giant_Foods_Stop_Shop.zip" },
-  { name: "Associated Supermarket Group", file: "Associated_Supermarket_Group.docx" },
-  { name: "Brookshire Grocery Company", file: "Brookshire_Grocery_Company.docx" },
-  { name: "Delhaize", file: "Delhaize.docx" },
-  { name: "Demoulas Supermarkets Inc", file: "Demoulas_Supermarkets_Inc.docx" },
-  { name: "General Trading", file: "General_Trading.docx" },
-  { name: "Golub Corporation", file: "Golub_Corporation.docx" },
-  { name: "Harris Teeter Supermarkets", file: "Harris_Teeter_Supermarkets.docx" },
-  { name: "HyVee Corporate / Lomar / Perishable Dist of Iowa (PDI)", file: "HyVee_Corporate_Lomar_Perishable_Dist_of_Iowa_PDI.docx" },
-  { name: "Kroger / Ralphs / Jake's Finer Foods / Vitacost.com", file: "Kroger_Ralphs_Grocery_Company_Jakes_Finer_Foods_Vitacostcom.zip" },
-  { name: "K-V-A-T Food Store Inc", file: "K_V_A_T_Food_Store_Inc.docx" },
-  { name: "McLane Company Inc", file: "McLane_Company_Inc.docx" },
-  { name: "Mitchell Grocery Company", file: "Mitchell_Grocery_Company.docx" },
-  { name: "OK Grocery Co / Giant Eagle", file: "OK_Grocery_Co_Giant_Eagle.docx" },
-  { name: "Save Mart / Yosemite / Food Maxx", file: "Save_Mart_Yosemite_Save_Mart_Food_Maxx.docx" },
-  { name: "Schnucks Markets Inc", file: "Schnucks_Markets_Inc.docx" },
-  { name: "Smart and Final", file: "Smart_and_Final.docx" },
-  { name: "Stater Bros", file: "Stater_Bros.doc" },
-  { name: "UNFI Conventional", file: "UNFI_Conventional.docx" },
-  { name: "United Natural Foods West / UNFI Accounts Payable", file: "United_Natural_Foods_West_UNFI_Accounts_Payable.docx" },
-  { name: "WinCo Foods Inc", file: "Winco_Foods_Inc.docx" },
-];
+// ── SOP file map ──
+const SOP_FILES = {
+  "ADUSA_Distr_The_Giant_Company_Giant_Foods_Stop_Shop.zip": "ADUSA Distribution / Giant Foods / Stop & Shop",
+  "Associated_Supermarket_Group.docx": "Associated Supermarket Group",
+  "Brookshire_Grocery_Company.docx": "Brookshire Grocery Company",
+  "Delhaize.docx": "Delhaize",
+  "Demoulas_Supermarkets_Inc.docx": "Demoulas Supermarkets Inc",
+  "General_Trading.docx": "General Trading",
+  "Golub_Corporation.docx": "Golub Corporation",
+  "Harris_Teeter_Supermarkets.docx": "Harris Teeter Supermarkets",
+  "HyVee_Corporate_Lomar_Perishable_Dist_of_Iowa_PDI.docx": "HyVee Corporate / Lomar / PDI",
+  "Kroger_Ralphs_Grocery_Company_Jakes_Finer_Foods_Vitacostcom.zip": "Kroger / Ralphs / Jake's Finer Foods",
+  "K_V_A_T_Food_Store_Inc.docx": "K-V-A-T Food Store Inc",
+  "McLane_Company_Inc.docx": "McLane Company Inc",
+  "Mitchell_Grocery_Company.docx": "Mitchell Grocery Company",
+  "OK_Grocery_Co_Giant_Eagle.docx": "OK Grocery Co / Giant Eagle",
+  "Save_Mart_Yosemite_Save_Mart_Food_Maxx.docx": "Save Mart / Yosemite / Food Maxx",
+  "Schnucks_Markets_Inc.docx": "Schnucks Markets Inc",
+  "Smart_and_Final.docx": "Smart and Final",
+  "Stater_Bros.doc": "Stater Bros",
+  "UNFI_Conventional.docx": "UNFI Conventional",
+  "United_Natural_Foods_West_UNFI_Accounts_Payable.docx": "United Natural Foods West / UNFI AP",
+  "Winco_Foods_Inc.docx": "WinCo Foods Inc",
+};
 
-const grid = document.getElementById("sopGrid");
-grid.innerHTML = SOPS.map(s => `
-  <div class="sop-card">
-    <div class="sop-card-icon">📄</div>
-    <div class="sop-card-name">${s.name}</div>
-    <a class="sop-card-link" href="sops/${s.file}" download>Download</a>
-  </div>`).join("");
+// Build list of customers that have a SOP file
+const SOP_CUSTOMERS = CUSTOMERS.filter(c => c.sop).map(c => ({
+  name: c.name,
+  sop: c.sop,
+  data: c,
+  display: SOP_FILES[c.sop] || c.name,
+}));
+
+let activeIdx = -1;
+let currentTab = 0;
+
+function esc(s) {
+  if (!s) return "";
+  return String(s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function ynBadge(v) {
+  const s = (v || "").toString().trim().toUpperCase();
+  if (s === "Y" || s === "YES") return `<span class="yn-badge yn-yes">Y</span>`;
+  if (s === "N" || s === "NO")  return `<span class="yn-badge yn-no">N</span>`;
+  return `<span class="yn-badge yn-na">—</span>`;
+}
+
+// ── Parse backup text into structured fields ──
+function parseBackup(raw) {
+  if (!raw) return {};
+  const lines = raw.split("\n").map(l => l.trim()).filter(Boolean);
+  const result = {};
+
+  function findAnswer(question) {
+    const idx = lines.findIndex(l => l.toLowerCase().includes(question.toLowerCase()));
+    if (idx === -1) return null;
+    const line = lines[idx];
+    const m = line.match(/\?\s*(YES|NO|yes|no)/i);
+    if (m) return m[1].toUpperCase();
+    // check next line
+    if (lines[idx + 1]) return lines[idx + 1].trim();
+    return null;
+  }
+
+  result.gcitResponsible = findAnswer("Is GCIT responsible for obtaining backup");
+  result.hasPortal       = findAnswer("is there a customer portal");
+  result.gcitRequests    = findAnswer("does GCIT request backup");
+  result.checkRemit      = findAnswer("check remittance information required");
+
+  // Auto/Non-auto line
+  const autoLine = lines.find(l => /^(automated|non-automated)/i.test(l));
+  result.method = autoLine || null;
+
+  // Email addresses
+  const emailLines = lines.filter(l => l.includes("@") && !l.startsWith("•") && !l.toLowerCase().startsWith("if yes"));
+  result.emails = emailLines;
+
+  // GCIT specific block — everything after "GCIT Specific Backup"
+  const gcitIdx = lines.findIndex(l => /gcit specific backup/i.test(l));
+  if (gcitIdx !== -1) {
+    result.gcitSpecific = lines.slice(gcitIdx + 1).filter(l => !l.startsWith("•") && l.length > 2);
+  }
+
+  // Raw for fallback
+  result.raw = raw;
+  return result;
+}
+
+// Parse client field into per-client note blocks
+function parseClientNotes(raw, claimsRaw) {
+  if (!raw || raw.trim().toUpperCase() === "N") return [];
+  // Split by newline, filter
+  const notes = raw.split("\n").map(s => s.trim()).filter(s => s && s.toUpperCase() !== "N");
+  // Also pull claims into a block if it references clients
+  const blocks = [];
+  notes.forEach(n => {
+    blocks.push({ client: null, note: n });
+  });
+  return blocks;
+}
+
+// ── Render sidebar ──
+function renderSidebar(filter) {
+  const q = (filter || "").toLowerCase();
+  const list = document.getElementById("sopList");
+  const items = SOP_CUSTOMERS.filter((c, i) => {
+    c._filteredIdx = i;
+    return !q || c.name.toLowerCase().includes(q) || c.display.toLowerCase().includes(q);
+  });
+  list.innerHTML = items.map((c, fi) => {
+    const origIdx = SOP_CUSTOMERS.indexOf(c);
+    return `<div class="sop-list-item${origIdx === activeIdx ? " active" : ""}" onclick="selectCustomer(${origIdx})">${esc(c.display)}</div>`;
+  }).join("");
+}
+
+function filterSidebar() {
+  renderSidebar(document.getElementById("sidebarSearch").value);
+}
+
+// ── Select customer ──
+function selectCustomer(idx) {
+  activeIdx = idx;
+  currentTab = 0;
+  renderSidebar(document.getElementById("sidebarSearch").value);
+  renderDetail();
+}
+
+// ── Render detail panel ──
+function renderDetail() {
+  const c = SOP_CUSTOMERS[activeIdx];
+  if (!c) return;
+  document.getElementById("emptyState").style.display = "none";
+  const det = document.getElementById("sopDetail");
+  det.style.display = "flex";
+
+  const bk = parseBackup(c.data.backup);
+
+  const hasFile = !!c.sop;
+  const downloadBtn = hasFile
+    ? `<a class="sop-download-btn" href="sops/${esc(c.sop)}" download>⬇ Download SOP</a>`
+    : "";
+
+  det.innerHTML = `
+    <div class="sop-page-header">
+      <div>
+        <h1>${esc(c.display)}</h1>
+        <div class="meta">Last updated: ${esc(c.data.updated || "—")} &nbsp;·&nbsp; Type: ${esc(c.data.type || "—")}</div>
+      </div>
+      ${downloadBtn}
+    </div>
+    <div class="sop-tabs">
+      <div class="sop-tab${currentTab === 0 ? " active" : ""}" onclick="switchTab(0)">Page 1 — General Info</div>
+      <div class="sop-tab${currentTab === 1 ? " active" : ""}" onclick="switchTab(1)">Page 2 — Invoice &amp; Deduction</div>
+    </div>
+    <div class="sop-content" id="sopTabContent"></div>
+  `;
+
+  renderTab();
+}
+
+function switchTab(t) {
+  currentTab = t;
+  // Update tab highlight
+  document.querySelectorAll(".sop-tab").forEach((el, i) => {
+    el.classList.toggle("active", i === t);
+  });
+  renderTab();
+}
+
+function renderTab() {
+  const c = SOP_CUSTOMERS[activeIdx];
+  const content = document.getElementById("sopTabContent");
+  if (!content) return;
+
+  if (currentTab === 0) {
+    content.innerHTML = renderPage1(c.data);
+  } else {
+    content.innerHTML = renderPage2(c.data);
+  }
+}
+
+// ── Page 1: General Info ──
+function renderPage1(c) {
+  const bk = parseBackup(c.backup);
+  let html = "";
+
+  // IRI/Nielsen
+  const iriMatch = c.backup && c.backup.match(/IRI[\s\/]*Nielsen/i);
+  const iriVal = iriMatch ? "YES" : null;
+  // Some customers mention IRI in claims or backup
+  const iriInText = (c.claims + " " + c.backup).match(/IRI.*Nielsen|Nielsen.*IRI|price point verif/i);
+  const iriBadge = iriInText
+    ? `<span class="iri-badge iri-yes">Yes</span>`
+    : `<span class="iri-badge iri-na">N/A</span>`;
+
+  html += `<div class="info-section">
+    <div class="info-section-header">General Info</div>
+    <div class="info-section-body">
+      <div class="iri-row">IRI/Nielsen for price point verification? ${iriBadge}</div>
+    </div>
+  </div>`;
+
+  // Other General Info / Claims
+  if (c.claims && c.claims.trim()) {
+    html += `<div class="info-section">
+      <div class="info-section-header">Other General Info</div>
+      <div class="info-section-body">${esc(c.claims).replace(/\n/g, "<br>")}</div>
+    </div>`;
+  }
+
+  // General Backup Retrieval Information
+  html += `<div class="info-section">
+    <div class="info-section-header">General Backup Retrieval Information</div>
+    <div class="info-section-body">
+      <ul class="backup-detail">
+        <li>
+          <span class="bk-label">Is GCIT responsible for obtaining backup from the customer?</span>
+          <span class="bk-val">${bk.gcitResponsible ? `<span class="yn-badge ${bk.gcitResponsible === "YES" ? "yn-yes" : "yn-no"}">${bk.gcitResponsible === "YES" ? "Yes" : "No"}</span>` : "—"}</span>
+        </li>
+        <li>
+          <span class="bk-label">If yes, is there a customer portal?</span>
+          <span class="bk-val">${bk.hasPortal ? `<span class="yn-badge ${bk.hasPortal === "YES" ? "yn-yes" : "yn-no"}">${bk.hasPortal === "YES" ? "Yes" : "No"}</span>` : "—"}</span>
+        </li>
+        <li>
+          <span class="bk-label">If yes, does GCIT request backup?</span>
+          <span class="bk-val">${bk.gcitRequests ? `<span class="yn-badge ${bk.gcitRequests === "YES" ? "yn-yes" : "yn-no"}">${bk.gcitRequests === "YES" ? "Yes" : "No"}</span>` : "—"}</span>
+        </li>
+        <li>
+          <span class="bk-label">Is check remittance information required to request backup?</span>
+          <span class="bk-val">${bk.checkRemit ? `<span class="yn-badge ${bk.checkRemit === "YES" ? "yn-yes" : "yn-no"}">${bk.checkRemit === "YES" ? "Yes" : "No"}</span>` : "—"}</span>
+        </li>
+      </ul>
+    </div>
+  </div>`;
+
+  // GCIT Specific Backup Retrieval
+  if (bk.method || (bk.emails && bk.emails.length)) {
+    let gcitBody = "";
+    if (bk.method) gcitBody += `<p><strong>${esc(bk.method)}</strong></p>`;
+    if (bk.emails && bk.emails.length) {
+      bk.emails.forEach(e => { gcitBody += `<p style="color:#374151;">${esc(e)}</p>`; });
+    }
+    if (bk.gcitSpecific && bk.gcitSpecific.length) {
+      bk.gcitSpecific.filter(l => !l.includes("@") && !/^(automated|non-automated)/i.test(l)).forEach(l => {
+        gcitBody += `<p style="color:#57606a;">${esc(l)}</p>`;
+      });
+    }
+    html += `<div class="info-section">
+      <div class="info-section-header">GCIT Specific Backup Retrieval Information</div>
+      <div class="info-section-body">${gcitBody}</div>
+    </div>`;
+  }
+
+  // Client-specific notes
+  const clients = (c.client || "").split(/[\n,]+/).map(s => s.trim()).filter(s => s && s.toUpperCase() !== "N");
+  if (clients.length) {
+    let noteHtml = "";
+    clients.forEach(cl => {
+      noteHtml += `<div class="client-note">
+        <div class="client-name">${esc(cl)}</div>
+        <div>See Page 2 for client-specific deduction and invoice details.</div>
+      </div>`;
+    });
+    html += `<div class="info-section">
+      <div class="info-section-header">Client Specific Info</div>
+      <div class="info-section-body">${noteHtml}</div>
+    </div>`;
+  }
+
+  if (!html) html = `<p style="color:#9ca3af;font-size:13px;">No general info available for this customer.</p>`;
+  return html;
+}
+
+// ── Page 2: Invoice & Deduction ──
+function renderPage2(c) {
+  let html = "";
+
+  // Customer signons
+  const sgns = (c.signon || "").split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+  if (sgns.length) {
+    html += `<div class="info-section">
+      <div class="info-section-header">Customer Signon(s)</div>
+      <div class="info-section-body">
+        <div class="signon-group">${sgns.map(s => `<span class="signon-badge">${esc(s)}</span>`).join("")}</div>
+      </div>
+    </div>`;
+  }
+
+  // Customer type
+  html += `<div class="info-section">
+    <div class="info-section-header">Customer Invoice &amp; Deduction Info</div>
+    <div class="info-section-body">
+      <div class="field-row">
+        <span class="field-label">Customer Type</span>
+        <span class="field-val">${esc(c.type || "—")}</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Line Level Detail Indexed?</span>
+        <span class="field-val">${ynBadge(c.linelvl)}</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">Last Updated</span>
+        <span class="field-val">${esc(c.updated || "—")}</span>
+      </div>
+    </div>
+  </div>`;
+
+  // Claims / deduction processing info
+  if (c.claims && c.claims.trim()) {
+    html += `<div class="info-section">
+      <div class="info-section-header">Claims Processing &amp; Deduction Type</div>
+      <div class="info-section-body">${esc(c.claims).replace(/\n/g, "<br>")}</div>
+    </div>`;
+  }
+
+  // Full backup raw (scrollable reference)
+  if (c.backup && c.backup.trim()) {
+    html += `<div class="info-section">
+      <div class="info-section-header">Full Backup Retrieval Reference</div>
+      <div class="info-section-body" style="white-space:pre-wrap;font-size:12px;color:#374151;">${esc(c.backup)}</div>
+    </div>`;
+  }
+
+  if (!html) html = `<p style="color:#9ca3af;font-size:13px;">No invoice or deduction info available for this customer.</p>`;
+  return html;
+}
+
+// ── Init ──
+renderSidebar();
 </script>
 </body>
 </html>

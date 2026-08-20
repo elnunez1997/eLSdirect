@@ -897,7 +897,13 @@ function navigate(id, btn){
   if(id==="reasoncode"){renderRC(RC);}
   if(id==="portal"){renderPortals(PORTALS);}
   if(id==="template"){buildRepayLetterSelect("");}
-  if(id==="patch"){renderPatchGrid("","all");}
+  if(id==="patch"){
+    var ps=document.getElementById("patch-search");
+    var pg=document.getElementById("patch-group");
+    if(ps)ps.value="";
+    if(pg)pg.value="all";
+    renderPatchGrid("","all");
+  }
   if(id==="jobaid"){renderBPS(BPS_DATA);}
   if(id==="customersop"){renderBPS(BPS_DATA);}
 }
@@ -1385,6 +1391,7 @@ renderNatDist(NATDIST);
 renderContacts(CONTACTS);
 renderRC(RC);
 renderPortals(PORTALS);
+renderPatchGrid("","all");
 
 // -- BPS TEAM INFORMATION DATA -------------------------------------------------
 // Cols: [0]customer [1]type [2]repay [3]portal [4]backupContact [5]bpsNotes

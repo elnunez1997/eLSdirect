@@ -832,31 +832,48 @@ var PATCH_FILES=[
   {label:"WEIS COI — 8.2024 - 8.2026",        group:"8.17.2026", url:"patch/8.17.2026/WEIS COI  8.2024 - 8.2026.xlsx"}
 ];
 
-function buildPatchSelect(q,groupFilter){
-  var sel=document.getElementById("patch-select");
-  if(!sel)return;
+function renderPatchGrid(q,groupFilter){
+  var grid=document.getElementById("patch-grid");
+  var countEl=document.getElementById("patch-count");
+  if(!grid)return;
   var lq=(q||"").toLowerCase();
   var filtered=PATCH_FILES.filter(function(x){
     var matchQ=!lq||x.label.toLowerCase().indexOf(lq)>=0;
     var matchG=!groupFilter||groupFilter==="all"||x.group===groupFilter;
     return matchQ&&matchG;
   });
+  if(countEl)countEl.textContent=filtered.length+" file"+(filtered.length!==1?"s":"");
+  if(!filtered.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px;color:#9ab4cc;font-size:13px">No files match your search.</div>';
+    return;
+  }
+  var batchColor={"General":"#dbeafe","8.17.2026":"#ede9fe"};
+  var batchText={"General":"#1d4ed8","8.17.2026":"#4c1d95"};
   var h="";
   for(var i=0;i<filtered.length;i++){
-    h+='<option value="'+filtered[i].url+'">'+esc(filtered[i].label)+' ['+filtered[i].group+']</option>';
+    var f=filtered[i];
+    var bc=batchColor[f.group]||"#f3f4f6";
+    var bt=batchText[f.group]||"#374151";
+    h+='<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s,box-shadow .15s" '
+      +'onmouseover="this.style.borderColor=\'#4a9eff\';this.style.boxShadow=\'0 4px 14px rgba(74,158,255,.13)\'" '
+      +'onmouseout="this.style.borderColor=\'#e5e7eb\';this.style.boxShadow=\'none\'">'
+      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">'
+      +'<div style="font-size:13px;font-weight:700;color:#1c2b3a;line-height:1.4">'+esc(f.label)+'</div>'
+      +'<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:'+bc+';color:'+bt+';white-space:nowrap;flex-shrink:0">'+esc(f.group)+'</span>'
+      +'</div>'
+      +'<div style="font-size:11px;color:#9ab4cc">📊 Excel (.xlsx)</div>'
+      +'<a href="'+f.url+'" download target="_blank" rel="noopener" '
+      +'style="display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:7px 14px;background:#065f46;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;width:fit-content">'
+      +'⬇ Download</a>'
+      +'</div>';
   }
-  sel.innerHTML=h||'<option disabled>No matches</option>';
-  var hint=document.getElementById("patch-hint");
-  if(hint)hint.textContent=filtered.length+" file"+(filtered.length!==1?"s":"")+" available";
+  grid.innerHTML=h;
 }
-function filterPatchFiles(q){buildPatchSelect(q,document.getElementById("patch-group")&&document.getElementById("patch-group").value);}
-function filterPatchGroup(g){buildPatchSelect(document.getElementById("patch-search")&&document.getElementById("patch-search").value,g);}
-function openPatchFile(){
-  var sel=document.getElementById("patch-select");
-  if(!sel||!sel.value)return false;
-  window.open(sel.value,"_blank","noopener");
-  return false;
-}
+function filterPatchFiles(q){renderPatchGrid(q,document.getElementById("patch-group")&&document.getElementById("patch-group").value);}
+function filterPatchGroup(g){renderPatchGrid(document.getElementById("patch-search")&&document.getElementById("patch-search").value,g);}
+// legacy — kept for any residual references
+function buildPatchSelect(){renderPatchGrid("","all");}
+function openPatchFile(){}
 
 // -- HELPERS -------------------------------------------------------------------
 function sba(s){var m={"F&B":"fb","SBS":"sbs","Pet":"pet","Coffee":"coffee","FHS":"fhs"};var c=m[s]||"other";return s?'<span class="badge '+c+'">'+s+'</span>':"";}
@@ -879,7 +896,8 @@ function navigate(id, btn){
   if(id==="directory"){renderDirect(DIRECT);renderAcosta(ACOSTA);renderNatDist(NATDIST);renderContacts(CONTACTS);}
   if(id==="reasoncode"){renderRC(RC);}
   if(id==="portal"){renderPortals(PORTALS);}
-  if(id==="template"){buildRepayLetterSelect("");buildPatchSelect("","all");}
+  if(id==="template"){buildRepayLetterSelect("");}
+  if(id==="patch"){renderPatchGrid("","all");}
   if(id==="jobaid"){renderBPS(BPS_DATA);}
   if(id==="customersop"){renderBPS(BPS_DATA);}
 }

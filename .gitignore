@@ -6,6 +6,10 @@
 # Exception: repay letter templates are intentionally tracked
 !repayletters/*.xlsx
 
+# Exception: Patch / COI files are intentionally tracked
+!patch/*.xlsx
+!patch/**/*.xlsx
+
 # OS noise
 Thumbs.db
 .DS_Store

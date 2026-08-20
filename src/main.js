@@ -799,6 +799,65 @@ function openRepayLetter(){
 }
 
 
+// -- PATCH / COI FILES --------------------------------------------------------
+var PATCH_FILES=[
+  // General Patch files
+  {label:"AHOLD — 05.2026 - Present",         group:"General", url:"patch/AHOLD 05.2026 - PRESENT.xlsx"},
+  {label:"BJS — 7.14.26",                     group:"General", url:"patch/BJS' PATCH 7.14.26.xlsx"},
+  {label:"CERTCO — 8.2024 - 8.2026",          group:"General", url:"patch/CERTCO  8.2024 - 8.2026.xlsx"},
+  {label:"FOOD LION — 05.01.26 - Present",    group:"General", url:"patch/FOOD LION 05.01.26 - PRESENT.xlsx"},
+  {label:"FOOD LION — 5.2025 - 4.2026",       group:"General", url:"patch/FOOD LION 5.2025 - 4.2026.xlsx"},
+  {label:"JETRO — 8.2024 - 8.2026",           group:"General", url:"patch/JETRO 8.2024 - 8.2026.xlsx"},
+  {label:"LIDL — 8.2024 - 8.2026",            group:"General", url:"patch/LIDL 8.2024 - 8.2026.xlsx"},
+  {label:"MITCHELL — 8.2024 - 8.2026",        group:"General", url:"patch/MITCHELL   8.2024 - 8.2026.xlsx"},
+  {label:"UNFI Patch — 7.18.26",              group:"General", url:"patch/UNFI Patch 7.18.26.xlsx"},
+  {label:"UNFI PATCH — 8.20",                 group:"General", url:"patch/UNFI PATCH 8.20.xlsx"},
+  // 8.17.2026 batch
+  {label:"AWG — 8.2024 - 8.2026",             group:"8.17.2026", url:"patch/8.17.2026/AWG  8.2024 - 8.2026.xlsx"},
+  {label:"AWG — 1.2023 - 12.2024",            group:"8.17.2026", url:"patch/8.17.2026/AWG 1.2023 - 12.2024.xlsx"},
+  {label:"COTTAGE COI — 8.2024 - 8.2026",     group:"8.17.2026", url:"patch/8.17.2026/COTTAGE COI  8.2024 - 8.2026.xlsx"},
+  {label:"CVS — 8.2024 - 8.2026",             group:"8.17.2026", url:"patch/8.17.2026/CVS  8.2024 - 8.2026.xlsx"},
+  {label:"DE MOULAS COI — 8.2024 - 8.2026",   group:"8.17.2026", url:"patch/8.17.2026/DE MOULAS COI  8.2024 - 8.2026.xlsx"},
+  {label:"FOOD 4 LESS — 8.2024 - 8.2026",     group:"8.17.2026", url:"patch/8.17.2026/FOOD 4 LESS  8.2024 - 8.2026.xlsx"},
+  {label:"HANNAFORD — 8.2024 - 8.2026",       group:"8.17.2026", url:"patch/8.17.2026/HANNAFORD 8.2024 - 8.2026.xlsx"},
+  {label:"HEB — 8.2024 - 8.2026",             group:"8.17.2026", url:"patch/8.17.2026/HEB  8.2024 - 8.2026.xlsx"},
+  {label:"HYVEE COI — 8.2024 - 8.2026",       group:"8.17.2026", url:"patch/8.17.2026/HYVEE COI  8.2024 - 8.2026.xlsx"},
+  {label:"KROGER — 8.2024 - 8.2026",          group:"8.17.2026", url:"patch/8.17.2026/KROGER  8.2024 - 8.2026.xlsx"},
+  {label:"MDI — 8.2024 - 8.2026",             group:"8.17.2026", url:"patch/8.17.2026/MDI 8.2024 -  8.2024 - 8.2026.xlsx"},
+  {label:"SAVE MART",                          group:"8.17.2026", url:"patch/8.17.2026/SAVE MART.xlsx"},
+  {label:"SCHNUCKS — 8.2024 - 8.2026",        group:"8.17.2026", url:"patch/8.17.2026/SCHNUCKS 8.2024 -  8.2024 - 8.2026.xlsx"},
+  {label:"TAMPA ALL OTHER",                    group:"8.17.2026", url:"patch/8.17.2026/TAMPA ALL OTHER.xlsx"},
+  {label:"U R M — 8.2024 - 8.2026",           group:"8.17.2026", url:"patch/8.17.2026/U R M  8.2024 - 8.2026.xlsx"},
+  {label:"WEGMANS COI — 8.2024 - 8.2026",     group:"8.17.2026", url:"patch/8.17.2026/WEGMANS COI  8.2024 - 8.2026.xlsx"},
+  {label:"WEIS COI — 8.2024 - 8.2026",        group:"8.17.2026", url:"patch/8.17.2026/WEIS COI  8.2024 - 8.2026.xlsx"}
+];
+
+function buildPatchSelect(q,groupFilter){
+  var sel=document.getElementById("patch-select");
+  if(!sel)return;
+  var lq=(q||"").toLowerCase();
+  var filtered=PATCH_FILES.filter(function(x){
+    var matchQ=!lq||x.label.toLowerCase().indexOf(lq)>=0;
+    var matchG=!groupFilter||groupFilter==="all"||x.group===groupFilter;
+    return matchQ&&matchG;
+  });
+  var h="";
+  for(var i=0;i<filtered.length;i++){
+    h+='<option value="'+filtered[i].url+'">'+esc(filtered[i].label)+' ['+filtered[i].group+']</option>';
+  }
+  sel.innerHTML=h||'<option disabled>No matches</option>';
+  var hint=document.getElementById("patch-hint");
+  if(hint)hint.textContent=filtered.length+" file"+(filtered.length!==1?"s":"")+" available";
+}
+function filterPatchFiles(q){buildPatchSelect(q,document.getElementById("patch-group")&&document.getElementById("patch-group").value);}
+function filterPatchGroup(g){buildPatchSelect(document.getElementById("patch-search")&&document.getElementById("patch-search").value,g);}
+function openPatchFile(){
+  var sel=document.getElementById("patch-select");
+  if(!sel||!sel.value)return false;
+  window.open(sel.value,"_blank","noopener");
+  return false;
+}
+
 // -- HELPERS -------------------------------------------------------------------
 function sba(s){var m={"F&B":"fb","SBS":"sbs","Pet":"pet","Coffee":"coffee","FHS":"fhs"};var c=m[s]||"other";return s?'<span class="badge '+c+'">'+s+'</span>':"";}
 function person(n,e){if(!n||!n.trim()||n.trim()===" ")return"";n=n.trim();if(e&&e.trim()&&e.trim()!=="No Acosta CS Support")return n+'<br><a class="em" href="mailto:'+e.trim()+'">'+e.trim()+'</a>';if(e&&e.trim()==="No Acosta CS Support")return n+'<br><span class="muted">No Acosta CS</span>';return n;}
@@ -820,7 +879,7 @@ function navigate(id, btn){
   if(id==="directory"){renderDirect(DIRECT);renderAcosta(ACOSTA);renderNatDist(NATDIST);renderContacts(CONTACTS);}
   if(id==="reasoncode"){renderRC(RC);}
   if(id==="portal"){renderPortals(PORTALS);}
-  if(id==="template"){buildRepayLetterSelect("");}
+  if(id==="template"){buildRepayLetterSelect("");buildPatchSelect("","all");}
   if(id==="jobaid"){renderBPS(BPS_DATA);}
   if(id==="customersop"){renderBPS(BPS_DATA);}
 }

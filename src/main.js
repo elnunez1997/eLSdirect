@@ -815,6 +815,7 @@ var PATCH_FILES=[
   {label:"UNFI Patch — 7.18.26",              group:"General", url:"patch/UNFI Patch 7.18.26.xlsx"},
   {label:"UNFI PATCH — 8.20",                 group:"General", url:"patch/UNFI PATCH 8.20.xlsx"},
   {label:"WAKEFERN — 8.2024 - 8.2026",        group:"General", url:"patch/WAKEFERN 8.2024 - 8.2026.xlsx"},
+  {label:"Wegmans — 8.2024 - 8.2026",         group:"General", url:"patch/Wegmans 8.2024 - 8.2026.xlsx"},
   // 8.17.2026 batch
   {label:"AWG — 8.2024 - 8.2026",             group:"8.17.2026", url:"patch/8.17.2026/AWG  8.2024 - 8.2026.xlsx"},
   {label:"AWG — 1.2023 - 12.2024",            group:"8.17.2026", url:"patch/8.17.2026/AWG 1.2023 - 12.2024.xlsx"},

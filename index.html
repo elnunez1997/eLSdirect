@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2135,62 +2135,24 @@ render('START');
     <div class="login-version">eLS v1.0 · 2026</div>
   </div>
 
-  <!-- Right form panel -->
-  <div class="login-right" id="login-right-panel">
-    <div class="login-right-top">
-      <div class="login-ibm-mark">
-        <div class="login-ibm-bars">
-          <span></span><span></span><span></span><span></span><span></span>
-        </div>
-        <div class="login-ibm-label">IBM</div>
+  <!-- Right panel — maintenance notice -->
+  <div class="login-right" id="login-right-panel" style="justify-content:center;align-items:center;text-align:center">
+    <div style="max-width:320px">
+      <div style="width:72px;height:72px;border-radius:16px;background:#fff3cd;border:1.5px solid #fbbf24;display:flex;align-items:center;justify-content:center;margin:0 auto 24px">
+        <svg width="34" height="34" fill="none" stroke="#d97706" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       </div>
-      <div class="login-secure-badge">● SECURE</div>
-    </div>
-
-    <div class="login-form-title">Welcome back</div>
-    <div class="login-form-sub">Sign in with your IBM w3id account</div>
-
-    <!-- IBM SSO button -->
-    <button class="login-btn" id="sso-btn" onclick="doSSOLogin()" style="background:#0f62fe;margin-bottom:8px;font-size:15px;padding:16px;letter-spacing:.3px">
-      <svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm0 2c6.627 0 12 5.373 12 12S22.627 28 16 28 4 22.627 4 16 9.373 4 16 4zm-1 4v2H9v2h6v2H9v2h6v2H8v2h8v2h2v-2h2v-2h-2v-2h2v-2h-2v-2h2V8h-2V6h-2z"/></svg>
-      Sign in with IBM w3id
-    </button>
-
-    <div class="login-error" id="login-error" style="margin-top:4px"></div>
-
-    <div class="login-divider"><span>ADMIN ACCESS</span></div>
-
-    <!-- Master PIN fallback (collapsed by default) -->
-    <div id="master-toggle" style="text-align:center;margin-bottom:8px">
-      <button onclick="toggleMasterForm()" style="background:none;border:none;color:#7a92a8;font-size:11px;cursor:pointer;letter-spacing:.3px">Admin / Master PIN sign-in ▾</button>
-    </div>
-    <div id="master-form" style="display:none">
-      <div class="login-field" style="margin-bottom:12px">
-        <label class="login-label" for="login-username">IBM Email</label>
-        <div class="login-input-wrap">
-          <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <input class="login-input" id="login-username" type="email" placeholder="yourname@ibm.com" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('login-input').focus()">
-        </div>
+      <div style="font-size:22px;font-weight:800;color:#0f1c2a;margin-bottom:8px;letter-spacing:-.5px">Under Maintenance</div>
+      <div style="font-size:13px;color:#6b7a8d;line-height:1.7;margin-bottom:28px">
+        The login service is temporarily unavailable.<br>
+        We'll be back shortly.
       </div>
-      <div class="login-field" style="margin-bottom:12px">
-        <label class="login-label" for="login-input">4-Digit PIN</label>
-        <div class="login-input-wrap">
-          <svg class="login-input-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <input class="login-input" id="login-input" type="password" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="letter-spacing:8px;font-size:20px;padding-left:44px" onkeydown="if(event.key==='Enter')doLogin()" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)">
-          <button class="login-eye" id="login-eye" onclick="toggleLoginEye()" title="Show/hide">
-            <svg id="eye-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-      </div>
-      <button class="login-btn" onclick="doLogin()" style="background:#1c2b3a">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        Sign In with PIN
+      <button onclick="document.getElementById('login-gate').classList.add('hidden')" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#1c2b3a;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:background .2s" onmouseover="this.style.background='#243548'" onmouseout="this.style.background='#1c2b3a'">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Click here to proceed to main page
       </button>
-    </div>
-
-    <div class="login-footer-note" style="margin-top:20px">
-      <strong>IBM Acosta</strong> · Invalid Claims &amp; Repay Management<br>
-      Sign in with your IBM w3id credentials
+      <div style="margin-top:20px;font-size:11px;color:#a0aec0">
+        <strong style="color:#6b7a8d">IBM Acosta</strong> · Invalid Claims &amp; Repay Management
+      </div>
     </div>
   </div>
 
@@ -2265,70 +2227,8 @@ render('START');
     if(un && email) un.textContent=email;
   }
 
-  /* ── session restore on page load ── */
-  try{
-    if(sessionStorage.getItem(SESSION_KEY)==='1'){
-      hideGate();
-      var savedEmail=sessionStorage.getItem(SESSION_KEY+'_email')||'';
-      if(savedEmail) setTopbarUser(savedEmail);
-      if(sessionStorage.getItem(SESSION_KEY+'_master')==='1') showAdminBtn();
-      return; /* already authenticated — skip everything below */
-    }
-  }catch(e){}
-
-  /* ── handle OIDC implicit callback (id_token in URL hash) ── */
-  (function handleCallback(){
-    var hash = window.location.hash.replace(/^#/,'');
-    if(!hash) return; /* no hash — not a callback */
-    var params = {};
-    hash.split('&').forEach(function(p){ var kv=p.split('='); params[kv[0]]=decodeURIComponent(kv[1]||''); });
-
-    var idToken = params['id_token'];
-    var state   = params['state'];
-    var error   = params['error'];
-
-    /* clean the hash from the URL immediately */
-    history.replaceState({},'',window.location.pathname);
-
-    if(error){
-      showGate();
-      document.getElementById('login-error').textContent='SSO error: '+(params['error_description']||error);
-      return;
-    }
-    if(!idToken){ return; } /* not an OIDC callback hash */
-
-    /* validate state */
-    var storedState = sessionStorage.getItem('oidc_state');
-    sessionStorage.removeItem('oidc_state');
-    if(!state || state !== storedState){
-      showGate();
-      document.getElementById('login-error').textContent='Authentication failed: invalid state. Please try again.';
-      return;
-    }
-
-    /* decode id_token JWT payload (trusted — came over HTTPS from IBM) */
-    try{
-      var payload = JSON.parse(atob(idToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-      var email   = (payload.email || payload.preferred_username || payload.sub || '').toLowerCase();
-      if(!email.endsWith('@ibm.com')){
-        showGate();
-        document.getElementById('login-error').textContent='Access restricted to IBM (@ibm.com) accounts only.';
-        return;
-      }
-      sessionStorage.setItem(SESSION_KEY,'1');
-      sessionStorage.setItem(SESSION_KEY+'_email', email);
-      setTopbarUser(email);
-      hideGate();
-    }catch(e){
-      showGate();
-      document.getElementById('login-error').textContent='Failed to read identity token. Please try again.';
-    }
-  })();
-
-  /* show login gate if not authenticated and not mid-callback */
-  if(!sessionStorage.getItem(SESSION_KEY) && !window.location.hash.includes('id_token')){
-    showGate();
-  }
+  /* ── maintenance mode: always show gate with maintenance notice ── */
+  showGate();
 
   /* ── IBM SSO button handler ── */
   window.doSSOLogin = function(){

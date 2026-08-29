@@ -4077,6 +4077,412 @@ window.lbClearAll = function() {
 };
 
 
+// ── eLS CHATBOT ──────────────────────────────────────────────────────────────
+(function(){
+
+// ── CSS ───────────────────────────────────────────────────────────────────────
+var style=document.createElement('style');
+style.textContent=`
+#els-chat-btn{position:fixed;bottom:24px;right:24px;z-index:9999;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1a3a5c,#2d6fbd);border:none;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s;}
+#els-chat-btn:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(0,0,0,.4);}
+#els-chat-btn svg{color:#fff;}
+#els-chat-badge{position:absolute;top:2px;right:2px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;display:none;}
+#els-chat-panel{position:fixed;bottom:88px;right:24px;z-index:9998;width:370px;max-height:560px;background:#0d1f35;border:1px solid #1e3a5c;border-radius:16px;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.5);transform:scale(.9) translateY(20px);opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease;}
+#els-chat-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all;}
+#els-chat-header{padding:14px 16px 12px;background:linear-gradient(90deg,#1a3a5c,#1d4d8a);border-radius:16px 16px 0 0;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+#els-chat-header-icon{width:32px;height:32px;border-radius:50%;background:rgba(74,158,255,.2);border:1px solid rgba(74,158,255,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#els-chat-header-text{flex:1;}
+#els-chat-header-title{font-size:13px;font-weight:700;color:#fff;letter-spacing:.3px;}
+#els-chat-header-sub{font-size:10px;color:#7aadcc;margin-top:1px;}
+#els-chat-close{background:none;border:none;color:#7aadcc;cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;}
+#els-chat-close:hover{color:#fff;background:rgba(255,255,255,.1);}
+#els-chat-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:0;max-height:400px;}
+#els-chat-messages::-webkit-scrollbar{width:4px;}
+#els-chat-messages::-webkit-scrollbar-track{background:transparent;}
+#els-chat-messages::-webkit-scrollbar-thumb{background:#1e3a5c;border-radius:4px;}
+.els-msg{display:flex;flex-direction:column;max-width:90%;}
+.els-msg.user{align-self:flex-end;align-items:flex-end;}
+.els-msg.bot{align-self:flex-start;align-items:flex-start;}
+.els-msg-bubble{padding:9px 13px;border-radius:12px;font-size:12.5px;line-height:1.55;word-break:break-word;}
+.els-msg.user .els-msg-bubble{background:#2d6fbd;color:#fff;border-bottom-right-radius:3px;}
+.els-msg.bot .els-msg-bubble{background:#112840;color:#c8dff0;border-bottom-left-radius:3px;border:1px solid #1e3a5c;}
+.els-msg-bubble a{color:#4a9eff;text-decoration:underline;}
+.els-msg-bubble strong{color:#fff;}
+.els-msg-bubble .els-tag{display:inline-block;background:rgba(74,158,255,.15);color:#7aadcc;font-size:10px;padding:1px 6px;border-radius:4px;margin:2px 2px 0 0;}
+.els-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.els-chip{background:rgba(74,158,255,.12);border:1px solid rgba(74,158,255,.25);color:#7aadcc;font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;transition:background .15s,color .15s;}
+.els-chip:hover{background:rgba(74,158,255,.25);color:#fff;}
+#els-chat-footer{padding:10px 12px;border-top:1px solid #1e3a5c;display:flex;gap:8px;flex-shrink:0;}
+#els-chat-input{flex:1;background:#071422;border:1px solid #1e3a5c;border-radius:8px;color:#c8dff0;font-size:12.5px;padding:8px 12px;outline:none;font-family:inherit;}
+#els-chat-input::placeholder{color:#3a5a78;}
+#els-chat-input:focus{border-color:#2d6fbd;}
+#els-chat-send{background:#2d6fbd;border:none;border-radius:8px;color:#fff;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;}
+#els-chat-send:hover{background:#3a82d4;}
+`;
+document.head.appendChild(style);
+
+// ── HTML ──────────────────────────────────────────────────────────────────────
+var btn=document.createElement('button');
+btn.id='els-chat-btn';
+btn.title='eLS Assistant';
+btn.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span id="els-chat-badge"></span>';
+document.body.appendChild(btn);
+
+var panel=document.createElement('div');
+panel.id='els-chat-panel';
+panel.innerHTML=`
+<div id="els-chat-header">
+  <div id="els-chat-header-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a9eff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+  <div id="els-chat-header-text"><div id="els-chat-header-title">eLS Assistant</div><div id="els-chat-header-sub">Ask about contacts, patches, reason codes & more</div></div>
+  <button id="els-chat-close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+</div>
+<div id="els-chat-messages"></div>
+<div id="els-chat-footer">
+  <input id="els-chat-input" type="text" placeholder="Ask me anything…" autocomplete="off" maxlength="200">
+  <button id="els-chat-send"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+</div>`;
+document.body.appendChild(panel);
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var open=false;
+var history=[];
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function tok(s){return (s||"").toLowerCase().replace(/[^a-z0-9 ]/g," ");}
+function match(q,s){var t=tok(q),w=tok(s);return t.split(" ").filter(Boolean).every(function(p){return w.indexOf(p)>=0;});}
+function score(q,s){var t=tok(q),w=tok(s),c=0;t.split(" ").filter(Boolean).forEach(function(p){if(w.indexOf(p)>=0)c++;});return c;}
+function scrollBottom(){var m=document.getElementById("els-chat-messages");m.scrollTop=m.scrollHeight;}
+
+function addMsg(role,html,chips){
+  var wrap=document.createElement("div");
+  wrap.className="els-msg "+role;
+  var bubble=document.createElement("div");
+  bubble.className="els-msg-bubble";
+  bubble.innerHTML=html;
+  wrap.appendChild(bubble);
+  if(chips&&chips.length){
+    var row=document.createElement("div");
+    row.className="els-chips";
+    chips.forEach(function(c){
+      var ch=document.createElement("button");
+      ch.className="els-chip";
+      ch.textContent=c;
+      ch.onclick=function(){handleSend(c);};
+      row.appendChild(ch);
+    });
+    wrap.appendChild(row);
+  }
+  document.getElementById("els-chat-messages").appendChild(wrap);
+  scrollBottom();
+}
+
+// ── BRAIN ─────────────────────────────────────────────────────────────────────
+function respond(q){
+  var ql=q.toLowerCase();
+  var qt=tok(q);
+  var words=qt.split(" ").filter(Boolean);
+
+  // ── GREETING ─────────────────────────────────────────────────────────────
+  if(/^(hi|hello|hey|sup|yo|hola|good morning|good afternoon)/.test(ql)){
+    return {html:"Hey! 👋 I'm your <strong>eLS Assistant</strong>. I can help you find:<br><br>• Contacts & reps by customer<br>• Patch / COI files<br>• Reason code definitions<br>• Customer portals<br>• Backup & repay notes<br>• Sign-on codes",
+      chips:["Patch files","Reason codes","Contact for HEB","Portal for Kroger"]};
+  }
+
+  // ── HELP ─────────────────────────────────────────────────────────────────
+  if(/\b(help|what can you do|capabilities|commands)\b/.test(ql)){
+    return {html:"Here's what I can answer:<br><br><strong>Contacts</strong> — <em>\"Who is the SBS rep for Giant Eagle?\"</em><br><strong>Patches</strong> — <em>\"Do we have a patch for Wakefern?\"</em><br><strong>Reason codes</strong> — <em>\"What is Post Audit?\"</em><br><strong>Portals</strong> — <em>\"Portal for ADUSA?\"</em><br><strong>Sign-ons</strong> — <em>\"Sign-on for Fareway\"</em><br><strong>Repay</strong> — <em>\"Repay info for AWG\"</em>",
+      chips:["Who is CRA for Albertsons","Patch for Publix","Sign-on for Fareway","What is POST AUDIT"]};
+  }
+
+  // ── PATCH FILE LOOKUP ─────────────────────────────────────────────────────
+  if(/patch|coi|file/.test(ql)){
+    var hits=[];
+    var customerQ=ql.replace(/patch|coi|file|do we have|for|the|a|an|is there/g," ").trim();
+    if(typeof PATCH_FILES!=="undefined"){
+      PATCH_FILES.forEach(function(p){
+        var s=score(customerQ,p.label);
+        if(s>0) hits.push({p:p,s:s});
+      });
+      hits.sort(function(a,b){return b.s-a.s;});
+    }
+    if(hits.length){
+      var top=hits.slice(0,5);
+      var html="Found <strong>"+hits.length+"</strong> patch file"+(hits.length>1?"s":"")+" matching <em>"+esc(customerQ.trim())+"</em>:<br><br>";
+      top.forEach(function(h){
+        html+='📄 <a href="'+esc(h.p.url)+'" download><strong>'+esc(h.p.label)+'</strong></a> <span class="els-tag">'+esc(h.p.group)+'</span><br>';
+      });
+      if(hits.length>5) html+="<br><em>…and "+(hits.length-5)+" more. Try a more specific name.</em>";
+      return {html:html};
+    }
+    // no customer specified — list groups
+    if(/patch|coi/.test(ql)&&customerQ.length<3){
+      return {html:"I have patch files across these groups:<br><br><span class='els-tag'>General</span> "+
+        (typeof PATCH_FILES!=="undefined"?PATCH_FILES.filter(function(p){return p.group==="General";}).length:0)+" files<br>"+
+        "<span class='els-tag'>8.17.2026</span> "+
+        (typeof PATCH_FILES!=="undefined"?PATCH_FILES.filter(function(p){return p.group==="8.17.2026";}).length:0)+" files<br><br>Try: <em>\"patch for Giant Eagle\"</em>",
+        chips:["Patch for Wakefern","Patch for CERTCO","Patch for LIDL","All patch files"]};
+    }
+    return {html:"I didn't find a patch file matching <em>"+esc(customerQ.trim())+"</em>. Try the customer name, e.g. <em>\"patch for Giant Eagle\"</em>.",chips:["All patch files","Patch for Wakefern","Patch for Publix"]};
+  }
+
+  // ── ALL PATCH FILES ───────────────────────────────────────────────────────
+  if(/all patch|list patch|show patch|all files/.test(ql)){
+    if(typeof PATCH_FILES==="undefined") return {html:"Patch data not loaded."};
+    var gen=PATCH_FILES.filter(function(p){return p.group==="General";});
+    var html="<strong>General Patch Files ("+gen.length+")</strong><br>";
+    gen.forEach(function(p){html+='📄 <a href="'+esc(p.url)+'" download>'+esc(p.label)+'</a><br>';});
+    var batches={};
+    PATCH_FILES.filter(function(p){return p.group!=="General";}).forEach(function(p){batches[p.group]=batches[p.group]||[];batches[p.group].push(p);});
+    Object.keys(batches).forEach(function(g){
+      html+="<br><strong>Batch: "+esc(g)+" ("+batches[g].length+")</strong><br>";
+      batches[g].forEach(function(p){html+='📄 <a href="'+esc(p.url)+'" download>'+esc(p.label)+'</a><br>';});
+    });
+    return {html:html};
+  }
+
+  // ── REASON CODES ─────────────────────────────────────────────────────────
+  if(/reason code|rc|reason|code/.test(ql)&&typeof RC!=="undefined"){
+    var rcQ=ql.replace(/reason code|reason|code|what is|what's|define|explain|tell me about/g," ").trim();
+    var rcHits=[];
+    RC.forEach(function(r){
+      var s=score(rcQ,r.code+" "+r.desc);
+      if(s>0) rcHits.push({r:r,s:s});
+    });
+    rcHits.sort(function(a,b){return b.s-a.s;});
+    if(rcHits.length){
+      var top2=rcHits.slice(0,3);
+      var html="";
+      top2.forEach(function(h){
+        html+="<strong>"+esc(h.r.code)+"</strong><br>"+esc(h.r.desc)+"<br><span class='els-tag'>Key Q</span> "+esc(h.r.q)+"<br><br>";
+      });
+      return {html:html.trim()};
+    }
+    // list all codes
+    if(rcQ.length<3){
+      var html="Here are all <strong>"+RC.length+"</strong> reason codes:<br><br>";
+      RC.forEach(function(r){html+="• "+esc(r.code)+"<br>";});
+      return {html:html,chips:["What is Post Audit","What is Duplicate Deduction","What is Freight"]};
+    }
+    return {html:"Couldn't find reason code <em>"+esc(rcQ)+"</em>. Try the exact code name, e.g. <em>\"Post Audit\"</em>.",chips:["List all reason codes","What is Freight","What is Shortages"]};
+  }
+
+  // ── PORTAL LOOKUP ─────────────────────────────────────────────────────────
+  if(/portal|website|link|url|login|log in/.test(ql)&&typeof PORTALS!=="undefined"){
+    var pQ=ql.replace(/portal|website|link|url|login|log in|for|the|what is|where is/g," ").trim();
+    var pHits=[];
+    PORTALS.forEach(function(p){
+      var s=score(pQ,p.name+" "+p.desc);
+      if(s>0) pHits.push({p:p,s:s});
+    });
+    pHits.sort(function(a,b){return b.s-a.s;});
+    if(pHits.length){
+      var html="";
+      pHits.slice(0,3).forEach(function(h){
+        html+="<strong>"+esc(h.p.name)+"</strong><br>"+esc(h.p.desc)+"<br>";
+        if(h.p.url) html+='🔗 <a href="'+esc(h.p.url)+'" target="_blank" rel="noopener">Open Portal</a>';
+        else html+="⚠️ No portal available.";
+        html+="<br><br>";
+      });
+      return {html:html.trim()};
+    }
+    var html="<strong>Customer Portals:</strong><br><br>";
+    PORTALS.forEach(function(p){
+      html+="• "+esc(p.name);
+      if(p.url) html+=' — <a href="'+esc(p.url)+'" target="_blank" rel="noopener">Open</a>';
+      html+="<br>";
+    });
+    return {html:html};
+  }
+
+  // ── CONTACT / REP LOOKUP ─────────────────────────────────────────────────
+  if(/contact|rep|who|manager|director|acosta|cra|bma|coordinator|sbs|pet|coffee|fhs|f&b/.test(ql)&&typeof DIRECT!=="undefined"){
+    var divPref="";
+    if(/\bsbs\b/.test(ql)) divPref="SBS";
+    else if(/\bpet\b/.test(ql)) divPref="Pet";
+    else if(/\bcoffee\b/.test(ql)) divPref="Coffee";
+    else if(/\bfhs\b|\bf&b\b/.test(ql)) divPref="FHS";
+
+    var custQ=ql.replace(/contact|rep|who is|who are|the|for|manager|director|acosta|cra|bma|coordinator|sbs|pet|coffee|fhs|f&b|of|at/g," ").trim();
+
+    // Search DIRECT first
+    var dHits=[];
+    DIRECT.forEach(function(r){
+      var s=score(custQ,r[0]);
+      if(s>0&&(!divPref||r[1]===divPref)) dHits.push({r:r,s:s,src:"direct"});
+    });
+    dHits.sort(function(a,b){return b.s-a.s;});
+
+    if(dHits.length){
+      var best=dHits[0].r;
+      var divs=dHits.filter(function(h){return h.r[0]===best[0];});
+      var html="<strong>"+esc(best[0])+"</strong> contacts:<br><br>";
+      divs.forEach(function(h){
+        var r=h.r;
+        html+="<span class='els-tag'>"+esc(r[1])+"</span><br>";
+        if(r[2]) html+="JMS Rep: <strong>"+esc(r[2])+"</strong>"+(r[3]?' — <a href="mailto:'+esc(r[3])+'">'+esc(r[3])+"</a>":"")+"<br>";
+        if(r[4]) html+="Director: "+esc(r[4])+(r[5]?' — <a href="mailto:'+esc(r[5])+'">'+esc(r[5])+"</a>":"")+"<br>";
+        if(r[10]) html+="Acosta HQ BMA: "+esc(r[10])+(r[11]?' — <a href="mailto:'+esc(r[11])+'">'+esc(r[11])+"</a>":"")+"<br>";
+        if(r[12]) html+="CRA: <strong>"+esc(r[12])+"</strong>"+(r[13]?" / "+esc(r[13]):"")+"<br>";
+        html+="<br>";
+      });
+      return {html:html.trim()};
+    }
+
+    // Fallback to ACOSTA data
+    if(typeof ACOSTA!=="undefined"){
+      var aHits=[];
+      ACOSTA.forEach(function(r){
+        var s=score(custQ,r[0]);
+        if(s>0) aHits.push({r:r,s:s});
+      });
+      aHits.sort(function(a,b){return b.s-a.s;});
+      if(aHits.length){
+        var best=aHits[0].r;
+        var html="<strong>"+esc(best[0])+"</strong>:<br><br>";
+        html+="JMS Rep: <strong>"+esc(best[2])+"</strong>"+(best[3]?' — <a href="mailto:'+esc(best[3])+'">'+esc(best[3])+"</a>":"")+"<br>";
+        if(best[4]) html+="Director: "+esc(best[4])+(best[5]?' — <a href="mailto:'+esc(best[5])+'">'+esc(best[5])+"</a>":"")+"<br>";
+        return {html:html};
+      }
+    }
+    return {html:"I couldn't find contacts for <em>"+esc(custQ)+"</em>. Try using the customer name, e.g. <em>\"contact for HEB\"</em>.",chips:["Contact for Giant Eagle","Contact for Ahold","Contact for HyVee"]};
+  }
+
+  // ── SIGN-ON LOOKUP ────────────────────────────────────────────────────────
+  if(/sign.?on|signon|customer code|cust code/.test(ql)&&typeof CONTACTS!=="undefined"){
+    var snQ=ql.replace(/sign.?on|signon|customer code|cust code|what is|for|the/g," ").trim();
+    var snHits=[];
+    CONTACTS.forEach(function(r){
+      var s=score(snQ,r[3]+" "+r[2]);
+      if(s>0) snHits.push({r:r,s:s});
+    });
+    snHits.sort(function(a,b){return b.s-a.s;});
+    if(snHits.length){
+      var html="";
+      snHits.slice(0,5).forEach(function(h){
+        var r=h.r;
+        html+="<strong>"+esc(r[3])+"</strong> — Sign-on: <span class='els-tag'>"+esc(r[2])+"</span><br>";
+        if(r[1]) html+="Branch: "+esc(r[1])+"<br>";
+        if(r[4]) html+="Client Mgr: "+esc(r[4])+"<br>";
+        html+="<br>";
+      });
+      return {html:html.trim()};
+    }
+    return {html:"No sign-on found for <em>"+esc(snQ)+"</em>.",chips:["Sign-on for Fareway","Sign-on for Jetro","Sign-on for Wakefern"]};
+  }
+
+  // ── BPS / REPAY / BACKUP ──────────────────────────────────────────────────
+  if(/repay|backup|bps|notes|check remit|portal.*backup/.test(ql)&&typeof BPS_DATA!=="undefined"){
+    var bQ=ql.replace(/repay|backup|bps|notes|check remit|info|for|the|what is|how do i/g," ").trim();
+    var bHits=[];
+    BPS_DATA.forEach(function(r){
+      var s=score(bQ,r[0]+" "+r[5]);
+      if(s>0) bHits.push({r:r,s:s});
+    });
+    bHits.sort(function(a,b){return b.s-a.s;});
+    if(bHits.length){
+      var r=bHits[0].r;
+      var html="<strong>"+esc(r[0])+"</strong> <span class='els-tag'>"+esc(r[1])+"</span><br><br>";
+      html+="<strong>Repay:</strong> "+esc(r[2])+"<br><br>";
+      html+="<strong>Portal:</strong> "+(r[3]==="yes"?"✅ Yes":"❌ No portal")+"<br>";
+      if(r[4]) html+="<strong>Backup contact:</strong> "+esc(r[4])+"<br>";
+      if(r[5]) html+="<br><strong>Notes:</strong> "+esc(r[5].substring(0,320))+(r[5].length>320?"…":"");
+      return {html:html};
+    }
+    return {html:"No repay/backup info found for <em>"+esc(bQ)+"</em>.",chips:["Repay info for AWG","Backup for ADUSA","Notes for Brookshire"]};
+  }
+
+  // ── NATURAL/SPECIALTY CONTACTS ────────────────────────────────────────────
+  if(/natural|specialty|natdist|kehe|unfi natural/.test(ql)&&typeof NATDIST!=="undefined"){
+    var nQ=ql.replace(/natural|specialty|natdist|contact|for|the/g," ").trim();
+    var nHits=[];
+    NATDIST.forEach(function(r){
+      var s=score(nQ,r[0]+" "+r[1]);
+      if(s>0) nHits.push({r:r,s:s});
+    });
+    nHits.sort(function(a,b){return b.s-a.s;});
+    if(nHits.length){
+      var html="<strong>Natural/Specialty Contacts:</strong><br><br>";
+      nHits.slice(0,4).forEach(function(h){
+        var r=h.r;
+        html+="<strong>"+esc(r[0])+"</strong> via <span class='els-tag'>"+esc(r[1])+"</span><br>";
+        html+="JMS: "+esc(r[2])+(r[3]?' (<a href="mailto:'+esc(r[3])+'">email</a>)':"")+"<br>";
+        html+="Acosta: "+esc(r[5])+(r[6]?" — "+esc(r[6]):"")+"<br><br>";
+      });
+      return {html:html.trim()};
+    }
+    var html="<strong>All Natural/Specialty Accounts:</strong><br><br>";
+    NATDIST.forEach(function(r){html+="• "+esc(r[0])+" via "+esc(r[1])+"<br>";});
+    return {html:html};
+  }
+
+  // ── REPAY LETTERS ─────────────────────────────────────────────────────────
+  if(/repay letter|letter|template/.test(ql)&&typeof RL_LIST!=="undefined"){
+    var rlQ=ql.replace(/repay letter|letter|template|for|the|get|download/g," ").trim();
+    var rlHits=[];
+    RL_LIST.forEach(function(r){
+      var s=score(rlQ,r.label);
+      if(s>0&&r.url) rlHits.push({r:r,s:s});
+    });
+    rlHits.sort(function(a,b){return b.s-a.s;});
+    if(rlHits.length){
+      var html="Found "+rlHits.length+" repay letter"+(rlHits.length>1?"s":"")+":<br><br>";
+      rlHits.slice(0,5).forEach(function(h){
+        html+='📄 <a href="'+esc(h.r.url)+'" download>'+esc(h.r.label)+'</a><br>';
+      });
+      return {html:html};
+    }
+    var html="<strong>Available Repay Letters:</strong><br><br>";
+    RL_LIST.filter(function(r){return r.url;}).forEach(function(r){
+      html+='📄 <a href="'+esc(r.url)+'" download>'+esc(r.label)+'</a><br>';
+    });
+    return {html:html};
+  }
+
+  // ── FALLBACK ──────────────────────────────────────────────────────────────
+  // Try a broad search across everything
+  var broad=[];
+  if(typeof PATCH_FILES!=="undefined") PATCH_FILES.forEach(function(p){if(score(qt,p.label)>0) broad.push("📄 Patch: <strong>"+esc(p.label)+"</strong>");});
+  if(typeof RC!=="undefined") RC.forEach(function(r){if(score(qt,r.code)>0) broad.push("🔖 Reason Code: <strong>"+esc(r.code)+"</strong> — "+esc(r.desc));});
+  if(typeof PORTALS!=="undefined") PORTALS.forEach(function(p){if(score(qt,p.name)>0&&p.url) broad.push("🔗 Portal: <strong>"+esc(p.name)+"</strong>");});
+  if(typeof BPS_DATA!=="undefined") BPS_DATA.forEach(function(r){if(score(qt,r[0])>0) broad.push("📋 BPS: <strong>"+esc(r[0])+"</strong>");});
+
+  if(broad.length){
+    return {html:"Here's what I found for <em>"+esc(q)+"</em>:<br><br>"+broad.slice(0,6).join("<br>")+(broad.length>6?"<br>…and more":"")};
+  }
+
+  return {html:"I couldn't find anything for <em>"+esc(q)+"</em>. Try asking about:<br><br>• A customer name (e.g. <em>Giant Eagle</em>)<br>• Patch files, reason codes, portals<br>• Contacts, sign-ons, repay info",
+    chips:["Patch for Wakefern","What is Post Audit","Contact for HEB","Portal for Kroger"]};
+}
+
+// ── SEND ─────────────────────────────────────────────────────────────────────
+function handleSend(text){
+  var q=(text||document.getElementById("els-chat-input").value).trim();
+  if(!q) return;
+  document.getElementById("els-chat-input").value="";
+  addMsg("user",esc(q));
+  history.push({role:"user",text:q});
+  setTimeout(function(){
+    var res=respond(q);
+    addMsg("bot",res.html,res.chips||[]);
+  },120);
+}
+
+// ── EVENTS ────────────────────────────────────────────────────────────────────
+btn.onclick=function(){
+  open=!open;
+  panel.classList.toggle("open",open);
+  if(open&&document.getElementById("els-chat-messages").children.length===0){
+    addMsg("bot","👋 Hi! I'm your <strong>eLS Assistant</strong>. Ask me about patch files, contacts, reason codes, portals, or sign-ons.",
+      ["Patch files","Reason codes","Contact for HEB","Portal for ADUSA"]);
+  }
+  if(open) setTimeout(function(){document.getElementById("els-chat-input").focus();},200);
+};
+document.getElementById("els-chat-close").onclick=function(e){e.stopPropagation();open=false;panel.classList.remove("open");};
+document.getElementById("els-chat-send").onclick=function(){handleSend();};
+document.getElementById("els-chat-input").onkeydown=function(e){if(e.key==="Enter")handleSend();};
+
+})();
 </script>
 </body>
 </html>
